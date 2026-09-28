@@ -72,7 +72,8 @@ MD / HTML / PDF
 - Repository 证据边界：`policies/repository-evidence-policy.md`
 - Metric：`policies/metric-policy.md`
 - Resume Bullet 写作：`policies/resume-writing-policy.md`
-- 知识递归：`policies/knowledge-expansion-policy.md`
+- 知识递归：`policies/knowledge-expansion-policy.md
+- `examples/interview-expansion-examples.md`：高价值知识节点判定与详细回答示例`
 - 面试递归深度：`policies/interview-depth-policy.md`
 - Mock Interview 回答评估：`policies/answer-assessment-policy.md`
 

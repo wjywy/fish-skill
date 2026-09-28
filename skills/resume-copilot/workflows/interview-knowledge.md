@@ -91,39 +91,88 @@ Generate Follow-up Answer
 > 旁白：当前项目可以确认存在 Outbox / Worker 链路，但消费侧具体采用哪一种幂等实现尚未核实；面试时需要按你的真实实现补充。
 ```
 
+## Answer Detail Standard
+
+Interview Knowledge 的参考答案默认应当达到“用户可以直接拿来学习和复习”的详细程度，而不是只给一两句话的摘要。
+
+根据问题复杂度按需使用：
+
+- 分层解释：先结论，再原理，再结合项目场景
+- 步骤列表：适合流程、实现、排查、设计题
+- 对比表格：适合方案选择、协议 / 框架区别、tradeoff
+- ASCII / Mermaid 流程图：适合链路、状态流转、Agent 编排、数据流、时序关系
+- 伪代码 / 示例结构：适合接口、状态机、数据结构、算法机制
+- 具体例子：帮助把抽象机制落到可理解场景
+
+如果一个流程图可以显著降低理解成本，应优先绘制流程图，不要只用一段文字描述。
+
+例如：
+
+```mermaid
+flowchart LR
+  A[用户请求] --> B[意图解析]
+  B --> C{信息是否完整}
+  C -- 否 --> D[返回澄清问题]
+  D --> A
+  C -- 是 --> E[执行 Agent Workflow]
+  E --> F[生成结果]
+```
+
+回答长度由问题复杂度决定，不为了简短而省略关键因果链、边界和步骤。
+
+但也不要为了“详细”做百科式扩写：所有补充内容仍应服务当前问题与目标岗位。
+
 ## Answer-driven Knowledge Expansion
 
-系统生成参考答案后，从答案中抽取具有面试价值的知识节点继续展开。
+系统生成参考答案后，不是简单“抽取所有技术关键词”，而是先产生 Candidate Knowledge Node，再按 `policies/knowledge-expansion-policy.md` 判断哪些节点值得继续展开。
+
+候选节点可以来自：
+
+- 答案中显式出现的关键概念或机制
+- 当前机制隐含但没有直接写出的必要工程问题
+- 技术选择自然引出的替代方案 / 取舍
+- 正常路径自然引出的边界条件
+
+是否继续追问只看它能否显著增加：
+
+1. 对 Target Role / JD 匹配程度的判断
+2. 对当前 Resume Claim 的理解深度
+3. 对候选人真实能力层级的区分度
+
+不得使用某些技术主题作为默认白名单。节点类型只用于分类。
 
 例如：
 
 ```text
-Q: 为什么需要 Outbox？
+Claim: 基于 Schema 驱动低代码页面编辑与运行时渲染
 
-A: 为了解决数据库状态更新与消息发送之间的双写一致性问题，
-可以在同一个本地事务里同时更新 Task 和写入 Outbox Event，
-之后由 Worker 异步投递。
+Answer 中出现：Schema / JSON / 运行时解析
+
+Schema
+→ 与 Claim 强相关、岗位相关、区分度高
+→ 继续追问
+
+JSON
+→ 若仅是序列化格式，问“JSON 是什么”几乎不增加岗位判断信息
+→ 不追问
 ```
 
-可抽取：
-
-- 双写一致性 → `CONSISTENCY`
-- 本地事务 → `MECHANISM`
-- Outbox Event → `DATA_MODEL`
-- Worker 异步投递 → `IMPLEMENTATION`
-
-继续生成：
+再例如：
 
 ```text
-Q: 什么是双写一致性问题？
-A: ...
-
-Q: 为什么 Task 与 Outbox Event 要在同一个事务里？
-A: ...
-
-Q: Worker 重复投递怎么办？
-A: ...
+Outbox
+→ 幂等
+→ 并发去重
+→ 唯一约束
+→ 事务隔离
 ```
+
+只要这些问题仍能帮助判断目标岗位需要的能力，即使已经远离 `Outbox` 字面关键词也应继续。
+
+详细判定流程和更多跨岗位示例见：
+
+- `policies/knowledge-expansion-policy.md`
+- `examples/interview-expansion-examples.md`
 
 ## Knowledge Node 类型
 
@@ -151,28 +200,17 @@ A: ...
 
 ## Expansion Priority
 
-当答案中出现多个节点时，按优先级展开：
+多个 Candidate Node 都通过高价值判定后，再根据以下顺序决定优先展开谁：
 
-```text
-DECISION / TRADEOFF / FAILURE / RECOVERY
-        ↓
-CONSISTENCY / CONCURRENCY / IDEMPOTENCY
-        ↓
-IMPLEMENTATION / ARCHITECTURE / PERFORMANCE / METRIC
-        ↓
-MECHANISM / PROTOCOL / DATA_MODEL
-        ↓
-CONCEPT / TECHNOLOGY
-```
+1. 与 Target Role / JD 更相关
+2. 对当前 Claim 的解释依赖更强
+3. 更能区分候选人的能力层级
+4. 预期信息增益更高
+5. 与已有问题重复更少
 
-同时考虑：
+默认每个父节点一次展开 1–3 个最高价值节点。
 
-- 是否直接支撑当前 Claim
-- 是否与 JD 高相关
-- 是否属于强措辞暴露的责任
-- 是否是面试官很可能继续追问的节点
-
-默认每个父节点只扩展 1–3 个高价值子节点。
+`CONCEPT / MECHANISM / FAILURE / TRADEOFF` 等 Knowledge Node 类型不得作为直接优先级依据。
 
 ## 去重与环路控制
 
