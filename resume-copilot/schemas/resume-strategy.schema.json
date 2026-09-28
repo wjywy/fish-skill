@@ -3,41 +3,171 @@
   "$id": "https://resume-copilot.local/schemas/resume-strategy.schema.json",
   "title": "Resume Strategy",
   "type": "object",
-  "required": ["id", "targetId", "selectedExperienceIds", "selectedClaimIds", "sectionPlan", "requirementCoverage"],
+  "required": [
+    "id",
+    "targetId",
+    "selectedExperienceIds",
+    "selectedClaimIds",
+    "sectionPlan",
+    "requirementCoverage"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "targetId": {"type": "string"},
-    "objective": {"type": ["string", "null"]},
+    "id": {
+      "type": "string"
+    },
+    "targetId": {
+      "type": "string"
+    },
+    "objective": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "requirements": {
       "type": "array",
-      "items": {"$ref": "jd-requirement.schema.json"}
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "statement",
+          "importance"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "responsibility",
+              "skill",
+              "domain",
+              "architecture",
+              "collaboration",
+              "leadership",
+              "outcome",
+              "other"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "importance": {
+            "type": "string",
+            "enum": [
+              "MUST",
+              "IMPORTANT",
+              "NICE_TO_HAVE"
+            ]
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "evidenceNeeded": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sourceText": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "requirementCoverage": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["requirementId", "status", "claimIds"],
+        "required": [
+          "requirementId",
+          "status",
+          "claimIds"
+        ],
         "properties": {
-          "requirementId": {"type": "string"},
-          "status": {"type": "string", "enum": ["covered", "weakly_covered", "gap"]},
-          "claimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-          "notes": {"type": ["string", "null"]}
+          "requirementId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "covered",
+              "weakly_covered",
+              "gap"
+            ]
+          },
+          "claimIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         },
         "additionalProperties": false
       }
     },
-    "selectedExperienceIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "selectedClaimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "selectedExperienceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "selectedClaimIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "claimScores": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["claimId", "score"],
+        "required": [
+          "claimId",
+          "score"
+        ],
         "properties": {
-          "claimId": {"type": "string"},
-          "score": {"type": "number", "minimum": 0, "maximum": 100},
-          "matchedRequirementIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-          "reason": {"type": ["string", "null"]}
+          "claimId": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "matchedRequirementIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         },
         "additionalProperties": false
       }
@@ -46,14 +176,33 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["claimId", "reason"],
+        "required": [
+          "claimId",
+          "reason"
+        ],
         "properties": {
-          "claimId": {"type": "string"},
+          "claimId": {
+            "type": "string"
+          },
           "reason": {
             "type": "string",
-            "enum": ["low_relevance", "weak_evidence", "ownership_too_weak", "high_risk", "redundant", "space_budget", "not_resume_eligible", "other"]
+            "enum": [
+              "low_relevance",
+              "weak_evidence",
+              "ownership_too_weak",
+              "high_risk",
+              "redundant",
+              "space_budget",
+              "not_resume_eligible",
+              "other"
+            ]
           },
-          "notes": {"type": ["string", "null"]}
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         },
         "additionalProperties": false
       }
@@ -62,19 +211,55 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["section", "priority"],
+        "required": [
+          "section",
+          "priority"
+        ],
         "properties": {
-          "section": {"type": "string"},
-          "priority": {"type": "integer", "minimum": 1},
-          "budget": {"type": ["string", "number", "null"]},
-          "experienceIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+          "section": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "budget": {
+            "type": [
+              "string",
+              "number",
+              "null"
+            ]
+          },
+          "experienceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
         },
         "additionalProperties": false
       }
     },
-    "emphasis": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "coverageGaps": {"type": "array", "items": {"type": "string"}},
-    "riskNotes": {"type": "array", "items": {"type": "string"}}
+    "emphasis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "coverageGaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "riskNotes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
   },
   "additionalProperties": false
 }

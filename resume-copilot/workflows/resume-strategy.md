@@ -31,7 +31,7 @@ Strategy 不负责润色句子，不负责 HTML/PDF 排版，也不得创造新�
 
 ## 3. JD 解析
 
-如果提供 JD，将其拆成 `JDRequirement`，不要只做关键词匹配。
+如果提供 JD，将其拆成结构化 requirements，不要只做关键词匹配。
 
 每条 requirement 至少包含：
 
@@ -135,7 +135,7 @@ Claim 与目标岗位 / JD requirement 的语义匹配程度。
 
 ## 6. 不是“JD 有什么就硬塞什么”
 
-JD Tailoring 的底线：
+基于 JD 做 Strategy 时的底线：
 
 ```text
 JD Requirement → Search Existing Claims → Select / Reframe

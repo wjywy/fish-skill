@@ -2,102 +2,62 @@
 
 ## 目标
 
-允许用户从任意粒度开始，而不是要求用户先准备结构化工作经历。
+允许用户从任意粒度开始，而不要求理解 Resume Copilot 的内部 Schema。
 
 可接受输入包括：
+- 按项目 / 经历组织的关键词与描述
 - 一句话或零散描述
 - 旧简历
 - JD
 - 项目 README / 方案文档
-- GitHub / Repository 描述
+- Repository / Coding Agent 当前工作区
 - 周报、季度总结、述职材料
 - 已有聊天内容
 
-## 原则
+## 核心原则
 
-1. 用户只负责提供材料，不需要理解 Resume Copilot 的 Schema。
-2. 不直接把原始材料当作事实源；先抽取 Candidate Facts。
-3. 从文件或文档抽取出的强表述，若 ownership / result / metric 未被用户确认，默认 `needs_confirmation`。
-4. JD 只用于目标岗位分析，不得作为用户经历证据。
-5. README / 代码仓库可以证明“项目存在某能力”，但不能自动证明“用户本人实现了该能力”。
+1. 原始材料先转成 `Fact`，再进入 Experience / Claim。
+2. JD 只用于目标岗位分析，不作为用户经历证据。
+3. 文档、README、代码仓库可以证明“项目存在某能力”，不能自动证明“用户本人实现了该能力”。
+4. 用户已经按项目 / 经历分组时，不再次做自动聚类。
+5. 用户目标是生成简历时，优先 Draft-first；已有足够信息就先给可讨论 Draft，再补关键缺口。
 
-## 流程
-
-用户目标是“生成简历”时，优先采用 Draft-first Bootstrap，而不是先完成整套采访。
+## 主链路
 
 ```text
 Raw Career Input
       ↓
-Extract Keyword Signals
+Facts
       ↓
-Resume Bootstrap
+Resume Bootstrap / Experience Mining
       ↓
-Candidate Resume Skeleton + Gaps
-      ↓
-Extract Candidate Facts
-      ↓
-Targeted Questions
-      ↓
-Confirmed Facts
+Verification
       ↓
 Experience + Claim + Metric
 ```
 
-具体规则见 `workflows/resume-bootstrap.md`。
+## 场景处理
 
-## Candidate Fact 抽取
+### 用户给一段经历 + 关键词
 
-从原始输入中优先抽取：
-- Context：为什么做、原始问题是什么
-- Role / Ownership：用户扮演什么角色
-- Action：实际做了什么
-- Decision：是否存在技术取舍
-- Result：产生了什么结果
-- Metric：是否存在量化数据
-- Technology：涉及哪些技术
-- Timeline / Scope：时间与影响范围
+直接进入 `resume-bootstrap.md`。不要要求用户填写表单，也不要把其他经历关键词混入当前项目。
 
-每个 Candidate Fact 必须保留 `sourceInputIds`，确保后续可追溯。
+### 用户给旧简历 / 工作总结
 
-## 输入场景处理
+抽取 Facts，区分已明确事实、需要确认的 Ownership、Result 和 Metric；只追问缺失和高风险部分。
 
-### 1. 用户只给一句话
+### 用户给 JD
 
-例如：`我做过一个 RAG 项目。`
+JD 进入 Resume Strategy 的 requirement 解析，不进入 Career Evidence。若没有任何经历材料，再询问最相关的一段经历作为起点。
 
-不要要求用户填写结构化表单。
+### 用户给 README / 项目文档
 
-如果用户目标是“帮我生成简历”，先进入 `resume-bootstrap.md`：
-- 提取 RAG / 项目等 Keyword Signals；
-- 生成候选项目骨架；
-- 明确缺失的 Context / Ownership / Action / Result；
-- 再进入 `experience-mining.md` 对最高价值缺口追问。
+抽取项目事实，Ownership 默认未验证；需要写入人物简历的能力再做 Ownership 确认。
 
-如果用户只是想讲经历或整理事实，可以直接进入 Experience Mining。
+### 用户要求结合当前 Coding Agent 项目
 
-### 2. 用户给旧简历
-
-先提取 Candidate Facts，并区分：
-- 已经明确的事实
-- 需要用户确认 ownership 的表述
-- 需要确认来源的 metric
-- 疑似润色而非事实的表述
-
-只追问缺失和高风险部分，不从头重新采访。
-
-### 3. 用户给 JD
-
-JD 进入 Target / Requirement 模型，不进入 Career Evidence。
-若只有 JD 没有经历材料，则进入 INTAKE，询问最相关的一段经历作为起点。
-
-### 4. 用户给项目 README / Repository
-
-可抽取 Candidate Facts，但必须把“项目能力”和“用户 ownership”分开。
-例如 README 写 `支持 Outbox`，只能得到：
-`项目存在 Outbox 能力`。
-只有用户确认后，才能形成：
-`用户直接实现 Outbox Worker`。
+进入 `repository-inspection.md`，主动检查当前工作区。仓库得到的事实统一写入 `Fact`，`sourceType = REPOSITORY`，Ownership 初始为 `UNVERIFIED`。
 
 ## 停止条件
 
-当已有信息足以生成至少一个 Candidate Experience 时，转入 `experience-mining.md`；不要为了完整性强迫用户一次性交代全部职业经历。
+当已有信息足以生成至少一个 Candidate Experience 或正式 Bullet 时进入后续流程，不为了“资料完整”强迫用户一次性交代全部职业经历。

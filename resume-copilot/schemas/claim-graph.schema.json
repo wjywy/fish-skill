@@ -1,16 +1,48 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "claim-graph.schema.json",
-  "title": "Claim Graph",
+  "title": "Interview Knowledge Graph",
   "type": "object",
-  "required": ["claimId", "rootNodeIds", "nodes", "questions", "answers"],
+  "required": [
+    "claimId",
+    "rootNodeIds",
+    "nodes",
+    "questions",
+    "generatedAnswers"
+  ],
   "properties": {
-    "claimId": { "type": "string" },
-    "rootNodeIds": { "type": "array", "items": { "type": "string" } },
-    "nodes": { "type": "array", "items": { "$ref": "interview-node.schema.json" } },
-    "questions": { "type": "array", "items": { "$ref": "interview-question.schema.json" } },
-    "answers": { "type": "array", "items": { "$ref": "interview-answer.schema.json" } },
-    "maxDepth": { "type": "integer", "minimum": 1, "default": 8 }
+    "claimId": {
+      "type": "string"
+    },
+    "rootNodeIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "interview-knowledge-node.schema.json"
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "$ref": "interview-question.schema.json"
+      }
+    },
+    "generatedAnswers": {
+      "type": "array",
+      "items": {
+        "$ref": "generated-answer.schema.json"
+      }
+    },
+    "maxDepth": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 8
+    }
   },
   "additionalProperties": false
 }

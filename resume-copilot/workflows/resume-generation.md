@@ -25,9 +25,8 @@ Resume Generation 回答“已经决定要写这些事实后，应该怎么组�
 7. 去除重复 Claim 和重复技术词。
 8. 检查每条 bullet 是否可追溯回 Claim。
 9. 输出 Resume View。
-10. 生成 Resume View。
-11. 如需 HTML / PDF，进入 `workflows/theme-selection.md` 解析主题；未指定则使用 `kami-default`。
-12. 最后交给 Renderer。
+10. 如需 HTML / PDF，由 Renderer 解析 `renderOptions`；未指定主题则使用 `kami-default`。
+11. 最后交给 Renderer。
 
 ## Bullet 生成原则
 

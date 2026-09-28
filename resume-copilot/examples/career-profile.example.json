@@ -10,20 +10,6 @@
       "metadata": {}
     }
   ],
-  "candidateFacts": [
-    {
-      "id": "fact-001",
-      "statement": "新品发布流程从全量刷新改为按变更页面增量刷新",
-      "category": "action",
-      "status": "confirmed",
-      "sourceInputIds": [
-        "input-001"
-      ],
-      "experienceId": "exp-release",
-      "confidence": "high",
-      "notes": null
-    }
-  ],
   "profile": {
     "name": null,
     "headline": null,
@@ -49,9 +35,22 @@
   "skills": [],
   "resumeStrategies": [],
   "resumeViews": [],
-  "interviewCoverage": {
-    "exposedClaimIds": [],
-    "readyClaimIds": [],
-    "highRiskClaimIds": []
-  }
+  "facts": [
+    {
+      "id": "fact-001",
+      "statement": "新品发布流程从全量刷新改为按变更页面增量刷新",
+      "category": "action",
+      "status": "confirmed",
+      "sourceInputIds": [
+        "input-001"
+      ],
+      "experienceId": "exp-release",
+      "confidence": "high",
+      "notes": null,
+      "sourceType": "USER",
+      "subject": "USER",
+      "ownership": "DIRECT",
+      "resumeValue": "high"
+    }
+  ]
 }

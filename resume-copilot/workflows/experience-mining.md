@@ -2,7 +2,7 @@
 
 ## 目标
 
-把 Raw Career Input 中抽取出的 Candidate Facts，连同用户的零散补充，转化为可以验证的 Experience、Claim 与 Metric，而不是直接润色成简历 bullet。
+把 Raw Career Input 中抽取出的 Facts，连同用户的零散补充，转化为可以验证的 Experience、Claim 与 Metric，而不是直接润色成简历 bullet。
 
 ## 状态机
 
@@ -24,7 +24,7 @@ DEPTH
 VERIFY
 ```
 
-并非每次都必须完整走完所有状态；根据 Candidate Facts 与用户已经提供的信息跳过已确认部分。若输入仍很原始，先读取 `input-intake.md`。
+并非每次都必须完整走完所有状态；根据 Facts 与用户已经提供的信息跳过已确认部分。若输入仍很原始，先读取 `input-intake.md`。
 
 ## 1. DISCOVER
 

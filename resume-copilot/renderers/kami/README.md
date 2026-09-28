@@ -4,18 +4,9 @@ Kami Renderer 负责把 `Resume View` 渲染成 A4 技术简历。它只负责�
 
 ## 默认主题
 
-用户侧默认主题 ID：`kami-default`。
+用户侧默认主题 ID：`kami-default`，当前映射到 `templates/kami-base.html`。
 
-当前内部映射：
-
-```text
-kami-default -> templates/kami-base.html
-```
-
-`kami-default` 是稳定 API 名称；即使未来内部基线模板文件发生变化，也应优先保持用户侧 ID 不变。
-
-## 可选主题
-
+可选主题：
 - `kami-default`
 - `kami-ivory`
 - `kami-mono`
@@ -27,11 +18,17 @@ kami-default -> templates/kami-base.html
 - `kami-sepia`
 - `kami-copper`
 
-主题解析规则见 `workflows/theme-selection.md`。
+## 主题选择
+
+主题只在渲染阶段解析：
+- 用户已指定主题：直接使用。
+- 用户说“默认 / 随便 / 直接生成 / 你决定”：使用 `kami-default`。
+- 用户无偏好：不得阻塞生成，使用 `kami-default`。
+- 生成 HTML / PDF 前可以询问一次主题偏好，但用户不需要必须选择。
+
+主题自然语言映射：Default / 默认、Ivory / 象牙白、Mono / 黑白、Navy / 深蓝、Slate / 灰蓝、Teal / 青色、Forest / 森林绿、Burgundy / 酒红、Sepia / 复古棕、Copper / 铜色。
 
 ## 数据契约
-
-Renderer 读取：
 
 ```json
 {
@@ -43,7 +40,7 @@ Renderer 读取：
 }
 ```
 
-如果 `renderOptions` 或 `theme` 缺失，应使用 `kami-default`，不得因为主题缺失中断渲染。
+缺少 `renderOptions` 或 `theme` 时使用 `kami-default`。
 
 ## 结构与主题分离
 

@@ -4,8 +4,8 @@
   "title": "Resume Copilot Career Profile",
   "type": "object",
   "required": [
-    "candidateFacts",
     "rawInputs",
+    "facts",
     "profile",
     "targets",
     "experiences",
@@ -19,12 +19,6 @@
       "type": "array",
       "items": {
         "$ref": "raw-career-input.schema.json"
-      }
-    },
-    "candidateFacts": {
-      "type": "array",
-      "items": {
-        "$ref": "candidate-fact.schema.json"
       }
     },
     "profile": {
@@ -142,34 +136,16 @@
         "$ref": "resume-view.schema.json"
       }
     },
-    "interviewCoverage": {
-      "type": "object",
-      "properties": {
-        "exposedClaimIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "readyClaimIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "highRiskClaimIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "resumeStrategies": {
       "type": "array",
       "items": {
         "$ref": "resume-strategy.schema.json"
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "$ref": "fact.schema.json"
       }
     }
   },

@@ -3,21 +3,58 @@
   "$id": "https://resume-copilot.local/schemas/raw-career-input.schema.json",
   "title": "Raw Career Input",
   "type": "object",
-  "required": ["id", "type", "source", "content"],
+  "required": [
+    "id",
+    "type",
+    "source",
+    "content"
+  ],
   "properties": {
-    "id": {"type": "string"},
+    "id": {
+      "type": "string"
+    },
     "type": {
       "type": "string",
-      "enum": ["free_text", "resume", "jd", "project_doc", "repository", "work_summary", "conversation", "other"]
+      "enum": [
+        "free_text",
+        "resume",
+        "jd",
+        "project_doc",
+        "repository",
+        "work_summary",
+        "conversation",
+        "other"
+      ]
     },
     "source": {
       "type": "string",
-      "enum": ["user", "uploaded_file", "linked_source", "conversation"]
+      "enum": [
+        "user",
+        "uploaded_file",
+        "linked_source",
+        "conversation",
+        "current_workspace"
+      ]
     },
-    "content": {"type": "string"},
-    "title": {"type": ["string", "null"]},
-    "receivedAt": {"type": ["string", "null"]},
-    "metadata": {"type": "object", "additionalProperties": true}
+    "content": {
+      "type": "string"
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "receivedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
   },
   "additionalProperties": false
 }

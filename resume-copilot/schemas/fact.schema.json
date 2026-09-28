@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/fact.schema.json",
+  "title": "Career Fact",
+  "type": "object",
+  "required": [
+    "id",
+    "statement",
+    "category",
+    "subject",
+    "sourceType",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "context",
+        "ownership",
+        "action",
+        "decision",
+        "result",
+        "metric",
+        "technology",
+        "scope",
+        "role",
+        "timeline",
+        "architecture",
+        "implementation",
+        "protocol",
+        "data_model",
+        "workflow",
+        "performance",
+        "reliability",
+        "security",
+        "tooling",
+        "testing",
+        "deployment",
+        "other"
+      ]
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "USER",
+        "RESUME",
+        "DOCUMENT",
+        "REPOSITORY",
+        "GIT",
+        "CONVERSATION",
+        "OTHER"
+      ]
+    },
+    "sourceInputIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidenceLocations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lineRange": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "experienceId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "extracted",
+        "needs_confirmation",
+        "confirmed",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "ownership": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "OWNER",
+        "DIRECT",
+        "COLLABORATIVE",
+        "OBSERVED",
+        "NONE",
+        "UNVERIFIED",
+        null
+      ]
+    },
+    "resumeValue": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical",
+        null
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "subject": {
+      "type": "string",
+      "enum": [
+        "PROJECT",
+        "USER"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
