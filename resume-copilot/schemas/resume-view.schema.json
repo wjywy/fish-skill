@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/resume-view.schema.json",
+  "title": "Resume View",
+  "type": "object",
+  "required": [
+    "id",
+    "targetId",
+    "sections",
+    "highlightClaimIds"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "targetId": {
+      "type": "string"
+    },
+    "headline": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "highlightClaimIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "renderOptions": {
+      "anyOf": [
+        {
+          "$ref": "render-options.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": {
+        "renderer": "kami",
+        "theme": "kami-default",
+        "format": "html"
+      }
+    }
+  },
+  "additionalProperties": false
+}

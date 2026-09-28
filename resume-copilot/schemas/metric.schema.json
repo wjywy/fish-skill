@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/metric.schema.json",
+  "title": "Career Metric",
+  "type": "object",
+  "required": ["id", "kind", "confidence"],
+  "properties": {
+    "id": {"type": "string"},
+    "experienceId": {"type": ["string", "null"]},
+    "label": {"type": ["string", "null"]},
+    "kind": {
+      "type": "string",
+      "enum": ["before_after", "absolute", "percentage", "duration", "scale", "cost", "quality", "other"]
+    },
+    "before": {"type": ["number", "string", "null"]},
+    "after": {"type": ["number", "string", "null"]},
+    "value": {"type": ["number", "string", "null"]},
+    "unit": {"type": ["string", "null"]},
+    "direction": {"type": ["string", "null"], "enum": ["increase", "decrease", "neutral", null]},
+    "scope": {"type": ["string", "null"]},
+    "source": {
+      "type": "object",
+      "properties": {
+        "kind": {"type": "string", "enum": ["user", "existing_resume", "document", "system", "other"]},
+        "reference": {"type": ["string", "null"]}
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "confidence": {"type": "string", "enum": ["confirmed", "inferred", "disputed", "unknown"]},
+    "resumeEligible": {"type": "boolean", "default": true},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

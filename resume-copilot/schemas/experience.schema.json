@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/experience.schema.json",
+  "title": "Resume Copilot Experience",
+  "type": "object",
+  "required": ["id", "type", "name", "actions", "claimIds", "resumeReady"],
+  "properties": {
+    "id": {"type": "string"},
+    "type": {"type": "string", "enum": ["work", "project", "internship", "research", "open_source", "education", "other"]},
+    "name": {"type": "string"},
+    "organization": {"type": ["string", "null"]},
+    "period": {
+      "type": "object",
+      "properties": {
+        "start": {"type": ["string", "null"]},
+        "end": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "problem": {"type": ["string", "null"]},
+        "goal": {"type": ["string", "null"]},
+        "previousState": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "ownership": {"type": ["string", "null"], "enum": ["OWNER", "DIRECT", "COLLABORATIVE", "OBSERVED", "NONE", null]},
+    "actions": {"type": "array", "items": {"type": "string"}},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "results": {"type": "array", "items": {"type": "string"}},
+    "technologies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "claimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "metricIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "openQuestions": {"type": "array", "items": {"type": "string"}},
+    "resumeReady": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}

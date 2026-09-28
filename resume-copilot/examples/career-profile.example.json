@@ -1,0 +1,57 @@
+{
+  "rawInputs": [
+    {
+      "id": "input-001",
+      "type": "free_text",
+      "source": "user",
+      "content": "我参与过新品发布系统优化，把全量刷新改成增量刷新。",
+      "title": null,
+      "receivedAt": null,
+      "metadata": {}
+    }
+  ],
+  "candidateFacts": [
+    {
+      "id": "fact-001",
+      "statement": "新品发布流程从全量刷新改为按变更页面增量刷新",
+      "category": "action",
+      "status": "confirmed",
+      "sourceInputIds": [
+        "input-001"
+      ],
+      "experienceId": "exp-release",
+      "confidence": "high",
+      "notes": null
+    }
+  ],
+  "profile": {
+    "name": null,
+    "headline": null,
+    "yearsOfExperience": null,
+    "location": null,
+    "contacts": {}
+  },
+  "targets": [
+    {
+      "id": "target-agent",
+      "role": "Agent 应用开发工程师",
+      "jdText": null,
+      "keywords": [
+        "Agent",
+        "RAG"
+      ],
+      "priority": 1
+    }
+  ],
+  "experiences": [],
+  "claims": [],
+  "metrics": [],
+  "skills": [],
+  "resumeStrategies": [],
+  "resumeViews": [],
+  "interviewCoverage": {
+    "exposedClaimIds": [],
+    "readyClaimIds": [],
+    "highRiskClaimIds": []
+  }
+}

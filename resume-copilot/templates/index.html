@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kami Family 模板总览</title>
+    <link rel="stylesheet" href="shared/common.css" />
+    <style>
+      body {
+        padding: 32px 24px;
+        background: #f7f7f4;
+      }
+
+      .gallery {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        margin-bottom: 24px;
+        padding: 28px 32px;
+        border: 1px solid #ddd8cf;
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(27, 54, 93, 0.1), rgba(255, 252, 247, 0.96));
+      }
+
+      .hero h1 {
+        margin: 0;
+        color: #1b1b18;
+        font-size: 34px;
+      }
+
+      .hero p {
+        margin: 12px 0 0;
+        color: #5d5a54;
+        line-height: 1.8;
+      }
+
+      .file-list {
+        margin: 20px 0 0;
+        padding: 16px 18px;
+        border: 1px dashed #c8c0b2;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .file-list h2 {
+        margin: 0 0 10px;
+        color: #1f1d18;
+        font-size: 16px;
+      }
+
+      .file-list ul {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px 16px;
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .file-list li {
+        color: #524d46;
+        font-family: "SFMono-Regular", "JetBrains Mono", "Fira Code", monospace;
+        font-size: 13px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        display: grid;
+        gap: 12px;
+        padding: 18px;
+        border: 1px solid #ddd8cf;
+        border-radius: 20px;
+        background: #fffdfa;
+      }
+
+      .card h2 {
+        margin: 0;
+        color: #1c1b18;
+        font-size: 20px;
+      }
+
+      .badge {
+        display: inline-flex;
+        width: fit-content;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #efe9de;
+        color: #5c4a35;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .meta {
+        margin: 0;
+        color: #666157;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .card a {
+        color: #1b365d;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .card a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 1100px) {
+        .grid,
+        .file-list ul {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .grid,
+        .file-list ul {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="gallery">
+      <section class="hero">
+        <h1>Kami Family 模板总览</h1>
+        <p>
+          当前模板体系已统一收口到 Kami family。9 个主题页共用同一套 Kami 骨架，由共享 CSS 与共享渲染脚本驱动，只保留主题变量差异。
+        </p>
+        <div class="file-list">
+          <h2>公开主题页</h2>
+          <ul>
+            <li>kami-ivory.html</li>
+            <li>kami-mono.html</li>
+            <li>kami-navy.html</li>
+            <li>kami-slate.html</li>
+            <li>kami-teal.html</li>
+            <li>kami-forest.html</li>
+            <li>kami-burgundy.html</li>
+            <li>kami-sepia.html</li>
+            <li>kami-copper.html</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-ivory</h2>
+          <p class="meta">米白暖纸感，适合强调温润阅读节奏与公开表达。</p>
+          <a href="kami-ivory.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-mono</h2>
+          <p class="meta">中性黑白调，适合偏克制、稳重、工程化的履历呈现。</p>
+          <a href="kami-mono.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-navy</h2>
+          <p class="meta">海军蓝强调专业感，适合兼顾可信度与精致排版的场景。</p>
+          <a href="kami-navy.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-slate</h2>
+          <p class="meta">冷静石板色，适合偏现代、干净、理性的技术候选人。</p>
+          <a href="kami-slate.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-teal</h2>
+          <p class="meta">青绿色强调清爽与秩序，适合产品技术混合背景。</p>
+          <a href="kami-teal.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-forest</h2>
+          <p class="meta">森林绿更偏沉稳自然，适合长期主义与深度工程叙事。</p>
+          <a href="kami-forest.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-burgundy</h2>
+          <p class="meta">酒红纸感强化辨识度，适合内容表达与个体风格较强的履历。</p>
+          <a href="kami-burgundy.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-sepia</h2>
+          <p class="meta">复古棕褐色适合技术作者、开源经历与方法沉淀导向内容。</p>
+          <a href="kami-sepia.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">Kami family</span>
+          <h2>kami-copper</h2>
+          <p class="meta">铜色暖调更强调叙述张力，适合结果与影响力兼具的内容。</p>
+          <a href="kami-copper.html">打开模板</a>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

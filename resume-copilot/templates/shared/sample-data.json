@@ -1,0 +1,83 @@
+{
+  "basics": {
+    "name": "张知行",
+    "title": "后端开发工程师 / AI 应用方向",
+    "city": "上海",
+    "phone": "138-0000-0000",
+    "email": "zhangzhixing@example.com",
+    "website": "https://example.com",
+    "social": [
+      { "label": "GitHub", "value": "github.com/zhangzhixing" },
+      { "label": "博客", "value": "example.com/blog" }
+    ],
+    "avatar": ""
+  },
+  "summary": "三段实习与项目经历，长期关注效率工具、AI 应用与工程化落地，擅长把模糊需求拆成可执行方案，并沉淀为可复用能力。",
+  "education": [
+    {
+      "school": "华东理工大学",
+      "major": "软件工程",
+      "degree": "本科",
+      "date": "2021.09 - 2025.06",
+      "highlights": ["GPA 3.8/4.0", "校级奖学金 2 次"]
+    }
+  ],
+  "experience": [
+    {
+      "company": "某智能平台公司",
+      "role": "后端开发实习生",
+      "date": "2024.06 - 2024.09",
+      "location": "上海",
+      "bullets": [
+        "负责策略服务的接口开发与联调，支持 3 个业务场景接入。",
+        "排查线上超时链路并优化缓存策略，接口 P95 延迟下降 28%。",
+        "补齐埋点和监控看板，帮助团队缩短问题定位时间。"
+      ]
+    },
+    {
+      "company": "某效率工具团队",
+      "role": "产品研发实习生",
+      "date": "2023.12 - 2024.03",
+      "location": "远程",
+      "bullets": [
+        "参与需求拆解、原型评审和版本跟进，推动 2 个功能在四周内上线。",
+        "协助整理用户反馈并建立问题分级表，提升迭代优先级判断效率。"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "智能问答工作台",
+      "role": "核心开发",
+      "date": "2024.03 - 2024.05",
+      "tags": ["Python", "FastAPI", "RAG"],
+      "bullets": [
+        "设计知识库检索与问答编排流程，覆盖文档检索、引用展示与会话历史管理。",
+        "将回答结果接入埋点分析，支持按问题类型复盘效果。",
+        "联调阶段补齐异常兜底与日志追踪，提升演示稳定性。"
+      ]
+    },
+    {
+      "name": "校园活动运营后台",
+      "role": "前后端协作开发",
+      "date": "2023.09 - 2023.11",
+      "tags": ["Vue", "Node.js", "MySQL"],
+      "bullets": [
+        "完成活动审核、报名统计和状态流转模块。",
+        "优化列表筛选与导出逻辑，减少运营人工整理时间。"
+      ]
+    }
+  ],
+  "skills": {
+    "languages": ["Java", "Python", "JavaScript"],
+    "frameworks": ["Spring Boot", "FastAPI", "Vue"],
+    "tools": ["Git", "Docker", "Linux", "Figma"],
+    "other": ["提示词设计", "数据分析", "技术写作"]
+  },
+  "extras": {
+    "awards": ["互联网+ 校赛二等奖"],
+    "certificates": ["英语六级"],
+    "campus": ["学生技术社团负责人"],
+    "links": ["作品集：example.com/portfolio"]
+  }
+}

@@ -1,0 +1,147 @@
+:root {
+  --kami-paper: #f5f4ed;
+  --kami-paper-alt: #faf9f5;
+  --kami-line: #e8e6dc;
+  --kami-line-soft: #e5e3d8;
+  --kami-text-strong: #141413;
+  --kami-text-muted: #6b6a64;
+  --kami-text-secondary: #504e49;
+  --kami-accent: #1b365d;
+  --kami-accent-soft: #eef2f7;
+  --kami-serif: "Source Han Serif SC", "Noto Serif CJK SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  --kami-sans: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+}
+
+@page {
+  size: A4;
+  margin: 12mm 13mm 11mm;
+  background: var(--kami-paper);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--kami-paper); color: var(--kami-text-strong); }
+body {
+  font-family: var(--kami-sans);
+  font-size: 9.5pt;
+  line-height: 1.46;
+  letter-spacing: .05pt;
+  widows: 3;
+  orphans: 3;
+}
+
+@media screen {
+  body { max-width: 210mm; margin: 0 auto; padding: 12mm 13mm; }
+}
+
+.serif { font-family: var(--kami-serif); }
+a { color: var(--kami-accent); text-decoration: none; }
+.accent, .blue, .em-brand, .hl { color: var(--kami-accent); }
+
+.resume-shell { width: 100%; }
+
+/* Header: follows the supplied resume structure, while retaining Kami typography/colors. */
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8mm;
+  border-bottom: .6pt solid var(--kami-line);
+  padding-bottom: 3mm;
+  margin-bottom: 4mm;
+}
+.identity { min-width: 42mm; }
+.name {
+  font-size: 25pt;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: .7pt;
+  margin-bottom: 2mm;
+}
+.education-inline { font-size: 9.2pt; color: var(--kami-text-secondary); }
+.headline { text-align: right; padding-top: 1mm; flex: 1; }
+.headline .role { color: var(--kami-accent); font-weight: 700; font-size: 10.6pt; margin-bottom: 1.5mm; }
+.contact-line { color: var(--kami-text-muted); font-size: 8.8pt; line-height: 1.5; }
+.contact-line a { color: var(--kami-text-secondary); }
+.sep { color: var(--kami-line); margin: 0 .45em; }
+
+/* Section */
+.resume-section { margin-top: 4.2mm; }
+.section-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4mm;
+  border-bottom: .6pt solid var(--kami-line);
+  padding-bottom: 1.5mm;
+  margin-bottom: 2.8mm;
+}
+.section-title-row h2 {
+  margin: 0;
+  font-family: var(--kami-serif);
+  font-size: 13pt;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: .4pt;
+}
+.section-range { font-size: 8.8pt; color: var(--kami-text-muted); white-space: nowrap; }
+
+/* Skills */
+.skill-grid { width: 100%; }
+.skill-row {
+  display: grid;
+  grid-template-columns: 30mm minmax(0, 1fr);
+  gap: 3mm;
+  border-bottom: .35pt dotted var(--kami-line-soft);
+  padding: 1.5mm 0;
+  break-inside: avoid;
+}
+.skill-row:last-child { border-bottom: 0; }
+.skill-key { color: var(--kami-accent); font-weight: 700; }
+.skill-text { color: var(--kami-text-strong); }
+
+/* Entries */
+.entry { margin-bottom: 3.8mm; break-inside: auto; }
+.entry-head {
+  display: grid;
+  grid-template-columns: 36mm minmax(0, 1fr) 50mm;
+  gap: 3mm;
+  align-items: baseline;
+  margin-bottom: 1.2mm;
+  break-after: avoid;
+}
+.entry-head .time { font-size: 9.3pt; font-weight: 600; font-variant-numeric: tabular-nums; }
+.entry-head .org { text-align: center; font-family: var(--kami-serif); font-size: 10.6pt; font-weight: 700; }
+.entry-head .dept { text-align: right; font-size: 8.8pt; color: var(--kami-text-muted); }
+
+ul { margin: .8mm 0 0; padding-left: 4.5mm; }
+li { margin: .55mm 0; line-height: 1.48; }
+.entry-summary { margin-bottom: 1.4mm; }
+
+.sub-block { margin-top: 1.8mm; break-inside: avoid; }
+.sub-title {
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: var(--kami-text-strong);
+  border-left: 2.2px solid var(--kami-accent);
+  padding-left: 2.2mm;
+  margin-bottom: .8mm;
+}
+
+.project-entry .entry-head { grid-template-columns: 34mm minmax(0, 1fr) 52mm; }
+.open-source-entry .entry-head { grid-template-columns: 31mm minmax(0, 1fr) 48mm; }
+.compact-entry { margin-bottom: 0; }
+.compact-entry .entry-head { grid-template-columns: 34mm minmax(0, 1fr) 48mm; }
+
+.optional-section { break-inside: avoid; }
+
+/* Print behavior */
+@media print {
+  html, body { background: var(--kami-paper); }
+  body { padding: 0; }
+  .resume-header, .section-title-row, .entry-head, .sub-title { break-after: avoid; }
+  .skill-row, .sub-block, .compact-entry, .open-source-entry { break-inside: avoid; }
+}
+
+/* Optional explicit page break when a generated resume needs it. */
+.page-break-before { break-before: page; page-break-before: always; }
+.no-break { break-inside: avoid; }

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GeneratedReferenceAnswer",
+  "type": "object",
+  "required": ["id", "questionId", "answerType", "text"],
+  "properties": {
+    "id": {"type": "string"},
+    "questionId": {"type": "string"},
+    "answerType": {"const": "GENERATED_REFERENCE"},
+    "text": {"type": "string"},
+    "projectGroundedText": {"type": ["string", "null"]},
+    "generalKnowledgeText": {"type": ["string", "null"]},
+    "sourceClaimIds": {"type": "array", "items": {"type": "string"}},
+    "sourceMetricIds": {"type": "array", "items": {"type": "string"}},
+    "extractedNodeIds": {"type": "array", "items": {"type": "string"}},
+    "groundingStatus": {"enum": ["VERIFIED", "PARTIAL", "INSUFFICIENT", "NOT_APPLICABLE"]}
+  }
+}

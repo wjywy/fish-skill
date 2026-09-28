@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/render-options.schema.json",
+  "title": "Resume Render Options",
+  "type": "object",
+  "properties": {
+    "renderer": {
+      "type": "string",
+      "enum": ["kami"],
+      "default": "kami"
+    },
+    "theme": {
+      "type": "string",
+      "enum": [
+        "kami-default",
+        "kami-ivory",
+        "kami-mono",
+        "kami-navy",
+        "kami-slate",
+        "kami-teal",
+        "kami-forest",
+        "kami-burgundy",
+        "kami-sepia",
+        "kami-copper"
+      ],
+      "default": "kami-default"
+    },
+    "format": {
+      "type": "string",
+      "enum": ["html", "pdf", "markdown"],
+      "default": "html"
+    }
+  },
+  "required": ["renderer", "theme"],
+  "additionalProperties": false
+}

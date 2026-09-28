@@ -1,0 +1,45 @@
+{
+  "inputSufficiency": "PARTIAL",
+  "target": {
+    "role": "Agent 应用开发工程师",
+    "jdProvided": false
+  },
+  "sections": [
+    {
+      "type": "projects",
+      "items": [
+        {
+          "status": "PROVISIONAL",
+          "text": "A2A Platform｜LangGraph / PostgreSQL / Redis / SSE",
+          "sourceInputIds": ["raw-001"],
+          "missingFields": ["ownership", "actions", "results"]
+        }
+      ]
+    },
+    {
+      "type": "skills",
+      "items": [
+        {
+          "status": "CONFIRMED",
+          "text": "LangGraph、RAG、SSE",
+          "sourceInputIds": ["raw-001"],
+          "missingFields": []
+        }
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "field": "ownership",
+      "priority": 1,
+      "question": "A2A Platform 中哪些模块是你自己直接设计或实现的？",
+      "candidateExperienceId": "candidate-a2a"
+    },
+    {
+      "field": "result",
+      "priority": 2,
+      "question": "这个项目目前有没有可以确认的规模、性能、稳定性或完整度结果？",
+      "candidateExperienceId": "candidate-a2a"
+    }
+  ]
+}

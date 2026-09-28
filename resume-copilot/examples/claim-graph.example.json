@@ -1,0 +1,83 @@
+{
+  "claimId": "claim-a2a-event-pipeline",
+  "rootNodeIds": ["node-outbox"],
+  "maxDepth": 8,
+  "nodes": [
+    {
+      "id": "node-outbox",
+      "claimId": "claim-a2a-event-pipeline",
+      "parentNodeId": null,
+      "sourceQuestionId": null,
+      "sourceAnswerId": null,
+      "concept": "事务 Outbox",
+      "normalizedConcept": "transactional-outbox",
+      "nodeType": "MECHANISM",
+      "depth": 0,
+      "risk": "HIGH",
+      "jdRelevance": "HIGH",
+      "ownershipScope": "CAREER_CLAIM",
+      "status": "PARTIAL",
+      "questionIds": ["q-outbox-why"],
+      "childNodeIds": ["node-worker-idempotency", "node-redis-pubsub"],
+      "stopReason": null
+    },
+    {
+      "id": "node-worker-idempotency",
+      "claimId": "claim-a2a-event-pipeline",
+      "parentNodeId": "node-outbox",
+      "sourceQuestionId": "q-outbox-why",
+      "sourceAnswerId": "a-outbox-why",
+      "concept": "Worker 幂等投递",
+      "normalizedConcept": "worker-idempotent-delivery",
+      "nodeType": "CONSISTENCY_SEMANTICS",
+      "depth": 1,
+      "risk": "HIGH",
+      "jdRelevance": "HIGH",
+      "ownershipScope": "INTERVIEW_ONLY",
+      "status": "UNASKED",
+      "questionIds": [],
+      "childNodeIds": [],
+      "stopReason": null
+    },
+    {
+      "id": "node-redis-pubsub",
+      "claimId": "claim-a2a-event-pipeline",
+      "parentNodeId": "node-outbox",
+      "sourceQuestionId": "q-outbox-why",
+      "sourceAnswerId": "a-outbox-why",
+      "concept": "Redis Pub/Sub",
+      "normalizedConcept": "redis-pubsub",
+      "nodeType": "TECHNOLOGY",
+      "depth": 1,
+      "risk": "HIGH",
+      "jdRelevance": "HIGH",
+      "ownershipScope": "CAREER_CLAIM",
+      "status": "UNASKED",
+      "questionIds": [],
+      "childNodeIds": [],
+      "stopReason": null
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-outbox-why",
+      "nodeId": "node-outbox",
+      "question": "为什么 Task 状态和 Outbox Event 要在同一个数据库事务里提交？",
+      "questionType": "MECHANISM",
+      "status": "ANSWERED",
+      "answerId": "a-outbox-why",
+      "risk": "HIGH"
+    }
+  ],
+  "answers": [
+    {
+      "id": "a-outbox-why",
+      "questionId": "q-outbox-why",
+      "text": "为了避免业务状态提交成功但事件没发出去。事务里同时写 Task 状态和 Outbox Event，提交后 Worker 再异步投递到 Redis Pub/Sub。",
+      "assessment": "PARTIAL",
+      "extractedNodeIds": ["node-worker-idempotency", "node-redis-pubsub"],
+      "missingPoints": ["需要继续解释 Worker 重复投递和 Redis Pub/Sub 丢消息边界"],
+      "resumeFeedback": null
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "interview-coverage.schema.json",
+  "title": "Interview Coverage",
+  "type": "object",
+  "required": ["claimId", "nodeIds", "coverageScore", "status"],
+  "properties": {
+    "claimId": { "type": "string" },
+    "nodeIds": { "type": "array", "items": { "type": "string" } },
+    "coverageScore": { "type": "number", "minimum": 0, "maximum": 1 },
+    "status": { "type": "string", "enum": ["UNASSESSED", "WEAK", "PARTIAL", "DEFENSIBLE"] },
+    "highRiskOpenNodeIds": { "type": "array", "items": { "type": "string" } },
+    "resumeAction": { "type": "string", "enum": ["KEEP", "SOFTEN", "REMOVE", "REVERIFY", "NONE"] }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/career-profile.schema.json",
+  "title": "Resume Copilot Career Profile",
+  "type": "object",
+  "required": [
+    "candidateFacts",
+    "rawInputs",
+    "profile",
+    "targets",
+    "experiences",
+    "claims",
+    "metrics",
+    "resumeStrategies",
+    "resumeViews"
+  ],
+  "properties": {
+    "rawInputs": {
+      "type": "array",
+      "items": {
+        "$ref": "raw-career-input.schema.json"
+      }
+    },
+    "candidateFacts": {
+      "type": "array",
+      "items": {
+        "$ref": "candidate-fact.schema.json"
+      }
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "headline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "yearsOfExperience": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contacts": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "role"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "jdText": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "priority": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "experiences": {
+      "type": "array",
+      "items": {
+        "$ref": "experience.schema.json"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "claim.schema.json"
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "$ref": "metric.schema.json"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "claimIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "resumeViews": {
+      "type": "array",
+      "items": {
+        "$ref": "resume-view.schema.json"
+      }
+    },
+    "interviewCoverage": {
+      "type": "object",
+      "properties": {
+        "exposedClaimIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "readyClaimIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "highRiskClaimIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "resumeStrategies": {
+      "type": "array",
+      "items": {
+        "$ref": "resume-strategy.schema.json"
+      }
+    }
+  },
+  "additionalProperties": false
+}

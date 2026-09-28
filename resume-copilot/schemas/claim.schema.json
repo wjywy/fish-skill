@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/claim.schema.json",
+  "title": "Resume Copilot Claim",
+  "type": "object",
+  "required": ["id", "experienceId", "statement", "type", "ownership", "evidenceLevel", "confidence", "interviewRisk"],
+  "properties": {
+    "id": {"type": "string"},
+    "experienceId": {"type": "string"},
+    "statement": {"type": "string", "minLength": 1},
+    "type": {
+      "type": "string",
+      "enum": ["context", "responsibility", "implementation", "decision", "result", "skill", "architecture", "collaboration"]
+    },
+    "ownership": {
+      "type": "string",
+      "enum": ["OWNER", "DIRECT", "COLLABORATIVE", "OBSERVED", "NONE"]
+    },
+    "evidenceLevel": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["confirmed", "inferred", "disputed", "unknown"]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "kind": {"type": "string", "enum": ["user", "existing_resume", "document", "other"]},
+        "reference": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "technologies": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "metricIds": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "allowedVerbs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "interviewDepth": {"type": "integer", "minimum": 0, "maximum": 6},
+    "interviewRisk": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH"]},
+    "resumeEligible": {"type": "boolean", "default": true},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

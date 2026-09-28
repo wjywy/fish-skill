@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resume-copilot.local/schemas/resume-strategy.schema.json",
+  "title": "Resume Strategy",
+  "type": "object",
+  "required": ["id", "targetId", "selectedExperienceIds", "selectedClaimIds", "sectionPlan", "requirementCoverage"],
+  "properties": {
+    "id": {"type": "string"},
+    "targetId": {"type": "string"},
+    "objective": {"type": ["string", "null"]},
+    "requirements": {
+      "type": "array",
+      "items": {"$ref": "jd-requirement.schema.json"}
+    },
+    "requirementCoverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirementId", "status", "claimIds"],
+        "properties": {
+          "requirementId": {"type": "string"},
+          "status": {"type": "string", "enum": ["covered", "weakly_covered", "gap"]},
+          "claimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "notes": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "selectedExperienceIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "selectedClaimIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "claimScores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claimId", "score"],
+        "properties": {
+          "claimId": {"type": "string"},
+          "score": {"type": "number", "minimum": 0, "maximum": 100},
+          "matchedRequirementIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "reason": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "excludedClaims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claimId", "reason"],
+        "properties": {
+          "claimId": {"type": "string"},
+          "reason": {
+            "type": "string",
+            "enum": ["low_relevance", "weak_evidence", "ownership_too_weak", "high_risk", "redundant", "space_budget", "not_resume_eligible", "other"]
+          },
+          "notes": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "sectionPlan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "priority"],
+        "properties": {
+          "section": {"type": "string"},
+          "priority": {"type": "integer", "minimum": 1},
+          "budget": {"type": ["string", "number", "null"]},
+          "experienceIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        },
+        "additionalProperties": false
+      }
+    },
+    "emphasis": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "coverageGaps": {"type": "array", "items": {"type": "string"}},
+    "riskNotes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

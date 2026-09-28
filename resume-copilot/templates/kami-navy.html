@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>{{姓名}} · 简历</title>
+<meta name="author" content="{{姓名}}">
+<meta name="description" content="{{摘要}}">
+<meta name="keywords" content="{{关键词}}">
+<meta name="generator" content="Kami Family">
+<link rel="stylesheet" href="shared/kami-family.css" />
+<style>
+  :root {
+    --kami-paper: #f7f8fb;
+    --kami-paper-alt: #ffffff;
+    --kami-line: #dde4f0;
+    --kami-line-soft: #e7edf6;
+    --kami-text-strong: #172033;
+    --kami-text-muted: #5a6a81;
+    --kami-text-secondary: #425067;
+    --kami-accent: #163a70;
+    --kami-accent-soft: #edf3fb;
+  }
+</style>
+</head>
+<body>
+
+<main id="kami-root"></main>
+<script src="shared/kami-render.js"></script>
+<script>
+  renderKamiResume({ target: "#kami-root" });
+</script>
+</body>
+</html>

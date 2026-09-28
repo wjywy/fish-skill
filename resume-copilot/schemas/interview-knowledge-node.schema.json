@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterviewKnowledgeNode",
+  "type": "object",
+  "required": ["id", "claimId", "nodeType", "label", "depth", "status"],
+  "properties": {
+    "id": {"type": "string"},
+    "claimId": {"type": "string"},
+    "parentNodeId": {"type": ["string", "null"]},
+    "label": {"type": "string"},
+    "normalizedLabel": {"type": "string"},
+    "nodeType": {
+      "enum": ["CONCEPT", "TECHNOLOGY", "MECHANISM", "PROTOCOL", "DATA_MODEL", "IMPLEMENTATION", "DECISION", "TRADEOFF", "ALTERNATIVE", "FAILURE", "RECOVERY", "CONSISTENCY", "CONCURRENCY", "IDEMPOTENCY", "PERFORMANCE", "METRIC", "SECURITY", "ARCHITECTURE", "OWNERSHIP"]
+    },
+    "questionDimension": {
+      "enum": ["DEFINITION", "MOTIVATION", "IMPLEMENTATION", "MECHANISM", "FAILURE", "CONSISTENCY", "CONCURRENCY", "PERFORMANCE", "TRADEOFF", "SCALING", "METRIC", "OWNERSHIP"]
+    },
+    "depth": {"type": "integer", "minimum": 0, "maximum": 20},
+    "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+    "projectContext": {"type": ["string", "null"]},
+    "projectGrounding": {"enum": ["VERIFIED", "PARTIAL", "INSUFFICIENT", "NOT_APPLICABLE"]},
+    "sharedKnowledgeKey": {"type": ["string", "null"]},
+    "status": {"enum": ["OPEN", "EXPANDED", "STOPPED"]},
+    "stopReason": {"type": ["string", "null"]}
+  }
+}

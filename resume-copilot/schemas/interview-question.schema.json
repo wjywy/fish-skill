@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterviewQuestion",
+  "type": "object",
+  "required": ["id", "claimId", "text", "dimension", "mode"],
+  "properties": {
+    "id": {"type": "string"},
+    "claimId": {"type": "string"},
+    "nodeId": {"type": ["string", "null"]},
+    "parentQuestionId": {"type": ["string", "null"]},
+    "text": {"type": "string"},
+    "dimension": {"enum": ["DEFINITION", "MOTIVATION", "IMPLEMENTATION", "MECHANISM", "FAILURE", "CONSISTENCY", "CONCURRENCY", "PERFORMANCE", "TRADEOFF", "SCALING", "METRIC", "OWNERSHIP"]},
+    "mode": {"enum": ["KNOWLEDGE", "MOCK_INTERVIEW"]},
+    "depth": {"type": "integer", "minimum": 0},
+    "risk": {"enum": ["LOW", "MEDIUM", "HIGH"]},
+    "generatedAnswerId": {"type": ["string", "null"]},
+    "userAnswerId": {"type": ["string", "null"]}
+  }
+}
