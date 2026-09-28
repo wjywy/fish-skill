@@ -10,7 +10,10 @@ Resume Generation 回答“已经决定要写这些事实后，应该怎么组�
 
 - Career Profile
 - Resume Strategy
+- Target Role / Target Direction（必须明确）
 - 写作语言 / 长度 / 格式约束
+
+若 Target Role / Target Direction 缺失，停止正式文案生成并先询问用户。不得根据已有技术词自行推断。
 
 如果存在 Strategy，不得绕过 Strategy 重新从全部 Claims 任意挑选内容。
 

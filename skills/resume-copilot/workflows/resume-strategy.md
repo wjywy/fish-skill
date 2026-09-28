@@ -22,9 +22,19 @@ Strategy 不负责润色句子，不负责 HTML/PDF 排版，也不得创造新�
 
 ## 2. 输入
 
+### Target Role 是硬性输入
+
+Resume Strategy 启动前必须已经明确 `Target Role / Target Direction`。
+
+如果用户没有提供：
+
+> 先询问用户这份简历主要投什么方向，例如前端、后端、Agent、产品、全栈，或具体岗位名称。
+
+禁止仅根据技术栈推断目标方向。JD 是可选输入，Target Role 不是。
+
 至少读取：
 
-- Target Role：目标岗位名称。
+- Target Role：目标岗位名称或明确方向。
 - Career Profile：Experiences、Claims、Metrics、Skills。
 - JD：若用户提供则解析；若未提供，则仅按目标岗位进行通用匹配，不假装知道具体公司要求。
 - Constraints：页数、语言、资历层级、用户希望突出/弱化的方向。

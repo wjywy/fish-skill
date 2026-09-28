@@ -13,10 +13,11 @@ Resume Copilot 不是简单的“简历润色器”。
 1. 从用户输入或当前代码仓库中提取可追溯的项目事实；
 2. 区分“项目中存在某能力”和“用户本人实际负责某能力”；
 3. 将确认后的事实组织为 Experience、Claim 和 Metric；
-4. 根据目标岗位选择更相关的 Claim；
-5. 按技术简历的标准表达方式生成 Resume Bullet；
-6. 使用 Kami 模板生成 HTML / PDF 简历；
-7. 针对简历中的每个 Claim 自动生成面试问题、参考答案，并从答案中的关键知识点继续递归追问。
+4. 在生成正式简历内容前确认目标岗位 / 方向；
+5. 根据目标岗位选择更相关的 Claim；
+6. 按技术简历的标准表达方式生成 Resume Bullet；
+7. 使用 Kami 模板生成 HTML / PDF 简历；
+8. 针对简历中的每个 Claim 自动生成面试问题、参考答案，并从答案中的关键知识点继续递归追问。
 
 核心链路：
 
@@ -123,6 +124,8 @@ Event ID
 
 Skill 会继续针对这些有面试价值的节点生成下一层问题和参考答案。
 
+这里的停止条件不是“离最初关键词越来越远”。根 Claim 只决定起点，目标岗位 / JD 决定边界：只要后续节点仍能考察该岗位需要的一致性、并发、架构、性能、实现或取舍能力，就继续深入；只有节点已经完全脱离岗位要求时才停止。固定 5 层、8 层之类的深度只能作为异常防护，不能作为正常停止条件。
+
 如果用户明确要求：
 
 ```text
@@ -135,15 +138,29 @@ Skill 会继续针对这些有面试价值的节点生成下一层问题和参�
 
 Resume Copilot 遵循以下原则：
 
-### 3.1 Draft early, verify continuously
+### 3.1 Target direction before final wording
+
+生成正式 Resume Bullet / Resume View 前必须明确目标岗位或方向。
+
+如果用户没有提供，Skill 会主动询问，例如：
+
+```text
+这份简历主要投什么方向？例如前端、后端、Agent、产品、全栈，或者直接给我具体岗位名称。
+```
+
+不会仅根据 React、Go、LangGraph、Redis 等技术关键词自行猜测岗位方向。
+
+目标方向未知时仍然可以读取旧简历、扫描仓库、抽取 Facts；只是不进入正式岗位定向文案生成。
+
+### 3.2 Draft early, verify continuously
 
 当已有信息足够形成候选简历时，先输出 Draft，再补关键缺口，不把用户困在长问卷里。
 
-### 3.2 Source → Fact → Claim → Wording
+### 3.3 Source → Fact → Claim → Wording
 
 正式简历内容必须能够追溯到 Fact 和 Claim。
 
-### 3.3 Never silently upgrade ownership
+### 3.4 Never silently upgrade ownership
 
 不能把：
 
@@ -157,15 +174,15 @@ Resume Copilot 遵循以下原则：
 负责 / 主导 / 设计 / 架构
 ```
 
-### 3.4 Metrics need provenance
+### 3.5 Metrics need provenance
 
 数字必须来源于用户确认、历史材料、仓库证据或其他可靠来源，不能为了让简历更好看自动编造。
 
-### 3.5 Repository evidence is project evidence, not ownership evidence
+### 3.6 Repository evidence is project evidence, not ownership evidence
 
 代码仓库只能证明项目中存在某项能力，不自动代表用户本人完成了该实现。
 
-### 3.6 High-information bullets, not duty statements
+### 3.7 High-information bullets, not duty statements
 
 优先生成：
 
@@ -547,3 +564,27 @@ Career Knowledge System
 ```
 
 而不仅仅是一个 Resume Writer。
+
+
+## Interview Knowledge 默认 Markdown 格式
+
+面试准备默认输出为可直接复习的 Markdown：
+
+```markdown
+# 简历要点核心主题
+
+## 面试问题
+
+参考答案
+
+## 继续追问的问题
+
+参考答案
+```
+
+内部使用的 Claim、Evidence、VERIFIED/PARTIAL、Node Type、depth、P0/P1、停止条件等信息默认不会出现在最终文档中。
+
+
+### Interview Knowledge 答案原则
+
+面试问题的参考答案优先保证技术内容准确完整，再结合已验证的项目背景做场景化说明。项目证据不足时仍应回答通用原理，只对无法确认的项目实现、选型动机或实际效果增加简短旁白提醒，不输出内部证据状态。

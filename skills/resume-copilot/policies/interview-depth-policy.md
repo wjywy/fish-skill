@@ -4,14 +4,18 @@
 
 控制 Interview Knowledge 与 Mock Interview 的追问深度。
 
+核心原则：**追问边界由目标岗位相关性决定，而不是由“离根关键词有多远”决定。**
+
+根 Claim / 根关键词只决定从哪里开始，不决定必须在哪里结束。
+
 ## 两种模式
 
 ### Interview Knowledge
 
-深度代表系统为某个 Resume Claim 准备知识树的展开深度。
+深度代表系统为某个 Resume Claim 准备知识树的递归展开深度。
 
 ```text
-Claim → Q&A → Knowledge Node → Follow-up Q&A
+Claim → Q&A → Knowledge Node → Follow-up Q&A → ...
 ```
 
 ### Mock Interview
@@ -19,10 +23,30 @@ Claim → Q&A → Knowledge Node → Follow-up Q&A
 深度代表根据用户真实回答继续追问的层数。
 
 ```text
-Question → User Answer → Assessment → Follow-up
+Question → User Answer → Assessment → Follow-up → ...
 ```
 
-两者共用风险判断，但不得混用 Answer 状态。
+两者共用岗位相关性判断，但不得混用 Answer 状态。
+
+## Role Relevance First
+
+每产生一个新的可追问节点，先判断它与 `Target Role / JD Requirements` 的关系。
+
+建议使用：
+
+- `CORE`：目标岗位核心能力，必须继续深入
+- `RELATED`：与岗位能力明显相关，通常继续深入
+- `CONTEXTUAL`：只用于解释上层问题，按价值决定是否继续
+- `OUT_OF_SCOPE`：已经脱离岗位要求，停止该分支
+
+判断岗位相关性时优先看：
+
+1. JD 明确要求的技术、能力、职责
+2. Target Role 的核心能力模型
+3. 当前 Resume Claim 暴露的责任强度
+4. 面试官是否能通过该节点继续判断候选人的岗位能力
+
+不要使用“与根关键词距离”作为停止依据。
 
 ## Risk Heuristics
 
@@ -40,19 +64,54 @@ LOW：
 - 与目标岗位关联弱
 - 简历中只弱暴露
 
-## 推荐深度
+风险等级影响优先级和广度，但**不再使用固定 1–8 层作为语义停止条件**。
 
-- LOW：1–2 层
-- MEDIUM：3–5 层
-- HIGH：5–8 层
+## 深入示例
 
-深度不是完成指标。优先使用语义停止条件。
+目标岗位：Agent / 后端平台工程师
 
-## 停止
+```text
+Outbox
+→ 为什么需要 Outbox
+→ 双写一致性
+→ 本地事务
+→ Worker 重复投递
+→ 幂等
+→ eventId / 唯一约束
+→ 并发写入竞态
+→ 事务隔离 / 原子更新
+```
 
-- 已解释当前 Claim 必要的核心机制
-- 已覆盖关键失败与取舍
-- 继续深入明显偏离简历暴露程度
-- 节点被其他分支覆盖
-- 新问题只剩百科细节
-- 达到最大深度兜底
+虽然最后的问题已经远离 `Outbox` 这个字面关键词，但仍在考察目标岗位需要的一致性、并发与可靠性能力，因此应继续。
+
+如果继续变成：
+
+```text
+事务隔离
+→ PostgreSQL WAL 二进制记录格式
+→ page layout
+→ B-Tree page split 内核实现
+```
+
+而目标岗位不要求数据库内核开发，则应标记 `OUT_OF_SCOPE` 并停止该分支。
+
+## 停止条件
+
+只有满足以下情况之一时才停止当前分支：
+
+1. 新节点已经 `OUT_OF_SCOPE`，完全脱离 Target Role / JD 能力要求
+2. 新问题不再帮助判断候选人的岗位能力，只剩与岗位无关的实现或学术细节
+3. 节点已被其他分支充分覆盖，继续追问只会重复
+4. 出现语义环路，新的节点回到祖先问题
+5. 缺少必要事实或知识上下文，无法继续生成可靠问题；此时标记缺口，而不是编造
+6. 达到实现层面的安全兜底深度，仅用于防止异常无限递归
+
+其中第 6 条不是正常业务停止条件。正常情况下应由岗位相关性决定停止。
+
+## 硬兜底
+
+允许实现保留一个很高的 `hardMaxDepth`（例如 20）用于防止异常环路或模型失控。
+
+- 不得把 `hardMaxDepth` 当作推荐追问深度
+- 不得因为达到 5 层、8 层等固定层数提前停止
+- 如果仍然属于 `CORE / RELATED`，应继续深入，直到岗位相关性真正消失

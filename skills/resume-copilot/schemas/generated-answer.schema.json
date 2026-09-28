@@ -2,17 +2,84 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "GeneratedReferenceAnswer",
   "type": "object",
-  "required": ["id", "questionId", "answerType", "text"],
+  "required": [
+    "id",
+    "questionId",
+    "answerType",
+    "text"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "questionId": {"type": "string"},
-    "answerType": {"const": "GENERATED_REFERENCE"},
-    "text": {"type": "string"},
-    "projectGroundedText": {"type": ["string", "null"]},
-    "generalKnowledgeText": {"type": ["string", "null"]},
-    "sourceClaimIds": {"type": "array", "items": {"type": "string"}},
-    "sourceMetricIds": {"type": "array", "items": {"type": "string"}},
-    "extractedNodeIds": {"type": "array", "items": {"type": "string"}},
-    "groundingStatus": {"enum": ["VERIFIED", "PARTIAL", "INSUFFICIENT", "NOT_APPLICABLE"]}
+    "id": {
+      "type": "string"
+    },
+    "questionId": {
+      "type": "string"
+    },
+    "answerType": {
+      "const": "GENERATED_REFERENCE"
+    },
+    "text": {
+      "type": "string"
+    },
+    "projectGroundedText": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "generalKnowledgeText": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceClaimIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sourceMetricIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extractedNodeIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "groundingStatus": {
+      "enum": [
+        "VERIFIED",
+        "PARTIAL",
+        "INSUFFICIENT",
+        "NOT_APPLICABLE"
+      ],
+      "description": "仅表示答案的项目场景化程度，不表示通用技术答案的正确性或完整性。"
+    },
+    "canonicalAnswer": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "不依赖项目个性化事实、直接回答问题本身的准确技术答案。"
+    },
+    "projectContext": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "已验证项目背景对通用答案的场景化补充。"
+    },
+    "projectAside": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "仅当项目具体实现/动机/效果无法核实时给用户的简短旁白；不得替代 canonicalAnswer。"
+    }
   }
 }

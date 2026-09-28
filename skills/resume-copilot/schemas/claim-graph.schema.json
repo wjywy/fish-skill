@@ -38,10 +38,11 @@
         "$ref": "generated-answer.schema.json"
       }
     },
-    "maxDepth": {
+    "hardMaxDepth": {
       "type": "integer",
       "minimum": 1,
-      "default": 8
+      "default": 20,
+      "description": "仅用于防止异常无限递归的硬兜底，不是业务停止条件。正常停止由 Target Role / JD 相关性决定。"
     }
   },
   "additionalProperties": false

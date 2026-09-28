@@ -20,7 +20,20 @@
 2. JD 只用于目标岗位分析，不作为用户经历证据。
 3. 文档、README、代码仓库可以证明“项目存在某能力”，不能自动证明“用户本人实现了该能力”。
 4. 用户已经按项目 / 经历分组时，不再次做自动聚类。
-5. 用户目标是生成简历时，优先 Draft-first；已有足够信息就先给可讨论 Draft，再补关键缺口。
+5. 用户目标是生成简历时，先检查 Target Role / Target Direction；目标方向未知时可以继续抽取 Facts，但不得输出正式 Resume Bullet。
+6. 目标方向明确后优先 Draft-first；已有足够信息就先给可讨论 Draft，再补关键缺口。
+
+
+## Target Direction Gate
+
+当用户提出“生成简历 / 写项目经历 / 优化简历内容”时：
+
+- 若已明确目标岗位或方向：继续后续流程。
+- 若未明确：先询问用户目标方向。
+- 推荐询问方式：
+  > 这份简历主要投什么方向？例如前端、后端、Agent、产品、全栈，或者直接给我具体岗位名称。
+- 不要求用户必须提供 JD。只有方向也足以进入 Bootstrap；有 JD 时再由 Resume Strategy 做进一步定向。
+- 资料解析、仓库扫描和 Fact 抽取不受该 Gate 阻塞。
 
 ## 主链路
 
@@ -28,6 +41,10 @@
 Raw Career Input
       ↓
 Facts
+      ↓
+Target Direction known?
+   ├─ no → Ask Target Direction
+   └─ yes
       ↓
 Resume Bootstrap / Experience Mining
       ↓

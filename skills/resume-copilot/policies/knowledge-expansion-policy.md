@@ -18,12 +18,14 @@
 
 ## 不创建子节点
 
-- 普通业务名词
-- 没有技术判断价值的名词
-- 与 Claim 关系弱的旁支知识
+- 普通业务名词，且与目标岗位能力无关
+- 没有岗位判断价值的名词
 - 已经覆盖的同义词
-- 仅作为举例出现的技术
-- 继续深入只能变成百科知识
+- 仅作为举例出现、且与 Target Role / JD 无关的技术
+- 新节点已经完全脱离目标岗位要求
+
+注意：**不能因为新节点离根 Claim / 根关键词较远就停止。**
+只要它仍然属于目标岗位的核心或相关能力，就应继续递归。
 
 ## 节点优先级
 
@@ -55,19 +57,28 @@ P3：
 
 P3 只有在其对 Claim 有明显解释价值时继续展开。
 
-## 深度预算
+## 深度策略
 
-深度预算由以下因素决定：
+不再使用 LOW / MEDIUM / HIGH 对应固定层数作为停止条件。
+
+每个新节点都评估岗位相关性：
 
 ```text
-Depth Budget = Claim Strength × JD Relevance × Interview Risk
+CORE        → 必须继续深入
+RELATED     → 通常继续深入
+CONTEXTUAL  → 仅在能解释上层判断时继续
+OUT_OF_SCOPE→ 停止该分支
 ```
 
-建议：
+深度由以下因素动态决定：
 
-- LOW：1–2 层
-- MEDIUM：3–5 层
-- HIGH：5–8 层
+```text
+Expansion Value = Role Relevance × Claim Strength × Interview Risk × New Information Value
+```
+
+根 Claim 只决定起点；`Target Role / JD Requirements` 才决定知识树的外边界。
+
+实现可以设置高位 `hardMaxDepth` 作为异常兜底，但不得用固定层数主动截断仍与岗位相关的追问。
 
 ## Breadth Budget
 
