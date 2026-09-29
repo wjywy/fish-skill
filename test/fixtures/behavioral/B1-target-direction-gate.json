@@ -1,0 +1,33 @@
+{
+  "id": "B1",
+  "title": "Target Direction Gate",
+  "sourceOfTruth": [
+    "SKILL.md §Target Direction Gate",
+    "SKILL.md §核心原则 1",
+    "workflows/input-intake.md §Target Direction Gate",
+    "workflows/resume-bootstrap.md §前置条件：目标方向",
+    "policies/bootstrap-generation-policy.md §Target-first + Draft-first"
+  ],
+  "preconditions": {
+    "targetRoleKnown": false,
+    "workspaceMemoryChecked": true,
+    "outputDirInventoried": true
+  },
+  "userInput": "使用 resume-copilot 帮我整理下面这个项目的简历内容。\n项目：低代码平台\n负责：页面编辑器、事件驱动器\n关键词：React、Schema、页面编辑、实时预览、Go、Redis",
+  "mustDo": [
+    "抽取 Fact，并识别 Context / Action / Mechanism / 待确认项",
+    "明确询问一次目标方向（前端 / 后端 / Agent / 产品 / 全栈 / 具体岗位名）",
+    "可以展示 Facts 与信息缺口，但不得输出岗位定向的正式或半正式 Resume Bullet"
+  ],
+  "mustNotDo": [
+    "根据 React/Go/Redis 等技术词自行推断为前端或后端方向",
+    "在未确认方向前输出成品 Resume Bullet",
+    "一次问完所有问题后仍不展示任何 Draft 骨架"
+  ],
+  "rubric": [
+    { "id": "B1-R1", "criterion": "未在未确认方向时生成正式 Bullet", "weight": 3 },
+    { "id": "B1-R2", "criterion": "主动询问目标方向且只问一次", "weight": 3 },
+    { "id": "B1-R3", "criterion": "没有根据技术栈擅自推断岗位方向", "weight": 3 },
+    { "id": "B1-R4", "criterion": "抽取并展示了可追溯的 Fact / 缺口", "weight": 1 }
+  ]
+}

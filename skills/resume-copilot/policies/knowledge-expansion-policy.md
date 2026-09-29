@@ -222,13 +222,197 @@ Candidate Node
 4. 能产生更多新的有效信息
 5. 与已有问题重复更少
 
-默认一个父节点一次展开 1–3 个最高价值节点。
+一个父 Answer 可以产生多个高价值 sibling nodes，所有满足展开条件的节点都必须保留。调度时默认一次只执行其中 1 个最高价值节点；未被选择的 sibling 继续保持 `UNEXPANDED`，当前分支耗尽后必须返回处理。
 
 不要为了覆盖数量而强行扩展低价值节点。
 
 ---
 
-## 六、示例
+## 五点五、一答多问：保留 sibling，不等于一次全部执行
+
+核心约束：
+
+```text
+1 Answer → 0..N high-value Candidate Nodes → 0..N Follow-up Questions
+```
+
+其中“0..N Follow-up Questions”可以按调度顺序逐步生成。不要把“默认下一步只展开 1 个”误解为“只允许这个 Answer 产生 1 个问题”。
+
+必须同时满足：
+
+- **Extract all**：从 Answer 中提取全部有意义的 Candidate Nodes。
+- **Retain all valuable siblings**：所有高价值且未充分覆盖的 sibling 都保持 `UNEXPANDED`。
+- **Execute one at a time**：默认一次只选择一个节点继续深入。
+- **Return to siblings**：当前深分支耗尽后，回到仍未展开的 sibling。
+- **Never silently discard**：未选中的 sibling 不能因为“不是最高分”而消失。
+
+示例：
+
+```text
+Answer: Outbox Worker 通过 SKIP LOCKED 领取记录，失败会重试，最终是至少一次投递。
+
+Candidate Nodes:
+- SKIP LOCKED / 多 Worker 并发领取       → UNEXPANDED
+- retry / backoff                        → UNEXPANDED
+- 至少一次投递 / 幂等                     → UNEXPANDED
+
+下一步可以先问“消费侧如何幂等？”，
+但另外两个节点必须继续留在 Expansion Queue。
+```
+
+## 六、Answer-first 执行算法与调度器
+
+高价值判定只是“值不值得追”的规则，真正执行时必须维护待展开状态与两个队列，避免答案里已经出现关键节点却直接跳到其他主题。
+
+### 两个队列
+
+```text
+Expansion Queue = 由当前 Answer 产生的 HIGH-VALUE UNEXPANDED Nodes
+Root Queue      = 尚未物化的 Claim 级横向问题候选
+```
+
+执行顺序必须是：
+
+```text
+Expansion Queue > Root Queue
+```
+
+只要 Expansion Queue 非空，就禁止从 Root Queue 取新问题。
+
+### 禁止预生成完整题纲
+
+可以预先识别 Resume Claims / Root Themes，但**不得预生成或预规划完整的 Interview Question Set**。
+
+允许：
+
+```text
+Root Claims:
+- Multi-Agent 编排
+- 长任务状态
+- Outbox 可靠投递
+```
+
+不允许在 Answer-driven expansion 之前就物化：
+
+```text
+Multi-Agent: Q1 / Q2 / Q3 / Q4
+Outbox: Q1 / Q2 / Q3 / Q4
+```
+
+问题必须在调度器允许时逐个物化。
+
+### Step 1：分析当前 Answer（强制）
+
+**每个 Generated Answer 完成后都必须执行本步骤。**立即从该 Answer 产生 Candidate Nodes，并记录 `sourceAnswerId`。
+
+在所有 Candidate Node 完成 `UNEXPANDED / MERGED / DROPPED` 判定之前，不得进入下一道问题。全部完成后将当前 Generated Answer 标记为 `candidateEvaluationComplete=true`；未标记时 Sibling Transition Gate 必须保持 BLOCKED。
+
+不得先批量生成完整问题清单，再回头补答案。主要递归链必须是：
+
+```text
+Answer → Node → Question → Answer → Node
+```
+
+### Step 2：先判断 Answer Coverage，再判定是否入队
+
+对每个 Candidate Node 先判断它在当前 Answer 中是：
+
+- `MENTIONED`：仅被提到。
+- `PARTIAL`：解释了一部分，但仍缺关键判断信息。
+- `SUFFICIENT`：当前答案已经充分覆盖，继续追问只会重复。
+
+然后执行前述五维判定：
+
+- 高价值 + `MENTIONED/PARTIAL` 且继续追问有信息增益 → `UNEXPANDED`
+- 高价值但 `SUFFICIENT`，或当前答案已经足以完成该层判断 → `COVERED`
+- 与已有节点等价 → `MERGED`
+- 价值不足 / 越界 / 环路 → `DROPPED`
+
+Expansion Queue 由所有 `status=UNEXPANDED` 节点动态派生；不要额外持久化第二份 `unexpandedNodeIds`。
+
+### Step 3：当前分支优先消费 Expansion Queue
+
+默认采用“当前分支优先”：如果最新 Answer 产生高价值 `UNEXPANDED` 后代，先从这些后代里选择价值最高的 1 个继续追问；只有当前分支已经耗尽，才回到更早的 Expansion sibling。
+
+这不是固定 DFS：如果当前后代信息增益明显更低，可以选择队列中更高价值节点。核心目标是避免刚进入一个高价值机制就过早横跳。
+
+先将当前 Answer 产生的**全部**高价值、未充分覆盖节点保留为 `UNEXPANDED`。然后按动态价值选择其中 1 个节点生成下一层问题。注意：选择 1 个只是“下一步执行谁”，不是“只留下谁”。生成问题和答案后：
+
+```text
+UNEXPANDED → EXPANDED
+```
+
+随后必须立刻分析新的 Generated Answer，继续产生节点。
+
+### Step 4：Sibling Transition Gate
+
+准备切换到 Expansion sibling、Root Queue 或下一个 Claim 前，必须通过强制 Gate：
+
+```text
+是否仍存在高价值 UNEXPANDED Node？
+```
+
+- 最新 Answer 仍有高价值后代 `UNEXPANDED` → `BLOCK transition`，优先继续当前分支
+- 当前分支耗尽但 Claim 中仍有其他高价值 `UNEXPANDED` → 继续消费 Expansion Queue
+- 没有 → 检查是否还有 Candidate Node 等待判定；全部完成后才允许访问 Root Queue
+
+### Step 5：Root Queue 只作为补充
+
+当 Expansion Queue 已耗尽且 Gate 通过后，才允许从 Root Queue 读取一个 `assessmentIntent`，并在当下结合 Claim、已覆盖内容和 Target Role 现场生成具体问题。Root Queue 不得保存未来问题全文。
+
+这个新问题回答完成后，调度器立即回到 Step 1；如果产生新的 Expansion Queue，Root Queue 再次暂停。
+
+因此默认优先级是：
+
+```text
+Answer-driven vertical expansion
+> Claim-driven horizontal expansion
+```
+
+这里的 `>` 表示执行顺序，不是 Knowledge Node 类型的固定优先级。
+
+### Scheduler 伪代码
+
+```text
+while claim.active:
+  if expansionQueue.hasHighValueUnexpanded():
+    node = expansionQueue.dequeueHighestValue()
+    q = generateQuestion(node)
+    a = generateAnswer(q)
+    evaluateAll(extractCandidates(a))
+    node.status = EXPANDED
+    continue
+
+  if not siblingTransitionGatePasses():
+    continue
+
+  if rootQueue.hasPending():
+    root = rootQueue.dequeue()
+    q = materializeRootQuestion(root)
+    a = generateAnswer(q)
+    evaluateAll(extractCandidates(a))
+    continue
+
+  break
+```
+
+## 七、节点状态与追溯
+
+每个 Knowledge Node 至少应记录：
+
+- `sourceAnswerId`：它由哪一个 Generated Answer 产生
+- `candidateSource`：`EXPLICIT / IMPLICIT / CONTRAST / BOUNDARY`
+- `status`：`UNEXPANDED / EXPANDED / MERGED / DROPPED`
+- `mergedIntoNodeId`：若重复，被合并到哪个节点
+- `decisionReason`：为什么展开、合并或丢弃
+
+这样可以回答：
+
+> “这个追问为什么出现？”
+
+而不是只知道它属于某种 Node Type。
+
+## 八、示例
 
 ### 示例 A：低代码 Schema
 
@@ -386,3 +570,12 @@ Resume Claim：
 7. 触发实现层异常递归兜底
 
 **不得因为“离根关键词太远”而停止。**
+
+
+## 七、项目 Grounding 不是递归停止条件
+
+项目仓库无法证明某个实现细节，只影响答案的项目场景化，不自动降低该知识节点的技术价值。
+
+- 通用技术知识可靠 → 正常回答、正常继续价值判定。
+- 项目细节不足 → 使用旁白说明“实际实现需核实”。
+- 只有通用答案本身也无法可靠生成，或继续追问没有岗位信息增益时，才停止。

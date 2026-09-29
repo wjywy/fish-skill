@@ -1,0 +1,30 @@
+{
+  "id": "B5",
+  "title": "Interview Knowledge — user-visible output hygiene",
+  "sourceOfTruth": [
+    "SKILL.md §Interview 模式",
+    "workflows/interview-knowledge.md §用户可见 Markdown 输出 / §默认禁止输出的内部信息"
+  ],
+  "preconditions": { "mode": "RESUME_GROUNDED", "targetRole": "Agent 应用开发工程师" },
+  "userInput": "把刚才那条 Outbox 简历描述的面试准备整理成一份可以直接复习的 Markdown 文档。",
+  "mustDo": [
+    "一级标题提炼核心主题（如 `# Outbox 可靠事件分发`），不写 `Claim 1`",
+    "二级标题为面试问题，正文为紧邻的参考答案",
+    "每个参考答案分为两部分：一段话的逻辑与项目场景 + `**原理详解**` 小节",
+    "项目细节不足时只追加简短旁白"
+  ],
+  "mustNotDo": [
+    "输出 claimId / Claim / 证据路径 / 文件路径",
+    "输出 VERIFIED / PARTIAL / INSUFFICIENT",
+    "输出 depth / Node Type / roleRelevance / 风险等级",
+    "输出 Knowledge Node / Parent / Child / Stop Reason / 文档状态",
+    "输出“建议补充验证”等内部缺口列表",
+    "把参考答案写成没有分节的单段文字"
+  ],
+  "rubric": [
+    { "id": "B5-R1", "criterion": "未暴露任何内部元数据字段", "weight": 3 },
+    { "id": "B5-R2", "criterion": "一级标题为主题而非 Claim 编号", "weight": 2 },
+    { "id": "B5-R3", "criterion": "问题与答案紧邻、可直接复习", "weight": 2 },
+    { "id": "B5-R4", "criterion": "每个答案使用两部分结构（含 `**原理详解**` 小节）", "weight": 2 }
+  ]
+}

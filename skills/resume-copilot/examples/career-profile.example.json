@@ -29,7 +29,37 @@
       "priority": 1
     }
   ],
-  "experiences": [],
+  "experiences": [
+    {
+      "id": "exp-release",
+      "type": "project",
+      "name": "新品发布系统",
+      "organization": null,
+      "period": {
+        "start": null,
+        "end": null
+      },
+      "context": {
+        "problem": "全量刷新耗时过长，发布窗口无法收敛",
+        "goal": "把刷新收敛到分钟级",
+        "previousState": "定时全量刷新"
+      },
+      "ownership": "DIRECT",
+      "actions": [
+        "将全量刷新改为按变更页面增量刷新"
+      ],
+      "decisions": [],
+      "results": [],
+      "technologies": [],
+      "claimIds": [],
+      "metricIds": [],
+      "openQuestions": [
+        "具体改动了哪些模块 / 链路",
+        "最终耗时与规模数据"
+      ],
+      "resumeReady": false
+    }
+  ],
   "claims": [],
   "metrics": [],
   "skills": [],

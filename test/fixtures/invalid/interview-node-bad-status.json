@@ -1,0 +1,9 @@
+{
+  "id": "node-bad-001",
+  "claimId": "claim-1",
+  "nodeType": "MECHANISM",
+  "label": "状态非法的节点",
+  "depth": 1,
+  "status": "PENDING_REVIEW",
+  "roleRelevance": "CORE"
+}

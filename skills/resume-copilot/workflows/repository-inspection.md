@@ -1,5 +1,14 @@
 # Repository Inspection Workflow
 
+## Required References
+
+进入本流程后必须读取：
+
+- `../policies/repository-evidence-policy.md`
+- `../examples/repository-project-mode.example.md`
+
+示例用于理解“仓库事实 ≠ 用户 Ownership”的行为边界，不得复制其中技术栈。
+
 ## 适用场景
 
 用户明确要求结合当前代码仓库 / 工作区 / 某个项目生成简历内容时进入该模式。
@@ -42,7 +51,9 @@ Current Workspace / Repository
 
 ### 第二层：核心能力证据
 
-围绕高简历价值能力检查核心源码、API / Protocol、Workflow / Agent、数据模型、事件 / Outbox / Webhook、缓存、前端性能、鉴权限流、容错恢复等。
+先根据项目画像、用户目标岗位和用户请求识别“最可能支撑简历 Claim 的能力区域”，再检查对应核心源码与配置。
+
+不得使用固定技术主题白名单决定扫描范围。可以检查接口、状态模型、交互链路、数据处理、工程工具、性能实现、产品逻辑等任何与目标岗位和当前项目直接相关的部分；具体检查什么由仓库事实决定。
 
 ### 第三层：结果与规模证据
 

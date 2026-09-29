@@ -1,0 +1,390 @@
+{
+  "generatedAt": "2026-09-29T14:51:20.393Z",
+  "node": "v22.22.2",
+  "totals": {
+    "total": 52,
+    "passed": 52,
+    "warned": 0,
+    "failed": 0
+  },
+  "suites": [
+    {
+      "name": "T1 · Package & structure integrity",
+      "summary": {
+        "total": 9,
+        "passed": 9,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T1.1",
+          "title": "SKILL.md exists with YAML frontmatter",
+          "status": "PASS",
+          "detail": "name=resume-copilot"
+        },
+        {
+          "id": "T1.2",
+          "title": "all 8 workflow files exist",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.3",
+          "title": "all 8 policy files exist",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.4",
+          "title": "all 15 schema files exist and are valid JSON",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.5",
+          "title": "all 6 example files exist",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.6",
+          "title": "all 10 Kami template entry files exist",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.7",
+          "title": "shared render assets exist",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.8",
+          "title": "every theme entry references shared css + render js",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T1.9",
+          "title": "bin entry exists and package.json points at it",
+          "status": "PASS",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "name": "T2 · JSON Schema validation",
+      "summary": {
+        "total": 12,
+        "passed": 12,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T2.examples/career-profile.example.json",
+          "title": "examples/career-profile.example.json validates against career-profile.schema.json",
+          "status": "PASS",
+          "detail": "schema-valid"
+        },
+        {
+          "id": "T2.examples/resume-strategy.example.json",
+          "title": "examples/resume-strategy.example.json validates against resume-strategy.schema.json",
+          "status": "PASS",
+          "detail": "schema-valid"
+        },
+        {
+          "id": "T2.examples/claim-graph.example.json",
+          "title": "examples/claim-graph.example.json validates against claim-graph.schema.json",
+          "status": "PASS",
+          "detail": "schema-valid"
+        },
+        {
+          "id": "T2.templates/shared/sample-data.json",
+          "title": "templates/shared/sample-data.json validates against resume-view.schema.json",
+          "status": "PASS",
+          "detail": "schema-valid"
+        },
+        {
+          "id": "T2.fixtures/valid/career-profile.min.json",
+          "title": "fixtures/valid/career-profile.min.json validates against career-profile.schema.json",
+          "status": "PASS",
+          "detail": "schema-valid"
+        },
+        {
+          "id": "T2.neg.fact-missing-statement.json",
+          "title": "validator rejects fact-missing-statement.json",
+          "status": "PASS",
+          "detail": "1 error(s), mentions \"statement\""
+        },
+        {
+          "id": "T2.neg.fact-bad-category-enum.json",
+          "title": "validator rejects fact-bad-category-enum.json",
+          "status": "PASS",
+          "detail": "1 error(s), mentions \"category\""
+        },
+        {
+          "id": "T2.neg.claim-empty-factids.json",
+          "title": "validator rejects claim-empty-factids.json",
+          "status": "PASS",
+          "detail": "1 error(s), mentions \"factIds\""
+        },
+        {
+          "id": "T2.neg.resume-view-bullet-missing-claimids.json",
+          "title": "validator rejects resume-view-bullet-missing-claimids.json",
+          "status": "PASS",
+          "detail": "1 error(s), mentions \"claimIds\""
+        },
+        {
+          "id": "T2.neg.render-options-bad-theme.json",
+          "title": "validator rejects render-options-bad-theme.json",
+          "status": "PASS",
+          "detail": "1 error(s), mentions \"theme\""
+        },
+        {
+          "id": "T2.neg.interview-node-bad-status.json",
+          "title": "validator rejects interview-node-bad-status.json",
+          "status": "PASS",
+          "detail": "1 error(s), mentions \"status\""
+        },
+        {
+          "id": "T2.10",
+          "title": "every generated answer has a two-part body (overview + principleDetail)",
+          "status": "PASS",
+          "detail": "2 answers: two-part, detail section is the longer one"
+        }
+      ]
+    },
+    {
+      "name": "T3 · Cross-reference integrity",
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T3.1",
+          "title": "fixtures/valid/career-profile.min.json is fully self-consistent",
+          "status": "PASS",
+          "detail": "all claim/fact/metric/experience/view refs resolve"
+        },
+        {
+          "id": "T3.2",
+          "title": "examples/career-profile.example.json refs resolve",
+          "status": "PASS",
+          "detail": "consistent"
+        },
+        {
+          "id": "T3.3",
+          "title": "examples/claim-graph.example.json node/question/answer refs resolve",
+          "status": "PASS",
+          "detail": "graph refs consistent"
+        },
+        {
+          "id": "T3.4",
+          "title": "resume-view bullets always carry ≥1 claimId (schema-level guarantee)",
+          "status": "PASS",
+          "detail": "5 bullets all traceable"
+        }
+      ]
+    },
+    {
+      "name": "T4 · Kami renderer contract",
+      "summary": {
+        "total": 9,
+        "passed": 9,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T4.1",
+          "title": "renders header name, target role, education",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.2",
+          "title": "contacts: href → <a>, no href → <span>",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.3",
+          "title": "renders summary, skills, sections, subBlocks, tags",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.4",
+          "title": "renders section-<type> class per section type",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.5",
+          "title": "escapes HTML special chars (XSS safety)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.6",
+          "title": "handles missing header with a safe placeholder",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.7",
+          "title": "works without renderOptions (theme is html-level, not js-level)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.8",
+          "title": "defaults to document.body when no target given",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T4.9",
+          "title": "renders plain-string bullets as well as {text} objects",
+          "status": "PASS",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "name": "T5 · CLI (fish-skill)",
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T5.1",
+          "title": "`list` prints resume-copilot and exits 0",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T5.2",
+          "title": "`check` validates frontmatter and exits 0",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T5.3",
+          "title": "no args prints usage and exits 0",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T5.4",
+          "title": "`install` copies the full skill to --target",
+          "status": "PASS",
+          "detail": "56 files copied"
+        },
+        {
+          "id": "T5.5",
+          "title": "`install` refuses to overwrite without --force",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T5.6",
+          "title": "`install --force` overwrites successfully",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T5.7",
+          "title": "`install unknown-skill` fails with exit 1",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T5.8",
+          "title": "unknown command exits 1 with usage",
+          "status": "PASS",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "name": "T6 · Internal spec consistency",
+      "summary": {
+        "total": 10,
+        "passed": 10,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T6.1",
+          "title": "all relative file refs in skill markdown resolve to real files",
+          "status": "PASS",
+          "detail": "23 markdown files scanned"
+        },
+        {
+          "id": "T6.2",
+          "title": "every workflow Required References entry resolves",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T6.3",
+          "title": "render-options theme enum matches Kami template files",
+          "status": "PASS",
+          "detail": "10 themes aligned"
+        },
+        {
+          "id": "T6.4",
+          "title": "ownership enum consistent across fact/claim/experience schemas",
+          "status": "PASS",
+          "detail": "core 5 aligned; UNVERIFIED restricted to facts"
+        },
+        {
+          "id": "T6.5",
+          "title": "interview node status enum covers policy vocabulary",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T6.6",
+          "title": "SKILL.md 能力与路由 entries resolve",
+          "status": "PASS",
+          "detail": "33 routing refs resolved"
+        },
+        {
+          "id": "T6.7",
+          "title": "default theme (kami-default → kami-base.html) documented consistently",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T6.8",
+          "title": "hardMaxDepth default is 20 in schema and echoed in policy",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "id": "T6.9",
+          "title": "all 15 schemas are referenced from SKILL.md",
+          "status": "PASS",
+          "detail": "15 schemas referenced"
+        },
+        {
+          "id": "T6.10",
+          "title": "two-part answer contract consistent across schema and all docs",
+          "status": "PASS",
+          "detail": "4 docs document overview + 原理详解"
+        }
+      ]
+    }
+  ]
+}

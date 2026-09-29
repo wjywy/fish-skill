@@ -1,5 +1,15 @@
 # Resume Bootstrap Workflow
 
+## Required References
+
+进入本流程后必须读取：
+
+- `../policies/bootstrap-generation-policy.md`
+- `../policies/resume-writing-policy.md`
+- `../examples/resume-bullet-patterns.md`
+
+示例只用于学习信息组织方式，不得复制其中事实。
+
 ## 目标
 
 当用户已经按“项目 / 工作经历”为单位给出关键词或少量描述时，在目标岗位 / 方向明确的前提下，尽快生成一版可讨论的候选简历内容，并围绕最影响简历质量的缺口做少量追问。

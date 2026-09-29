@@ -27,7 +27,8 @@
 <main id="kami-root"></main>
 <script src="shared/kami-render.js"></script>
 <script>
-  renderKamiResume({ target: "#kami-root" });
+  // 生成最终简历时，将 Resume View JSON 赋给 window.KAMI_RESUME_DATA。
+  renderKamiResume({ target: "#kami-root", data: window.KAMI_RESUME_DATA });
 </script>
 </body>
 </html>

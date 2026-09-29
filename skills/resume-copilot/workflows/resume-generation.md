@@ -1,5 +1,13 @@
 # Resume Generation Workflow
 
+## Required References
+
+进入本流程后必须读取：
+
+- `../policies/resume-writing-policy.md`
+- `../examples/resume-bullet-patterns.md`
+- `../schemas/resume-view.schema.json`
+
 ## 目标
 
 将 `Career Profile + Resume Strategy` 转换成目标岗位对应的 `Resume View`。
@@ -21,13 +29,17 @@ Resume Generation 回答“已经决定要写这些事实后，应该怎么组�
 
 1. 按 Strategy 读取 `selectedExperienceIds` 和 `selectedClaimIds`。
 2. 根据 `sectionPlan` 分配内容位置和 bullet 数量。
-3. 将相关 Claims 组合为 bullet。
+3. 将相关 Claims 组合为 bullet；每条 bullet 必须生成稳定 `id`，并记录直接支撑它的 `claimIds` 与实际使用的 `metricIds`。
 4. 优先采用 `Context/Action/Decision/Result` 中对目标岗位最有区分度的信息。
 5. 使用符合 Ownership 的动词。
 6. Metric 只能引用 `metricIds` 对应、且符合 Metric Policy 的指标。
 7. 去除重复 Claim 和重复技术词。
 8. 检查每条 bullet 是否可追溯回 Claim。
-9. 输出 Resume View。
+9. 输出符合 `../schemas/resume-view.schema.json` 的 Resume View：
+   - `header`：姓名、目标岗位、教育简述、联系方式
+   - `skills`：能力方向 + 描述
+   - `sections`：工作 / 项目 / 实习 / 开源 / 教育等；entry 内可含 `summaryBullets / bullets / subBlocks`
+   - `summaryBullets / bullets / subBlocks[].bullets` 使用结构化 Resume Bullet：`{ id, text, claimIds, metricIds }`；Renderer 只展示 `text`，追溯信息保留在 Resume View。
 10. 如需 HTML / PDF，由 Renderer 解析 `renderOptions`；未指定主题则使用 `kami-default`。
 11. 最后交给 Renderer。
 

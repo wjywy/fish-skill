@@ -40,6 +40,12 @@
 
 Interview Risk 不是“禁止写入”的开关，而是决策信息。
 
+## Fact → Claim 追溯规则
+
+每个正式 Claim 必须至少引用一个 `factId`。Claim 不直接重复维护 source；来源、仓库路径、用户确认状态等统一从 Fact 追溯。
+
+每个 Metric 也必须引用支撑它的 `factIds`，避免指标脱离来源单独存在。
+
 ## 写入原则
 
 1. `Evidence D` 默认不进入最终简历。
@@ -51,9 +57,11 @@ Interview Risk 不是“禁止写入”的开关，而是决策信息。
 ## Metric Policy
 
 每个数字至少记录：
-- value / before / after 中可用的信息
-- unit
-- source：用户陈述、文档、现有简历、系统数据等
-- confidence
+- `value / before / after` 中可用的信息
+- `unit`
+- `confidence`
+- 至少一个支撑它的 `factId`
+
+Metric 不重复维护 `source`。来源类型、文件位置、Repository 证据和用户确认状态统一通过 `factIds → Fact` 回溯。
 
 不允许为了“量化”自动估算业务指标。

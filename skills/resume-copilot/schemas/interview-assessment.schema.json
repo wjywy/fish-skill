@@ -2,27 +2,124 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "InterviewAnswerAssessment",
   "type": "object",
-  "required": ["id", "userAnswerId", "status"],
+  "required": [
+    "id",
+    "userAnswerId",
+    "status"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "userAnswerId": {"type": "string"},
-    "status": {"enum": ["NOT_ANSWERED", "WEAK", "PARTIAL", "DEFENSIBLE", "NOT_OWNED", "INCORRECT"]},
+    "id": {
+      "type": "string"
+    },
+    "userAnswerId": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "NOT_ANSWERED",
+        "WEAK",
+        "PARTIAL",
+        "DEFENSIBLE",
+        "NOT_OWNED",
+        "INCORRECT"
+      ]
+    },
     "dimensions": {
       "type": "object",
       "properties": {
-        "correctness": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "relevance": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "mechanism": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "projectGrounding": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "boundary": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "tradeoff": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "ownershipClarity": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "metricClarity": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "communication": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+        "correctness": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "relevance": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mechanism": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "projectGrounding": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "boundary": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tradeoff": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "ownershipClarity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "metricClarity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "communication": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
       }
     },
-    "missingDimensions": {"type": "array", "items": {"type": "string"}},
-    "followUpQuestionIds": {"type": "array", "items": {"type": "string"}},
-    "resumeReviewSuggestion": {"type": ["string", "null"]}
-  }
+    "missingDimensions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "followUpQuestionIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "resumeReviewSuggestion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$id": "interview-assessment.schema.json",
+  "additionalProperties": false
 }

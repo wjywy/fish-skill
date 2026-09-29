@@ -1,5 +1,14 @@
 # Resume Strategy Workflow
 
+## Required References
+
+进入本流程后必须读取：
+
+- `../schemas/resume-strategy.schema.json`
+- `../examples/resume-strategy.example.json`
+
+示例只用于理解 Strategy 的组织方式，不得把其中岗位或 Claim 当作用户事实。
+
 ## 1. 目标
 
 Resume Strategy 负责回答“针对这个目标岗位，这份简历应该写什么”。
@@ -77,71 +86,23 @@ JD：负责多 Agent 工作流的设计与落地，熟悉 LangGraph。
 
 `OBSERVED`、`evidenceLevel = C`、`interviewRisk = HIGH` 不自动删除，但必须降低优先级，并避免使用超过事实强度的动词。
 
-## 5. Claim 选择评分
+## 5. Claim 选择判定
 
-评分的目的不是伪装成绝对数学真理，而是让 Agent 的选择可解释、稳定。
+Claim 选择默认使用**相对判定**，不使用跨岗位通用的固定权重公式。不同岗位对结果、Ownership、领域经验、协作或技术深度的重视程度不同，固定 35% / 20% 等权重会制造虚假的精确性。
 
-建议使用 0–100 的内部评分：
+对每个候选 Claim 至少判断：
 
-```text
-ClaimScore =
-  35% Requirement Relevance
-+ 20% Ownership Strength
-+ 15% Evidence Confidence
-+ 15% Outcome Strength
-+ 10% Differentiation
-+  5% Recency
-- Risk Penalty
-- Redundancy Penalty
-```
+1. **Requirement Relevance**：是否直接支撑 Target Role / JD 的重要要求。
+2. **Ownership Strength**：用户本人参与深度是否足以支撑表述强度。
+3. **Evidence Confidence**：事实来源与确认程度是否可靠。
+4. **Outcome Strength**：是否有可信结果、影响或明确完成状态。
+5. **Differentiation**：是否能体现相比普通候选人的区分度。
+6. **Redundancy**：是否与其他 Claim 重复证明同一能力。
+7. **Space Cost**：在有限篇幅中是否值得占用一条 bullet。
 
-### Requirement Relevance（0–100）
+选择原则：先满足核心 Requirement，再在同类 Claim 中优先选择 Ownership 更强、证据更可靠、结果更清晰、区分度更高且重复更少的项。
 
-Claim 与目标岗位 / JD requirement 的语义匹配程度。
-
-- 100：直接证明 MUST requirement
-- 80：直接证明 IMPORTANT requirement
-- 60：对岗位核心能力有强支撑
-- 30：弱相关
-- 0：无关
-
-### Ownership Strength
-
-- OWNER = 100
-- DIRECT = 90
-- COLLABORATIVE = 65
-- OBSERVED = 30
-- NONE = 0
-
-### Evidence Confidence
-
-- A + confirmed = 100
-- B + confirmed/inferred = 80
-- C = 45
-- D = 0
-
-### Outcome Strength
-
-- 有确认的业务 / 性能 / 效率结果 = 100
-- 有明确非量化结果 = 70
-- 只有动作无结果 = 40
-- 只有技术名词 = 10
-
-### Differentiation
-
-衡量是否能让候选人与普通简历形成区分。例如复杂架构权衡、规模、跨团队影响、可复用方法论等。
-
-### Risk Penalty
-
-- LOW = 0
-- MEDIUM = 5
-- HIGH = 15
-
-若 HIGH Risk 同时为 `OBSERVED` 或 Evidence C，则可额外扣分。
-
-### Redundancy Penalty
-
-若多个 Claim 证明同一件事，只保留最强证据，避免简历重复堆技术名词。
+如果某个具体场景确实需要数值评分，可以在当前 Target 下临时定义权重，但必须记录该权重为何适合该岗位；不得把一套固定权重当作所有岗位的通用真理。
 
 ## 6. 不是“JD 有什么就硬塞什么”
 

@@ -67,7 +67,7 @@
 
 ## Bootstrap Bullet 写作要求
 
-即使是 provisional bullet，也应尽量遵循 `resume-writing-policy.md` 的结构，不要为了“先出结果”输出空泛职责句。
+即使是 provisional bullet，也应尽量遵循 `./resume-writing-policy.md` 的结构，不要为了“先出结果”输出空泛职责句。
 
 当信息不足以形成“动作 + 对象 + 技术机制”时，宁可输出候选骨架和明确缺口，也不要生成：
 

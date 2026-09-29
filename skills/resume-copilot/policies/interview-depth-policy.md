@@ -10,7 +10,7 @@
 
 ## 深度判定
 
-每产生一个新的 Candidate Knowledge Node，调用 `knowledge-expansion-policy.md` 的高价值判定流程。
+每产生一个新的 Candidate Knowledge Node，调用 `./knowledge-expansion-policy.md` 的高价值判定流程。
 
 只要节点仍满足：
 
@@ -87,7 +87,12 @@ Outbox
 3. 当前 Claim 已经可以被充分解释，新的节点也没有额外区分度
 4. 节点已被其他问题实质覆盖
 5. 出现语义环路
-6. 无法生成可靠答案
+6. 无法生成可靠的通用技术答案（仅项目 Grounding 不足不属于该情况）
 7. 达到实现层 `hardMaxDepth` 安全兜底
 
 第 7 条只用于防止异常无限递归，不是推荐深度。
+
+
+## Project Grounding 与深度无关
+
+`VERIFIED / PARTIAL / INSUFFICIENT` 描述的是项目场景化程度，不直接决定是否继续追问。一个节点即使 `projectGrounding=INSUFFICIENT`，只要通用技术答案可靠且对岗位仍有信息增益，就可以继续展开，并用旁白标明项目实现尚未核实。

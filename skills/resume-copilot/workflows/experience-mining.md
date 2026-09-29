@@ -1,5 +1,14 @@
 # Experience Mining Workflow
 
+## Required References
+
+进入本流程后必须读取：
+
+- `../policies/evidence-policy.md`
+- `../policies/metric-policy.md`
+
+需要形成 Claim / Metric 时以对应 Schema 为约束。
+
 ## 目标
 
 把 Raw Career Input 中抽取出的 Facts，连同用户的零散补充，转化为可以验证的 Experience、Claim 与 Metric，而不是直接润色成简历 bullet。

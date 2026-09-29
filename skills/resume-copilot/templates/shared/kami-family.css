@@ -145,3 +145,6 @@ li { margin: .55mm 0; line-height: 1.48; }
 /* Optional explicit page break when a generated resume needs it. */
 .page-break-before { break-before: page; page-break-before: always; }
 .no-break { break-inside: avoid; }
+
+.resume-summary{margin:0 0 4mm;color:var(--kami-text-secondary);font-size:10px;line-height:1.65;}
+.entry-tags{margin-top:1mm;color:var(--kami-text-muted);font-size:9px;}

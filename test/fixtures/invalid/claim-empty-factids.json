@@ -1,0 +1,11 @@
+{
+  "id": "claim-bad-001",
+  "experienceId": "exp-1",
+  "factIds": [],
+  "statement": "一条无法追溯到任何 Fact 的 Claim",
+  "type": "implementation",
+  "ownership": "DIRECT",
+  "evidenceLevel": "A",
+  "confidence": "confirmed",
+  "interviewRisk": "LOW"
+}

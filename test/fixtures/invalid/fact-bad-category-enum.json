@@ -1,0 +1,8 @@
+{
+  "id": "fact-bad-002",
+  "statement": "使用某个不存在的分类",
+  "category": "vibes",
+  "subject": "USER",
+  "sourceType": "USER",
+  "status": "confirmed"
+}

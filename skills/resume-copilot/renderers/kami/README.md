@@ -30,22 +30,32 @@ Kami Renderer 负责把 `Resume View` 渲染成 A4 技术简历。它只负责�
 
 ## 数据契约
 
-```json
-{
-  "renderOptions": {
-    "renderer": "kami",
-    "theme": "kami-default",
-    "format": "html"
-  }
-}
+Kami Renderer 直接消费 `../../schemas/resume-view.schema.json`。核心结构：
+
+```text
+Resume View
+├── header
+├── skills[]
+├── sections[]
+│   └── entries[]
+│       ├── summaryBullets[]
+│       ├── bullets[]
+│       └── subBlocks[]
+└── renderOptions
 ```
 
-缺少 `renderOptions` 或 `theme` 时使用 `kami-default`。
+调用：
+
+```js
+renderKamiResume({ target: "#kami-root", data: resumeView });
+```
+
+`../../templates/shared/sample-data.json` 与 Resume View Schema 保持一致，可用于开发预览。缺少 `renderOptions` 或 `theme` 时使用 `kami-default`。
 
 ## 结构与主题分离
 
 - `templates/shared/kami-render.js`：共享结构。
 - `templates/shared/kami-family.css`：共享排版。
-- `templates/kami-*.html`：主题变量入口。
+- `../../templates/kami-*.html`：主题变量入口。
 
 主题只控制颜色与视觉变量；不得修改 Career Profile、Resume Strategy、Claim 或 Metric。

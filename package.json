@@ -1,6 +1,6 @@
 {
   "name": "fish-skill",
-  "version": "0.1.5",
+  "version": "0.1.12",
   "description": "A collection of reusable AI coding-agent skills, including Resume Copilot.",
   "type": "module",
   "bin": {
@@ -29,6 +29,8 @@
   "scripts": {
     "list": "node ./bin/fish-skill.mjs list",
     "check": "node ./bin/fish-skill.mjs check",
+    "test": "node ./test/run-tests.mjs",
+    "test:report": "node ./test/run-tests.mjs --json",
     "prepack": "node ./bin/fish-skill.mjs check"
   }
 }

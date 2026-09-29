@@ -1,5 +1,13 @@
 # Raw Career Input Intake Workflow
 
+## Required References
+
+按输入类型读取，不一次性加载全部材料：
+
+- 需要建立 Fact 时：`../schemas/fact.schema.json`
+- 当前仓库模式：转入 `../workflows/repository-inspection.md`
+- 已有完整 Career Profile 需要校验结构时，可参考 `../examples/career-profile.example.json`
+
 ## 目标
 
 允许用户从任意粒度开始，而不要求理解 Resume Copilot 的内部 Schema。
@@ -57,7 +65,7 @@ Experience + Claim + Metric
 
 ### 用户给一段经历 + 关键词
 
-直接进入 `resume-bootstrap.md`。不要要求用户填写表单，也不要把其他经历关键词混入当前项目。
+直接进入 `../workflows/resume-bootstrap.md`。不要要求用户填写表单，也不要把其他经历关键词混入当前项目。
 
 ### 用户给旧简历 / 工作总结
 
@@ -73,7 +81,7 @@ JD 进入 Resume Strategy 的 requirement 解析，不进入 Career Evidence。�
 
 ### 用户要求结合当前 Coding Agent 项目
 
-进入 `repository-inspection.md`，主动检查当前工作区。仓库得到的事实统一写入 `Fact`，`sourceType = REPOSITORY`，Ownership 初始为 `UNVERIFIED`。
+进入 `../workflows/repository-inspection.md`，主动检查当前工作区。仓库得到的事实统一写入 `Fact`，`sourceType = REPOSITORY`，Ownership 初始为 `UNVERIFIED`。
 
 ## 停止条件
 

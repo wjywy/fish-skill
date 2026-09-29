@@ -8,7 +8,10 @@
       "category": "architecture",
       "statement": "具备多 Agent 工作流设计与落地经验",
       "importance": "MUST",
-      "keywords": ["Multi-Agent", "LangGraph"],
+      "keywords": [
+        "Multi-Agent",
+        "LangGraph"
+      ],
       "evidenceNeeded": "DIRECT 或 OWNER 的工作流实现 Claim",
       "sourceText": "负责多 Agent 工作流设计与落地"
     }
@@ -17,19 +20,18 @@
     {
       "requirementId": "req-001",
       "status": "covered",
-      "claimIds": ["claim-a2a-workflow"],
+      "claimIds": [
+        "claim-a2a-workflow"
+      ],
       "notes": "LangGraph 1 Supervisor + 6 Specialist Agents"
     }
   ],
-  "selectedExperienceIds": ["exp-a2a-platform"],
-  "selectedClaimIds": ["claim-a2a-workflow", "claim-a2a-outbox"],
-  "claimScores": [
-    {
-      "claimId": "claim-a2a-workflow",
-      "score": 95,
-      "matchedRequirementIds": ["req-001"],
-      "reason": "直接覆盖核心 requirement，且为实际实现"
-    }
+  "selectedExperienceIds": [
+    "exp-a2a-platform"
+  ],
+  "selectedClaimIds": [
+    "claim-a2a-workflow",
+    "claim-a2a-outbox"
   ],
   "excludedClaims": [],
   "sectionPlan": [
@@ -37,10 +39,31 @@
       "section": "projects",
       "priority": 1,
       "budget": "3 bullets",
-      "experienceIds": ["exp-a2a-platform"]
+      "experienceIds": [
+        "exp-a2a-platform"
+      ]
     }
   ],
-  "emphasis": ["Multi-Agent Workflow", "Long-running Task", "RAG"],
+  "emphasis": [
+    "Multi-Agent Workflow",
+    "Long-running Task",
+    "RAG"
+  ],
   "coverageGaps": [],
-  "riskNotes": []
+  "riskNotes": [],
+  "claimEvaluations": [
+    {
+      "claimId": "claim-a2a-workflow",
+      "decision": "SELECT",
+      "matchedRequirementIds": [
+        "req-001"
+      ],
+      "strengths": [
+        "直接覆盖核心 requirement",
+        "Ownership 与证据强度足够"
+      ],
+      "weaknesses": [],
+      "reason": "直接覆盖核心 requirement，且为实际实现"
+    }
+  ]
 }

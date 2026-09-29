@@ -1,12 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://resume-copilot.local/schemas/render-options.schema.json",
+  "$id": "render-options.schema.json",
   "title": "Resume Render Options",
   "type": "object",
   "properties": {
     "renderer": {
       "type": "string",
-      "enum": ["kami"],
+      "enum": [
+        "kami"
+      ],
       "default": "kami"
     },
     "theme": {
@@ -27,10 +29,16 @@
     },
     "format": {
       "type": "string",
-      "enum": ["html", "pdf", "markdown"],
+      "enum": [
+        "html",
+        "pdf"
+      ],
       "default": "html"
     }
   },
-  "required": ["renderer", "theme"],
+  "required": [
+    "renderer",
+    "theme"
+  ],
   "additionalProperties": false
 }

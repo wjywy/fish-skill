@@ -19,6 +19,30 @@ Resume Copilot 先建立可追溯的职业事实，再根据目标岗位生成�
 8. **Career Profile is the source of truth.** Markdown、HTML、PDF 只是输出视图。
 
 
+## 硬性执行约束（Interview Knowledge，不可跳过）
+
+以下约束是硬性的。**「输出形态是一份文档」或「用户要求批量题目」都不构成豁免。**
+
+1. **Pre-flight：动笔前先读两处**
+   - 先读工作区记忆（`.workbuddy-ai/memory/` 的当日日志与 `MEMORY.md`），确认用户对同类文档的历史反馈与既有约定。
+   - 先盘点目标输出目录下的已有版本，对齐既有结构，不另起炉灶。
+2. **禁止预生成完整题纲**
+   - 不得先列「主题 → 每个主题 4–5 个问题」的清单，再逐题补答案。
+   - 必须先物化一个 Root Question、写出参考答案，再从该答案提取节点，决定下一问。
+3. **当前分支优先（Depth before Breadth）**
+   - 只要当前分支仍有高价值未展开节点，就必须继续深入，**不得横向换题**。
+   - 一条链要挖到**机制层**，不是停在一两层。参照深链示例：
+     `Outbox → 双写一致性 → 本地事务 → Worker 重复执行 → 幂等 → 并发去重 → 唯一约束 → 事务隔离`
+4. **批量输出例外必须显式受限**
+   - 只有输出形态确需批量时才可一次物化多个问题；即便如此，每一条仍必须**由上一层答案驱动、逐层加深**。
+   - **禁止**把批量输出做成「平行兄弟问题清单」。
+5. **Output Gate：交付前逐主题自检（不通过就重写）**
+   - 这是「一条答案驱动的深链」，还是「一组互不依赖的平行问题」？
+   - 深度是否至少到机制层（解释「为什么成立 / 底层怎么做」），而不是停在「是什么 / 为什么要」？
+   - 是否在分支真正耗尽前就横向换了题？
+   - 只要出现「平行问题堆叠」或「深度 ≤ 2 层」→ **该主题不达标，必须重写**。
+
+
 ## Target Direction Gate
 
 Resume Copilot 可以在目标方向未知时读取资料、分析仓库、抽取 Fact 和整理 Experience，但**不得生成正式 Resume Bullet / Resume View**。
@@ -65,6 +89,16 @@ MD / HTML / PDF
 - 默认面试知识树：`workflows/interview-knowledge.md`
 - 用户主动模拟面试：`workflows/mock-interview.md`
 
+## 按需加载规则
+
+不要在启动 Skill 时一次性读取全部文件。进入某个 Workflow 后，必须读取该 Workflow 的 **Required References**；示例文件只有在对应阶段被列为 Required Reference 时才需要加载。
+
+```text
+SKILL.md → 选择 Workflow → 读取 Required References → 执行
+```
+
+这保证 examples / policies 真正进入执行链，同时避免无关上下文占用。
+
 ## 核心 Policy
 
 - Bootstrap 边界：`policies/bootstrap-generation-policy.md`
@@ -72,8 +106,8 @@ MD / HTML / PDF
 - Repository 证据边界：`policies/repository-evidence-policy.md`
 - Metric：`policies/metric-policy.md`
 - Resume Bullet 写作：`policies/resume-writing-policy.md`
-- 知识递归：`policies/knowledge-expansion-policy.md
-- `examples/interview-expansion-examples.md`：高价值知识节点判定与详细回答示例`
+- 知识递归：`policies/knowledge-expansion-policy.md`
+- 面试扩展示例：`examples/interview-expansion-examples.md`
 - 面试递归深度：`policies/interview-depth-policy.md`
 - Mock Interview 回答评估：`policies/answer-assessment-policy.md`
 
@@ -133,21 +167,27 @@ Claim → Question → Generated Reference Answer → Knowledge Node → Follow-
 
 系统生成参考答案，并从答案中的关键技术、机制、决策、失败恢复、一致性、并发、性能和取舍继续递归展开。
 
-递归边界由 **Target Role / JD Requirements** 决定，而不是由“距离根 Claim / 根关键词有多远”决定。只要新节点仍属于目标岗位的 `CORE / RELATED` 能力，就继续向下追问；只有完全脱离岗位要求、进入不再影响岗位判断的细节时才停止。
+递归边界由 **Target Role / JD Requirements** 决定，而不是由“距离根 Claim / 根关键词有多远”决定。`CORE / RELATED` 节点通常继续；`CONTEXTUAL` 节点根据 Claim Dependency 与 Information Gain 决定；只有进入 `OUT_OF_SCOPE`，或继续深入已不能增加岗位判断信息时才停止。项目 Grounding 不足本身不是停止条件。
 
 `Generated Reference Answer != User Answer`，系统生成内容不代表用户已经掌握，也不自动成为 Career Claim。
 
-默认用户可见输出使用简洁 Markdown：
+默认用户可见输出使用简洁 Markdown，每个参考答案固定两部分：
 
 ```text
 # 一条简历描述的核心主题
 ## 面试问题
-参考答案
+第一部分：一段话的逻辑与项目场景
+**原理详解**
+第二部分：展开的通用原理
 ## 递归追问
-参考答案
+第一部分：一段话的逻辑与项目场景
+**原理详解**
+第二部分：展开的通用原理
 ```
 
-Claim、证据路径、VERIFIED/PARTIAL、Node Type、depth、P0/P1、停止条件等仅用于内部推理，除非用户明确要求，否则不得输出。递归知识树可以在内部保持树结构，但最终 Markdown 默认按一级主题下的二级问题扁平展示。
+第一部分保持简洁（一段话，给结论、机制主线和项目落点）；第二部分 `**原理详解**` 承担详细度，展开原理、机制、边界与取舍。
+
+Claim、证据路径、项目 Grounding 状态、Node Type、depth、停止条件等仅用于内部推理，除非用户明确要求，否则不得输出。递归知识树可以在内部保持树结构，但最终 Markdown 默认按一级主题下的二级问题扁平展示。
 
 ### Mock Interview（可选）
 
@@ -164,3 +204,7 @@ Question → User Answer → Assessment → Follow-up
 Renderer 只负责展示。Kami 规则见 `renderers/kami/README.md`。
 
 默认主题 `kami-default`；用户未指定主题时不得阻塞生成。
+
+### Interview expansion cardinality
+
+在 Interview Knowledge 中，一个 Generated Answer 可以产生多个高价值 Follow-up Nodes。必须提取并保留所有有价值的 sibling；默认一次只执行其中一个，当前分支耗尽后再返回其余 sibling。不要把“one-at-a-time execution”误解为“one-answer-one-question”。

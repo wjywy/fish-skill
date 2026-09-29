@@ -1,35 +1,116 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://resume-copilot.local/schemas/metric.schema.json",
+  "$id": "metric.schema.json",
   "title": "Career Metric",
   "type": "object",
-  "required": ["id", "kind", "confidence"],
+  "required": [
+    "id",
+    "factIds",
+    "kind",
+    "confidence"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "experienceId": {"type": ["string", "null"]},
-    "label": {"type": ["string", "null"]},
+    "id": {
+      "type": "string"
+    },
+    "experienceId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "label": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "kind": {
       "type": "string",
-      "enum": ["before_after", "absolute", "percentage", "duration", "scale", "cost", "quality", "other"]
+      "enum": [
+        "before_after",
+        "absolute",
+        "percentage",
+        "duration",
+        "scale",
+        "cost",
+        "quality",
+        "other"
+      ]
     },
-    "before": {"type": ["number", "string", "null"]},
-    "after": {"type": ["number", "string", "null"]},
-    "value": {"type": ["number", "string", "null"]},
-    "unit": {"type": ["string", "null"]},
-    "direction": {"type": ["string", "null"], "enum": ["increase", "decrease", "neutral", null]},
-    "scope": {"type": ["string", "null"]},
-    "source": {
-      "type": "object",
-      "properties": {
-        "kind": {"type": "string", "enum": ["user", "existing_resume", "document", "system", "other"]},
-        "reference": {"type": ["string", "null"]}
+    "before": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "after": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "value": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "unit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "direction": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "increase",
+        "decrease",
+        "neutral",
+        null
+      ]
+    },
+    "scope": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "inferred",
+        "disputed",
+        "unknown"
+      ]
+    },
+    "resumeEligible": {
+      "type": "boolean",
+      "default": true
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "factIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
       },
-      "required": ["kind"],
-      "additionalProperties": false
-    },
-    "confidence": {"type": "string", "enum": ["confirmed", "inferred", "disputed", "unknown"]},
-    "resumeEligible": {"type": "boolean", "default": true},
-    "notes": {"type": "array", "items": {"type": "string"}}
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "支撑该指标的 Career Fact IDs。来源与证据从 Fact 追溯。"
+    }
   },
   "additionalProperties": false
 }

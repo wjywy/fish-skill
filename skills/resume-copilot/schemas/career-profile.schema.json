@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://resume-copilot.local/schemas/career-profile.schema.json",
+  "$id": "career-profile.schema.json",
   "title": "Resume Copilot Career Profile",
   "type": "object",
   "required": [

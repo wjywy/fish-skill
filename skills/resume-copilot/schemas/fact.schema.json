@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://resume-copilot.local/schemas/fact.schema.json",
+  "$id": "fact.schema.json",
   "title": "Career Fact",
   "type": "object",
   "required": [

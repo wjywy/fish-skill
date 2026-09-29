@@ -1,0 +1,27 @@
+{
+  "id": "B3",
+  "title": "Metric provenance",
+  "sourceOfTruth": [
+    "SKILL.md §核心原则 5",
+    "policies/metric-policy.md",
+    "policies/evidence-policy.md §Metric Policy",
+    "workflows/experience-mining.md §5. RESULT / METRIC"
+  ],
+  "preconditions": { "targetRoleKnown": true, "targetRole": "后端开发工程师" },
+  "userInput": "我做过新品发布系统优化，把缓存刷新从全量改成增量，原来要 7 小时多，现在 5 分钟左右。整体效果提升很多，效率高了不少。帮我写简历。",
+  "mustDo": [
+    "保留用户给出的 before=7h+ / after=5min 原始值",
+    "可表达“从 7 小时+ 降至约 5 分钟”，但不得自行补精确百分比",
+    "对“提升很多 / 高了不少”标记为需要确认或定性结果，不自动量化"
+  ],
+  "mustNotDo": [
+    "自动生成“提升约 90% / 提升 95% / 提升 40%”等数字",
+    "把“大约”删除成精确值",
+    "把局部数据扩大成全站数据"
+  ],
+  "rubric": [
+    { "id": "B3-R1", "criterion": "未编造任何未提供的百分比", "weight": 3 },
+    { "id": "B3-R2", "criterion": "保留 7h+ → 5min 原始口径", "weight": 3 },
+    { "id": "B3-R3", "criterion": "对模糊表述给出确认请求或定性表达", "weight": 2 }
+  ]
+}

@@ -1,8 +1,24 @@
 # Interview Knowledge Workflow
 
+## Required References
+
+进入本流程后，在生成问题前必须读取：
+
+- `../policies/knowledge-expansion-policy.md`
+- `../policies/interview-depth-policy.md`
+- `../examples/interview-expansion-examples.md`
+- `../examples/claim-graph.example.json`
+
+其中 examples 是行为示例，不是事实来源；不得把示例里的项目、技术栈或答案场景迁移到用户项目。
+
 ## 目标
 
-Interview Knowledge 是默认面试准备模式。它不要求用户先回答问题，而是围绕 Resume View 中暴露的 Claim 自动生成：
+Interview Knowledge 是默认面试准备模式。它不要求用户先回答问题，支持两种入口：
+
+- `RESUME_GROUNDED`：围绕 Resume View 中实际暴露的 Claim 生成面试知识树。
+- `PROJECT_GROUNDED`：围绕当前项目 / Repository 已验证出的 Claim 集合生成面试知识树，用于“结合这个项目准备面试”。Repository Fact 只能证明项目能力，不能自动证明用户 Ownership。
+
+两种模式都会生成：
 
 - 面试问题
 - 参考答案
@@ -21,7 +37,11 @@ Generated Reference Answer
    ↓
 Extract Drillable Knowledge Nodes
    ↓
-Normalize / Deduplicate / Prioritize
+Normalize / Deduplicate / Evaluate
+   ↓
+Enqueue High-value Nodes as UNEXPANDED
+   ↓
+Dequeue Highest-value UNEXPANDED Node
    ↓
 Generate Follow-up Question
    ↓
@@ -31,9 +51,59 @@ Generate Follow-up Answer
 
 默认模式下，**不得因为答案是系统生成的，就推断用户已经掌握这些内容**。
 
+## 生成前与交付前强制检查（Gate）
+
+本 Workflow 存在两个强制 Gate，缺一即视为执行失败。
+
+### Gate 1：生成前（Pre-flight）
+
+1. 读取工作区记忆与目标输出目录下已有版本，对齐既有结构与用户历史反馈。
+2. 确认本题将以 **Answer-driven 深链**方式生成，而不是「主题清单」。
+
+### Gate 2：交付前（Output Gate）
+
+对**每一个一级主题**逐条自检：
+
+1. 该主题下的问题是否构成**一条链**（后一问由前一问的答案引出）？
+2. 该链是否至少深入到**机制层**，而不是停在「是什么 / 为什么要」？
+3. 是否在分支真正耗尽前就横向换了题？
+4. 是否存在互不依赖的平行兄弟问题堆叠？
+
+只要 1 或 2 为否、或 3 / 4 为是 → 该主题不达标，**必须重写**后才能交付。
+
+### 反模式（明确不达标）
+
+```text
+# 主题 A
+## 问题 A1（是什么）
+## 问题 A2（为什么）
+## 问题 A3（怎么做）
+## 问题 A4（有什么限制）
+
+# 主题 B
+## 问题 B1
+...
+```
+
+问题之间互不依赖、深度只到第二层——这是**主题清单**，不是 Interview Knowledge。
+
+达标形态是**一条链**：
+
+```text
+# 主题 A
+## 根问题
+<答案>
+## 由根答案引出的追问
+<答案>
+## 由上一答案继续引出的、更深的机制追问
+<答案>
+```
+
 ## 输入
 
-优先读取：
+根据 `sourceMode` 读取：
+
+### RESUME_GROUNDED
 
 - Resume View 中实际暴露的 `claimIds`
 - Claim 对应的 Experience / Metric / Ownership / Evidence
@@ -42,34 +112,76 @@ Generate Follow-up Answer
 
 不要重新从最终简历文案猜事实；简历文本只用于确定“用户最终暴露了什么”。
 
+### PROJECT_GROUNDED
+
+- 当前 Repository / Project 中已验证的 Facts、Experience 与 Claim
+- Target Role / JD Requirement
+- 已存在的 Interview Knowledge Graph
+
+项目技术事实可以用于生成技术问题和通用参考答案；如果答案要表述成“我负责 / 我设计 / 我实现”，必须有对应 Ownership 证据。不得把仓库能力自动升级成个人经历。
+
 ## Root Question 生成
 
-每个核心 Claim 可以按需覆盖以下问题维度：
+Root Question 只负责**启动一个 Claim 的第一条有效追问链**，不是提前生成完整题库。
 
-1. `DEFINITION`：是什么
-2. `MOTIVATION`：为什么需要
-3. `IMPLEMENTATION`：怎么做
-4. `MECHANISM`：底层为什么成立
-5. `FAILURE`：异常、失败、恢复
-6. `CONSISTENCY`：一致性、顺序、幂等
-7. `CONCURRENCY`：并发、竞态、锁
-8. `PERFORMANCE`：吞吐、延迟、复杂度、指标
-9. `TRADEOFF`：为什么选 A，不选 B
-10. `SCALING`：规模扩大后怎么办
-11. `METRIC`：指标怎么计算、来源是什么
-12. `OWNERSHIP`：这个能力在项目中自己做到哪一层
+可以参考以下问题维度来选择一个合适的起点：
 
-不是每个 Claim 都机械生成全部维度。根据 Claim Strength、Target Role、JD 相关性决定覆盖范围。
+- `DEFINITION`：是什么
+- `MOTIVATION`：为什么需要
+- `IMPLEMENTATION`：怎么做
+- `MECHANISM`：底层为什么成立
+- `FAILURE`：异常、失败、恢复
+- `CONSISTENCY`：一致性、顺序、幂等
+- `CONCURRENCY`：并发、竞态、锁
+- `PERFORMANCE`：吞吐、延迟、复杂度、指标
+- `TRADEOFF`：为什么选 A，不选 B
+- `SCALING`：规模扩大后怎么办
+- `METRIC`：指标怎么计算、来源是什么
+- `OWNERSHIP`：这个能力在项目中自己做到哪一层
+
+但必须遵守：
+
+1. **不要预生成或预规划完整问题目录。**
+2. 每个 Claim 初始只物化最有价值的 Root Question；其余横向需求只能保存为 `ROOT_PENDING` 的 **assessment intent**（例如“评估失败边界”），不得提前写成具体问题文本。
+3. Root Question 得到 Answer 后，必须先消费由 Answer 产生的高价值 `UNEXPANDED` 节点。
+4. 只有 Expansion Queue 清空且通过 Sibling Transition Gate 后，才允许从 `ROOT_PENDING` 取下一个横向问题。
+5. Question Dimension 只是问题视角，不是固定覆盖清单。
 
 ## Generated Reference Answer
 
 参考答案的首要目标是**准确回答面试问题本身**。项目事实用于场景化答案，而不是决定“这个问题能不能回答”。
 
-答案生成按以下顺序：
+每个参考答案固定由两部分组成：
 
-1. **Canonical Answer**：先用可靠的通用技术知识完整回答问题，覆盖原理、实现、边界和取舍中与题目相关的部分。
-2. **Project Context**：如果 Career Profile / Repository 能确认项目中的具体使用方式，把这些背景自然融入答案，说明“在这个项目里是怎么落地的”。
-3. **Project-specific Gap**：如果仓库只能证明存在某个机制，但无法证明选择动机、故障恢复、性能效果等项目细节，仍然输出完整准确的 Canonical Answer；只对无法确认的项目个性化部分做简短旁白提醒。
+```text
+第一部分 · 逻辑与项目场景
+  一段话给出结论与机制主线，并说明它在本项目中的落点。
+
+第二部分 · 原理详解
+  另起一节展开通用技术原理：机制、边界、失败与恢复、并发与一致性、取舍。
+```
+
+### 第一部分：逻辑与项目场景
+
+用一段话（通常 2–4 句）回答“是什么 / 为什么这么做 / 在这个项目里怎么落地”。
+
+- 先给结论，再给机制主线，最后落到项目场景。
+- 项目场景只能来自 Career Profile / Repository 中已验证的事实；无法确认时不写。
+- 这一段必须能独立读懂：只看这一段也应能理解答案的骨架。
+
+### 第二部分：原理详解
+
+在第一部分之后另起一节，以 `**原理详解**` 标注，展开通用技术原理。
+
+- 覆盖原理、实现、边界、失败与恢复、并发与一致性、性能与取舍中与题目相关的部分。
+- 使用分层解释、步骤列表、对比表格、流程图、伪代码或具体例子（见 Answer Detail Standard）。
+- 不依赖项目个性化事实：即使项目证据不足，这一部分也必须完整、准确。
+- 不得把通用最佳实践写成“用户项目就是这样做的”。
+- 这一部分是“可复习”的主体，应当比第一部分详细得多。
+
+### 项目细节旁白（可选）
+
+如果仓库 / Career Profile 只能证明某机制存在，但无法证明选择动机、故障恢复、性能效果等项目细节，仍然完整输出两部分内容；只对无法确认的项目个性化部分追加一句简短旁白。
 
 必须遵守：
 
@@ -77,7 +189,7 @@ Generate Follow-up Answer
 - 不得把通用最佳实践写成“用户项目就是这样做的”。
 - 不得静默提高 Ownership。
 - 不得编造用户没有确认的项目指标、线上事故、选型动机或实际运行效果。
-- 对纯概念 / 原理问题，如果答案不依赖项目事实，可以直接回答，不需要任何旁白。
+- 对纯概念 / 原理问题，如果答案不依赖项目事实，第一部分可以只保留逻辑、省略项目场景；也不需要旁白。
 
 内部仍可记录 `groundingStatus`，但它表示的是**项目场景化程度**，不是答案本身的正确性或完整性。
 
@@ -86,7 +198,16 @@ Generate Follow-up Answer
 ```markdown
 ## Worker 重复投递时如何保证幂等？
 
-幂等的核心是让同一个业务事件重复执行多次时，只产生一次有效业务结果。常见做法是给事件分配稳定的 eventId，并在消费侧通过唯一约束、幂等记录表或业务唯一键执行原子去重……
+幂等的核心是让同一个业务事件重复执行多次时，只产生一次有效业务结果。实现上需要一个稳定的业务唯一键（通常是 eventId）和一个原子写入点，让“判断是否处理过”与“写入处理结果”发生在同一次原子操作里；本项目把 Task / Status / Artifact 事件写入 PostgreSQL 事务 Outbox，消费侧就落在这条链路的末端。
+
+**原理详解**
+
+幂等要解决的是“重复投递 × 副作用”的组合问题：投递语义通常是至少一次，所以同一条事件可能被消费多次，而业务副作用必须只发生一次。
+
+1. 唯一键的选择：eventId 必须由生产侧在事务内生成并保持稳定，不能依赖消费侧的到达时间或自增序号，否则重投时无法识别为同一事件。
+2. 原子写入点：把“检查是否处理过”和“写入处理结果”合并成一次依赖数据库原子性的操作——唯一索引上的 INSERT、INSERT ... ON CONFLICT DO NOTHING、或带条件的 UPDATE。
+3. 竞态与隔离：仅靠“先查再写”会在并发下产生 check-then-act 竞态，因为两个事务的检查阶段互相不可见；唯一约束由存储引擎在索引上加锁裁决，后到者冲突失败，从而把并发重复收敛为一次成功。
+4. 边界与恢复：热点 eventId 会造成锁等待甚至死锁，需要控制事务粒度或加锁顺序；失败重试要有退避与上限，超过上限进入死信并保留人工恢复入口。
 
 > 旁白：当前项目可以确认存在 Outbox / Worker 链路，但消费侧具体采用哪一种幂等实现尚未核实；面试时需要按你的真实实现补充。
 ```
@@ -95,9 +216,14 @@ Generate Follow-up Answer
 
 Interview Knowledge 的参考答案默认应当达到“用户可以直接拿来学习和复习”的详细程度，而不是只给一两句话的摘要。
 
-根据问题复杂度按需使用：
+两部分的分工：
 
-- 分层解释：先结论，再原理，再结合项目场景
+- **第一部分（逻辑与项目场景）** 刻意保持简洁：一段话，给出结论、机制主线和项目落点。
+- **第二部分（原理详解）** 承担详细度：按需分层展开，是答案的主体。
+
+第二部分根据问题复杂度按需使用：
+
+- 分层解释：先结论，再原理，再边界与取舍
 - 步骤列表：适合流程、实现、排查、设计题
 - 对比表格：适合方案选择、协议 / 框架区别、tradeoff
 - ASCII / Mermaid 流程图：适合链路、状态流转、Agent 编排、数据流、时序关系
@@ -139,6 +265,14 @@ flowchart LR
 2. 对当前 Resume Claim 的理解深度
 3. 对候选人真实能力层级的区分度
 
+在决定 `UNEXPANDED` 前，还必须判断该节点在当前 Answer 中的覆盖程度：
+
+- `MENTIONED`：只被点到，关键机制尚未解释。
+- `PARTIAL`：已经解释一部分，但继续追问仍可能增加显著信息。
+- `SUFFICIENT`：当前答案已足够解释该节点，继续追问只会重复。
+
+如果节点本身高价值但当前 Answer 已 `SUFFICIENT`，标记为 `COVERED`，不要为了“形成更多问题”重复展开。若未来出现一个更具体、仍有新信息增益的问题，应创建新的具体节点，而不是重新打开同一个已覆盖节点。
+
 不得使用某些技术主题作为默认白名单。节点类型只用于分类。
 
 例如：
@@ -174,6 +308,213 @@ Outbox
 - `policies/knowledge-expansion-policy.md`
 - `examples/interview-expansion-examples.md`
 
+## Interview Expansion Scheduler
+
+Interview Knowledge 使用两个逻辑队列：
+
+- `Expansion Queue`：由 `nodes[].status == UNEXPANDED` **运行时派生**，不是第二份持久化权威状态。
+- `Root Queue`：持久化尚未覆盖的 Claim 级评估意图，状态为 `ROOT_PENDING`；队列项只描述“还需要评估什么”，不保存预生成问题文本。
+
+`activeQueue / transitionGate / pendingCandidateEvaluationCount` 等调度状态同样应运行时派生，不与 Domain State 重复持久化。
+
+调度优先级必须固定为：
+
+```text
+Expansion Queue
+>
+Root Queue
+```
+
+这里的 `>` 表示**执行顺序**，不是技术类型的价值排序。
+
+执行算法：
+
+```text
+while current Claim is active:
+
+  if latest Answer produced HIGH-VALUE UNEXPANDED descendants:
+      prefer the highest-value descendant of the current branch
+  else if Expansion Queue has HIGH-VALUE UNEXPANDED node:
+      dequeue highest-value remaining node
+      generate follow-up question
+      generate detailed answer
+      extract candidate nodes from THIS answer
+      evaluate every candidate node
+      enqueue new high-value nodes
+      mark current node EXPANDED
+      continue
+
+  run Sibling Transition Gate
+
+  if gate passes and Root Queue has ROOT_PENDING item:
+      materialize next root/sibling question
+      generate detailed answer
+      extract candidate nodes from THIS answer
+      evaluate every candidate node
+      continue
+
+  stop current Claim
+```
+
+**禁止行为：**
+
+- 先生成一整套 Root / sibling 问题，再逐题回答。
+- 因为已经有“后续主题规划”，就跳过当前 Answer 里的高价值节点。
+- 在 Expansion Queue 非空时切换一级主题、Claim 或 sibling question。
+
+## Answer-first Expansion
+
+Interview Knowledge 的下一层追问必须**优先由上一层 Generated Answer 驱动**。
+
+执行顺序：
+
+```text
+Questionₙ
+  ↓
+Generated Answerₙ
+  ↓
+Extract / Derive Candidate Nodes from Answerₙ
+  ↓
+Value Evaluation
+  ↓
+High-value Nodes → UNEXPANDED Queue
+  ↓
+Expand highest-value node
+  ↓
+Questionₙ₊₁
+```
+
+规则：
+
+1. 新问题首先消费当前答案中显式出现或由当前答案合理推导出的高价值节点。
+2. 只有当前答案没有值得继续展开的节点时，才允许从 Claim 本身补充新的横向 sibling 问题。
+3. 不得为了“问题覆盖更全面”而跳过答案里已经暴露出的关键机制。
+4. Claim 负责确定起点与边界，Generated Answer 负责驱动主要递归路径。
+5. `Implicit / Contrast / Boundary` 类型的新问题仍然允许生成，但必须能说明它是由哪一层 Answer 引出的。
+
+## One Answer → Multiple Follow-up Nodes
+
+Interview Knowledge **不是** `1 Answer → 1 Question`。正确关系是：
+
+```text
+1 Generated Answer
+        ↓
+Extract ALL meaningful Candidate Nodes
+        ↓
+0..N high-value UNEXPANDED siblings
+   ├── Node A
+   ├── Node B
+   └── Node C
+        ↓
+选择一个节点继续执行
+        ↓
+其他 sibling 继续保留在 Expansion Queue
+```
+
+强制规则：
+
+1. 每个 Answer 必须提取**全部有意义的候选节点**，不能只提取最显眼的一个。
+2. 所有通过高价值判断且尚未充分覆盖的节点都进入/保留于 Expansion Queue。
+3. “本轮只选一个节点生成下一题”只是执行策略，不是过滤策略。
+4. 当前活动分支耗尽后，必须回到同一父 Answer 产生的其余高价值 sibling。
+5. sibling 只有在 `COVERED / MERGED / DROPPED` 后才可以从待展开集合消失。
+6. 同一个 Answer 可以最终生成多个 Follow-up Questions；这些问题可以按深度优先顺序逐步出现，而不要求同时展示。
+
+例如：
+
+```text
+Outbox Answer
+├── 至少一次投递 → 幂等
+├── FOR UPDATE SKIP LOCKED → 多 Worker 并发领取
+├── retry/backoff → 重试策略
+└── dead letter → 失败终局处理
+```
+
+如果四个节点都高价值，就都必须保留；先深入“幂等”并不意味着另外三个被删除。
+
+## Unexpanded Node Queue
+
+每个 Claim 必须维护一个待展开队列。通过高价值判定的 Knowledge Node 先进入 `UNEXPANDED`，不能只在生成当前问题时临时记住。
+
+节点状态：
+
+- `UNEXPANDED`：高价值，尚未生成对应追问与答案
+- `EXPANDED`：已经生成问题并完成参考答案
+- `MERGED`：与已有节点语义重复，合并到已有节点
+- `DROPPED`：信息增益不足、岗位无关、形成环路或不值得继续
+
+队列选择顺序继续使用：岗位相关性、Claim 依赖、区分度、信息增益、Novelty。
+
+一个 Answer 可以产生 **0..N 个**高价值 `UNEXPANDED` sibling nodes。必须把所有通过价值判定、且当前仅为 `MENTIONED/PARTIAL` 的节点保留下来；不能因为当前只选择其中一个继续展开，就丢弃其他 sibling。
+
+调度时仍默认一次只**执行 1 个**节点：选择当前最高价值节点生成下一题和答案。其余 sibling 保持 `UNEXPANDED`，继续留在 Expansion Queue 中。当前分支耗尽后，调度器必须回到这些 sibling，再逐个决定是否展开、合并、覆盖或丢弃。
+
+因此必须区分：
+
+- **Extraction cardinality**：一个 Answer 可提取并保留多个高价值节点。
+- **Execution cardinality**：默认一次只执行一个节点。
+- **Retention rule**：未被本轮选中的高价值 sibling 不得删除或隐式丢弃。
+- **Return rule**：当前深分支耗尽后，必须回到仍为 `UNEXPANDED` 的 sibling。
+
+## Mandatory Per-Answer Node Extraction
+
+**每一个 Generated Answer 完成后都必须执行一次 Node Extraction，不能跳过。**
+
+在进入任何下一道问题之前，必须完成：
+
+1. 从当前 Answer 提取 / 推导全部有意义的 Candidate Knowledge Nodes。
+2. 对每个 Candidate Node 执行 Role Relevance、Claim Dependency、Discriminative Power、Information Gain、Novelty 判定。
+3. 为每个 Candidate Node 分配状态：`UNEXPANDED / COVERED / MERGED / DROPPED`。
+4. 将**所有**高价值且仍需追问的 `UNEXPANDED` 节点保留在 Expansion Queue；不得只保留最高价值的一个。
+5. 记录 `sourceAnswerId` 与 `decisionReason`。
+
+只有这一轮 Candidate Node 全部完成判定后，调度器才允许继续。
+
+## Answer Exhaustion Check / Sibling Transition Gate
+
+Answer Exhaustion Check 是**强制 Gate**，不是建议。
+
+在以下动作之前都必须通过 Sibling Transition Gate：
+
+- 从一个问题切换到同层 sibling question
+- 从一个一级主题切换到下一个 Claim
+- 宣告当前 Claim 的 Interview Knowledge 已完成
+
+检查流程：
+
+```text
+Current Claim
+   ↓
+Any high-value UNEXPANDED node?
+   ├─ Yes → 继续展开，不允许切换主题
+   └─ No
+       ↓
+Any node waiting for merge / scope decision?
+   ├─ Yes → 先完成判定
+   └─ No → 当前 Claim 可以结束或横向扩展
+```
+
+Gate 条件：
+
+```text
+ALLOW sibling/root/claim transition
+ONLY IF
+no HIGH-VALUE node has status UNEXPANDED
+and current Generated Answer has candidateEvaluationComplete = true
+and no candidate node is waiting for evaluation / merge decision
+```
+
+如果条件不满足：`BLOCK transition`，继续消费 Expansion Queue。
+
+只有以下情况才算“当前答案已经耗尽”：
+
+- 所有高价值节点都已 `EXPANDED`；或
+- 已被 `MERGED` 到等价节点；或
+- 经判定为 `DROPPED`；或
+- 已达到岗位边界，不再产生新的有效判断信息。
+
+**问题数量多不代表答案已经耗尽。** 判断标准是“是否仍存在高价值未展开节点”。
+
 ## Knowledge Node 类型
 
 统一使用以下类型：
@@ -208,7 +549,7 @@ Outbox
 4. 预期信息增益更高
 5. 与已有问题重复更少
 
-默认每个父节点一次展开 1–3 个最高价值节点。
+一个父 Answer 可以产生多个值得追问的 sibling nodes；必须全部保留。调度执行仍默认一次只展开 1 个最高价值节点，但其他 sibling 继续保持 `UNEXPANDED`，当前分支耗尽后必须返回处理。只有用户明确要求批量题目或输出形态需要批量展示时，才可一次物化多个问题；即使批量物化，也不能跳过后续 Answer-driven Node Extraction。**批量物化不等于允许写成互不依赖的平行问题清单**——每一条仍必须由上一层答案驱动并逐层加深，否则触发 Gate 2 重写。
 
 `CONCEPT / MECHANISM / FAILURE / TRADEOFF` 等 Knowledge Node 类型不得作为直接优先级依据。
 
@@ -301,6 +642,8 @@ Interview Knowledge 在内部可以继续维护完整结构，包括：
 - Shared Knowledge References
 - Expansion Depth
 - Stop Reason
+- Expansion Queue / Root Queue
+- Scheduler State / Transition Gate Result
 
 这些字段用于去重、递归、证据校验和岗位相关性判断，**默认不得直接暴露给用户**。
 
@@ -315,15 +658,19 @@ Interview Knowledge 在内部可以继续维护完整结构，包括：
 
 ## <面试问题>
 
-<对应参考答案>
+<第一部分：一段话的逻辑与项目场景>
+
+**原理详解**
+
+<第二部分：分层展开的原理、机制、边界与取舍>
 
 ## <继续递归得到的面试问题>
 
-<对应参考答案>
+<第一部分：一段话的逻辑与项目场景>
 
-## <继续递归得到的面试问题>
+**原理详解**
 
-<对应参考答案>
+<第二部分：分层展开的原理、机制、边界与取舍>
 ```
 
 规则：
@@ -334,7 +681,10 @@ Interview Knowledge 在内部可以继续维护完整结构，包括：
    - `# A2A 多轮澄清与任务状态`
    - `# Outbox 可靠事件分发`
 2. **二级标题**：该核心主题下的面试问题。根问题和递归追问都使用 `##`，默认不暴露内部树层级。
-3. **正文**：紧跟该问题的参考答案。可以分自然段、列表或必要的代码块，但不再额外添加“参考回答”“项目事实”“通用补充”等内部标签，除非用户明确要求。
+3. **正文**：紧跟该问题的参考答案，固定为两部分——
+   - 第一部分：一段话的逻辑与项目场景，直接跟在 `##` 之后，不加标签；
+   - 第二部分：以 `**原理详解**` 单独成行标注，随后展开通用原理。
+   可以分自然段、列表或必要的代码块，但不再额外添加“参考回答”“项目事实”“通用补充”等内部标签，除非用户明确要求。
 4. 递归追问仍按 Knowledge Graph 的父子关系生成，但最终 Markdown 默认**扁平化展示为同一一级标题下的一组二级问题**。
 5. 默认不输出题号；只有用户明确要求题号时才输出 `Q1 / Q1.1` 等编号。
 
@@ -345,7 +695,6 @@ Interview Knowledge 在内部可以继续维护完整结构，包括：
 - `Claim` / `claimId`
 - 项目证据路径、文件路径、代码证据列表
 - `VERIFIED / PARTIAL / INSUFFICIENT`
-- `P0 / P1 / P2 / P3`
 - `depth`
 - Node Type，例如 `IMPLEMENTATION / FAILURE / TRADEOFF`
 - `roleRelevance`
@@ -367,7 +716,7 @@ Interview Knowledge 在内部可以继续维护完整结构，包括：
 
 也不要把未验证的通用方案改写成用户实际实现。
 
-不要用 `PARTIAL` 等内部状态污染最终 Markdown。
+不要用项目 Grounding 状态等内部元数据污染最终 Markdown。
 
 ### 输出原则
 
@@ -388,3 +737,17 @@ Interview Knowledge 只负责“准备问题与答案”。
 它不判断用户本人是否已经掌握。
 
 只有用户明确进入模拟面试时，才把其中的问题交给 `workflows/mock-interview.md`。
+
+
+## Grounding 与停止语义
+
+`projectGrounding = INSUFFICIENT` 只表示“项目个性化事实不足”，**不是停止技术递归的理由**。
+
+```text
+General Knowledge 足够 + Project Grounding 不足
+→ 继续给完整技术答案
+→ 必要时加旁白
+→ 仍可根据答案产生下一层高价值节点
+```
+
+只有无法生成可靠的通用技术答案，或继续追问已经没有岗位信息增益时，才停止该分支。

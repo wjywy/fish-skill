@@ -1,11 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://resume-copilot.local/schemas/resume-view.schema.json",
+  "$id": "resume-view.schema.json",
   "title": "Resume View",
   "type": "object",
   "required": [
     "id",
     "targetId",
+    "header",
+    "skills",
     "sections",
     "highlightClaimIds"
   ],
@@ -16,11 +18,52 @@
     "targetId": {
       "type": "string"
     },
-    "headline": {
-      "type": [
-        "string",
-        "null"
-      ]
+    "header": {
+      "type": "object",
+      "required": [
+        "name",
+        "targetRole"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "targetRole": {
+          "type": "string"
+        },
+        "educationInline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "href": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "summary": {
       "type": [
@@ -28,10 +71,123 @@
         "null"
       ]
     },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "label",
+          "description"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "sections": {
       "type": "array",
       "items": {
-        "type": "object"
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "entries"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "work",
+              "project",
+              "internship",
+              "open_source",
+              "education",
+              "other"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "range": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title"
+              ],
+              "properties": {
+                "time": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "meta": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "summaryBullets": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/resumeBullet"
+                  }
+                },
+                "bullets": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/resumeBullet"
+                  }
+                },
+                "subBlocks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "title",
+                      "bullets"
+                    ],
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "bullets": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/resumeBullet"
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
       }
     },
     "highlightClaimIds": {
@@ -63,5 +219,44 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "resumeBullet": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "claimIds",
+        "metricIds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claimIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "该文案直接来源的 Claim IDs。"
+        },
+        "metricIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "该文案使用的 Metric IDs；未使用指标时为空数组。"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }

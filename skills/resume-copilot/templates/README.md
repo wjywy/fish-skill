@@ -31,18 +31,18 @@ Kami 的结构以标准中文技术简历为主，并参考用户提供的实际
 - `shared/kami-family.css`
   - 共享排版、A4 打印、经历条目、技能行、专项标题等样式。
   - 使用 `--kami-*` CSS 变量承接主题差异。
-- `kami-base.html`
+- `./kami-base.html`
   - 基线 / 兼容入口。
 - 9 个主题：
-  - `kami-ivory.html`
-  - `kami-mono.html`
-  - `kami-navy.html`
-  - `kami-slate.html`
-  - `kami-teal.html`
-  - `kami-forest.html`
-  - `kami-burgundy.html`
-  - `kami-sepia.html`
-  - `kami-copper.html`
+  - `./kami-ivory.html`
+  - `./kami-mono.html`
+  - `./kami-navy.html`
+  - `./kami-slate.html`
+  - `./kami-teal.html`
+  - `./kami-forest.html`
+  - `./kami-burgundy.html`
+  - `./kami-sepia.html`
+  - `./kami-copper.html`
 
 9 个主题只覆盖颜色变量，不维护独立主体结构。
 
@@ -64,7 +64,7 @@ Kami 的结构以标准中文技术简历为主，并参考用户提供的实际
 
 ## 预览入口
 
-- 统一总览页：`index.html`
+- 统一总览页：`./index.html`
 
 ## 用户主题选择
 
@@ -75,3 +75,7 @@ kami-default -> kami-base.html
 ```
 
 其他 9 个主题保持原有 ID。主题选择属于 Render Options，不属于 Resume Strategy；用户不选择时必须回退到 `kami-default`。
+
+## Resume View 对接
+
+Kami 共享渲染器不再输出占位符骨架；它直接消费 `Resume View`。`./shared/sample-data.json` 与 `schemas/resume-view.schema.json` 使用同一结构，避免模板示例与正式数据模型漂移。

@@ -6,7 +6,10 @@
     "id",
     "questionId",
     "answerType",
-    "text"
+    "overview",
+    "principleDetail",
+    "extractedNodeIds",
+    "candidateEvaluationComplete"
   ],
   "properties": {
     "id": {
@@ -17,21 +20,6 @@
     },
     "answerType": {
       "const": "GENERATED_REFERENCE"
-    },
-    "text": {
-      "type": "string"
-    },
-    "projectGroundedText": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "generalKnowledgeText": {
-      "type": [
-        "string",
-        "null"
-      ]
     },
     "sourceClaimIds": {
       "type": "array",
@@ -60,26 +48,30 @@
       ],
       "description": "仅表示答案的项目场景化程度，不表示通用技术答案的正确性或完整性。"
     },
-    "canonicalAnswer": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "不依赖项目个性化事实、直接回答问题本身的准确技术答案。"
+    "overview": {
+      "type": "string",
+      "minLength": 1,
+      "description": "第一部分：一段话的逻辑与项目场景。先给结论与机制主线，再说明它在本项目中的落点。保持简洁，项目场景只能来自已验证事实。"
     },
-    "projectContext": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "已验证项目背景对通用答案的场景化补充。"
+    "principleDetail": {
+      "type": "string",
+      "minLength": 1,
+      "description": "第二部分：原理详解。不依赖项目个性化事实，展开通用技术原理、机制、边界、失败恢复与取舍，是可直接复习的主体。"
     },
     "projectAside": {
       "type": [
         "string",
         "null"
       ],
-      "description": "仅当项目具体实现/动机/效果无法核实时给用户的简短旁白；不得替代 canonicalAnswer。"
+      "description": "仅当项目具体实现/动机/效果无法核实时给用户的简短旁白；不得替代 overview 或 principleDetail。"
+    },
+    "candidateEvaluationComplete": {
+      "type": "boolean",
+      "description": "该 Answer 的 Candidate Node 是否已全部完成提取与判定。答案刚生成时可为 false；完成 UNEXPANDED/MERGED/DROPPED/已充分覆盖 判定后置为 true。false/缺失时禁止切换问题。",
+      "default": false
     }
-  }
+  },
+  "$id": "generated-answer.schema.json",
+  "additionalProperties": false,
+  "description": "参考答案固定两部分：overview（一段话的逻辑与项目场景）+ principleDetail（原理详解）。二者共同构成用户可见答案；projectAside 为可选旁白。"
 }

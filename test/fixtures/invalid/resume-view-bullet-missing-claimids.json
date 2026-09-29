@@ -1,0 +1,28 @@
+{
+  "id": "resume-view-bad-001",
+  "targetId": "target-1",
+  "header": {
+    "name": "张三",
+    "targetRole": "后端开发工程师"
+  },
+  "skills": [],
+  "sections": [
+    {
+      "type": "project",
+      "title": "项目经历",
+      "entries": [
+        {
+          "title": "缺少 claimIds 的 bullet",
+          "bullets": [
+            {
+              "id": "b1",
+              "text": "这条 bullet 没有 claimIds，无法追溯。",
+              "metricIds": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "highlightClaimIds": []
+}

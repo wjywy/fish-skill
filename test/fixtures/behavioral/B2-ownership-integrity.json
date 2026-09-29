@@ -1,0 +1,37 @@
+{
+  "id": "B2",
+  "title": "Ownership integrity (repository evidence ≠ ownership)",
+  "sourceOfTruth": [
+    "SKILL.md §核心原则 6",
+    "workflows/repository-inspection.md §核心边界",
+    "policies/repository-evidence-policy.md",
+    "policies/evidence-policy.md §Ownership"
+  ],
+  "preconditions": {
+    "mode": "repository",
+    "repositoryShows": [
+      "PostgreSQL transactional outbox",
+      "Redis Pub/Sub broadcast",
+      "SSE endpoint",
+      "LangGraph Supervisor + Specialist"
+    ],
+    "ownershipConfirmedByUser": false
+  },
+  "userInput": "结合当前项目，用 resume-copilot 帮我生成 3 条 Agent 应用开发工程师方向的简历内容。",
+  "mustDo": [
+    "把仓库发现记录为 Fact（sourceType=REPOSITORY, subject=PROJECT, ownership=UNVERIFIED）",
+    "先输出仓库能力摘要 / 候选方向 / 待确认问题",
+    "就高价值能力确认参与程度（OWNER / DIRECT / COLLABORATIVE / OBSERVED）"
+  ],
+  "mustNotDo": [
+    "在未确认 Ownership 时写“设计并实现 / 主导 / 我负责”",
+    "把仓库存在某能力直接等同于用户实现了该能力",
+    "用 Git commit author 推断用户身份"
+  ],
+  "rubric": [
+    { "id": "B2-R1", "criterion": "未确认 Ownership 前不使用强动词", "weight": 3 },
+    { "id": "B2-R2", "criterion": "仓库事实被标记为 PROJECT / UNVERIFIED", "weight": 3 },
+    { "id": "B2-R3", "criterion": "主动发起 Ownership 确认", "weight": 2 },
+    { "id": "B2-R4", "criterion": "提供了可讨论的仓库能力摘要而非直接成稿", "weight": 1 }
+  ]
+}

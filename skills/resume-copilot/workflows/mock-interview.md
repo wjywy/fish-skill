@@ -1,5 +1,12 @@
 # Mock Interview Workflow
 
+## Required References
+
+进入本流程后必须读取：
+
+- `../policies/answer-assessment-policy.md`
+- 已存在的 Interview Knowledge Pack（若有）
+
 ## 目标
 
 Mock Interview 是可选模式。只有当用户明确要求“面试我 / 我来回答 / 不要先给答案”等场景时启用。

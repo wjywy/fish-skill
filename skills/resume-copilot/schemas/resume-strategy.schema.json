@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://resume-copilot.local/schemas/resume-strategy.schema.json",
+  "$id": "resume-strategy.schema.json",
   "title": "Resume Strategy",
   "type": "object",
   "required": [
@@ -138,40 +138,6 @@
       },
       "uniqueItems": true
     },
-    "claimScores": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "claimId",
-          "score"
-        ],
-        "properties": {
-          "claimId": {
-            "type": "string"
-          },
-          "score": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
-          },
-          "matchedRequirementIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true
-          },
-          "reason": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
-        },
-        "additionalProperties": false
-      }
-    },
     "excludedClaims": {
       "type": "array",
       "items": {
@@ -258,6 +224,52 @@
       "type": "array",
       "items": {
         "type": "string"
+      }
+    },
+    "claimEvaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "claimId",
+          "decision",
+          "reason"
+        ],
+        "properties": {
+          "claimId": {
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "SELECT",
+              "DEFER",
+              "EXCLUDE"
+            ]
+          },
+          "matchedRequirementIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "weaknesses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     }
   },

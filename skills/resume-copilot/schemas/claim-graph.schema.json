@@ -5,10 +5,12 @@
   "type": "object",
   "required": [
     "claimId",
+    "sourceMode",
     "rootNodeIds",
     "nodes",
     "questions",
-    "generatedAnswers"
+    "generatedAnswers",
+    "rootQuestionQueue"
   ],
   "properties": {
     "claimId": {
@@ -43,7 +45,70 @@
       "minimum": 1,
       "default": 20,
       "description": "仅用于防止异常无限递归的硬兜底，不是业务停止条件。正常停止由 Target Role / JD 相关性决定。"
+    },
+    "rootQuestionQueue": {
+      "type": "array",
+      "description": "尚未物化的 Claim 级横向问题候选。只有 Expansion Queue 为空且 Sibling Transition Gate 通过后才可消费。",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "assessmentIntent",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "dimension": {
+            "anyOf": [
+              {
+                "$ref": "interview-question.schema.json#/$defs/questionDimension"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选的问题视角标签，仅辅助现场物化问题。"
+          },
+          "status": {
+            "enum": [
+              "ROOT_PENDING",
+              "ROOT_MATERIALIZED",
+              "ROOT_DROPPED"
+            ]
+          },
+          "decisionReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assessmentIntent": {
+            "type": "string",
+            "minLength": 1,
+            "description": "尚未覆盖的评估意图，例如“评估可靠投递的失败边界”。不是预生成的问题文本。"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sourceMode": {
+      "enum": [
+        "RESUME_GROUNDED",
+        "PROJECT_GROUNDED"
+      ],
+      "description": "RESUME_GROUNDED 从 Resume View 暴露的 Claim 开始；PROJECT_GROUNDED 从已验证的项目/仓库 Claim 集合开始。"
+    },
+    "sourceExperienceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "PROJECT_GROUNDED 时可记录来源 Experience；不得据此自动升级用户 Ownership。"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "description": "Interview Knowledge Graph. 一个 Generated Answer 可产生多个高价值 sibling Knowledge Nodes；所有仍需追问的节点都保留为 UNEXPANDED，调度器一次执行一个并在分支耗尽后返回其余 sibling。"
 }

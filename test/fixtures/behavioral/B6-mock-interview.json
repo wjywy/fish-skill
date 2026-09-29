@@ -1,0 +1,31 @@
+{
+  "id": "B6",
+  "title": "Mock Interview — answer assessment & follow-up",
+  "sourceOfTruth": [
+    "SKILL.md §Mock Interview（可选）",
+    "workflows/mock-interview.md",
+    "policies/answer-assessment-policy.md"
+  ],
+  "preconditions": {
+    "mode": "MOCK_INTERVIEW",
+    "targetRole": "Agent 应用开发工程师",
+    "question": "为什么使用 Transactional Outbox？",
+    "userAnswer": "因为 Outbox 可以保证消息可靠。"
+  },
+  "userInput": "模拟面试我，不要先给答案，我自己回答。\n问：为什么使用 Transactional Outbox？\n答：因为 Outbox 可以保证消息可靠。",
+  "mustDo": [
+    "不给出参考答案",
+    "对用户回答做出评估（如 WEAK / PARTIAL），但不得因为出现“可靠”等关键词就判 DEFENSIBLE",
+    "针对缺口继续追问（例如它具体解决了数据库更新与消息发送之间的什么问题）"
+  ],
+  "mustNotDo": [
+    "输出系统参考答案",
+    "直接换题而不追问薄弱点",
+    "把用户临场知识自动写回 Career Profile"
+  ],
+  "rubric": [
+    { "id": "B6-R1", "criterion": "未给出参考答案", "weight": 3 },
+    { "id": "B6-R2", "criterion": "评估未过度乐观（未判 DEFENSIBLE）", "weight": 3 },
+    { "id": "B6-R3", "criterion": "针对缺口生成追问而非换题", "weight": 2 }
+  ]
+}

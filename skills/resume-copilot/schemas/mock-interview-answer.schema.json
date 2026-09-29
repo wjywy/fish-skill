@@ -2,13 +2,38 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "MockInterviewUserAnswer",
   "type": "object",
-  "required": ["id", "questionId", "answerType", "text"],
+  "required": [
+    "id",
+    "questionId",
+    "answerType",
+    "text"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "questionId": {"type": "string"},
-    "answerType": {"const": "USER_ANSWER"},
-    "text": {"type": "string"},
-    "assessmentId": {"type": ["string", "null"]},
-    "mentionedNodeIds": {"type": "array", "items": {"type": "string"}}
-  }
+    "id": {
+      "type": "string"
+    },
+    "questionId": {
+      "type": "string"
+    },
+    "answerType": {
+      "const": "USER_ANSWER"
+    },
+    "text": {
+      "type": "string"
+    },
+    "assessmentId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mentionedNodeIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$id": "mock-interview-answer.schema.json",
+  "additionalProperties": false
 }
