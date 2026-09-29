@@ -4,15 +4,15 @@ Two layers of testing, because the skill has two kinds of correctness:
 
 | Layer | Folder | Runs | Checks |
 | --- | --- | --- | --- |
-| **Deterministic** | `cases/` + `run-tests.mjs` | `npm test` | File layout, JSON Schema conformance, cross-reference integrity, the Kami renderer, the CLI, internal spec consistency |
-| **Behavioural** | `behavioral/` | manual / agent replay | Whether the skill follows its own rules under realistic inputs (target gate, ownership, metric provenance, interview depth, output hygiene, mock assessment) |
+| **Deterministic** | `cases/` + `run-tests.mjs` | `npm test` | File layout, JSON Schema conformance, cross-reference integrity, the Kami renderer, the CLI, internal spec consistency, resume content lint |
+| **Behavioural** | `behavioral/` | manual / agent replay | Whether the skill follows its own rules under realistic inputs (target gate, ownership, metric provenance, interview depth, output hygiene, mock assessment, resume bullet quality, JD matching, resume generation) |
 
 ## Run it
 
 ```bash
 npm test                     # all deterministic suites
 npm run test:report          # same + writes test/reports/results.json
-node test/run-tests.mjs T4   # one suite (T1…T6)
+node test/run-tests.mjs T7   # one suite (T1…T7)
 ```
 
 No dependencies, no network. Node ≥ 18.
@@ -21,19 +21,20 @@ No dependencies, no network. Node ≥ 18.
 
 ```
 test/
-├── run-tests.mjs                 # deterministic runner (T1–T6)
+├── run-tests.mjs                 # deterministic runner (T1–T7)
 ├── lib/
 │   ├── validator.mjs             # dependency-free JSON Schema (draft 2020-12 subset)
 │   ├── dom-shim.mjs              # minimal DOM so kami-render.js can be executed
-│   └── util.mjs                  # paths, frontmatter, link extraction, reporting
-├── cases/README.md               # every deterministic case, with rationale
+│   ├── resume-lint.mjs           # encodes resume-writing-policy Rule 2 (vague duty statements)
+│   └── util.mjs                  # paths, frontmatter, link extraction, reporting├── cases/README.md               # every deterministic case, with rationale
 ├── fixtures/
 │   ├── valid/career-profile.min.json   # hand-built, fully consistent profile
-│   ├── invalid/*.json                  # negative fixtures (prove the validator bites)
-│   └── behavioral/*.json               # scenario inputs + rubrics for B1–B6
+│   ├── valid/resume-view.agent.json    # golden B9 output (asserted by T2 + T3.5)
+│   ├── invalid/*.json                  # negative fixtures (prove the validator/lint bite)
+│   └── behavioral/*.json               # scenario inputs + rubrics for B1–B9
 ├── behavioral/
 │   ├── README.md                 # methodology + rubric scale
-│   ├── B1…B6-*.md                # scenario, anti-patterns, rubric, recorded run, score
+│   ├── B1…B9-*.md                # scenario, anti-patterns, rubric, recorded run, score
 │   └── results.md                # aggregate behavioural results
 └── reports/
     ├── test-report.md            # human-readable summary + findings
@@ -42,9 +43,9 @@ test/
 
 ## Current status
 
-**Deterministic: 52/52 checks pass** (exit 0) — see `reports/test-report.md`.
+**Deterministic: 70/70 checks pass** (exit 0) — see `reports/test-report.md`.
 
-**Behavioural: 6/6 scenarios pass** with no anti-patterns fired — see
+**Behavioural: 9/9 scenarios pass** with no anti-patterns fired — see
 `behavioral/results.md`.
 
 ## Adding a case

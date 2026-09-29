@@ -1,6 +1,6 @@
-# Behavioural Test Cases (B1–B6)
+# Behavioural Test Cases (B1–B9)
 
-The deterministic suite (T1–T6) checks artefacts. It cannot check whether the
+The deterministic suite (T1–T7) checks artefacts. It cannot check whether the
 skill *behaves* correctly when an agent follows its instructions — that is where
 most of the skill's value lives. The behavioural cases cover that gap.
 
@@ -45,6 +45,13 @@ weighted score, because the anti-patterns encode the skill's hard constraints
 | B4 | Interview prep on one claim | Answer-driven depth | `workflows/interview-knowledge.md` |
 | B5 | Same claim, output format | Output hygiene | `workflows/interview-knowledge.md §用户可见 Markdown 输出` |
 | B6 | "模拟面试我" | Mock Interview assessment | `policies/answer-assessment-policy.md` |
+| B7 | Multi-capability project, no mechanism | Resume bullet quality | `policies/resume-writing-policy.md §Rule 2` |
+| B8 | JD with unmet requirements | Strategy selection, no invented Claim | `workflows/resume-strategy.md` |
+| B9 | "按这个 Strategy 生成 Resume View" | Generation ≠ re-selection | `workflows/resume-generation.md` |
+
+B1–B6 exercise the **interview** half of the skill; B7–B9 exercise the **resume**
+half. B9's recorded output is additionally frozen as a deterministic fixture
+(`fixtures/valid/resume-view.agent.json`) and asserted by T3.5.
 
 ## How to re-run a case
 

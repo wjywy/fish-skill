@@ -1,0 +1,49 @@
+{
+  "id": "resume-view-duty-lint",
+  "targetId": "target-lint",
+  "header": {
+    "name": "测试用户",
+    "targetRole": "前端开发工程师"
+  },
+  "skills": [
+    { "label": "前端基础", "description": "HTML / CSS / JavaScript。" }
+  ],
+  "sections": [
+    {
+      "type": "project",
+      "title": "项目经历",
+      "entries": [
+        {
+          "title": "低代码平台",
+          "bullets": [
+            {
+              "id": "b1",
+              "text": "负责低代码平台相关能力建设。",
+              "claimIds": ["claim-lint-1"],
+              "metricIds": []
+            },
+            {
+              "id": "b2",
+              "text": "参与页面编辑器项目开发。",
+              "claimIds": ["claim-lint-1"],
+              "metricIds": []
+            },
+            {
+              "id": "b3",
+              "text": "熟悉并使用 React、Vue、Webpack 等前端技术。",
+              "claimIds": ["claim-lint-1"],
+              "metricIds": []
+            },
+            {
+              "id": "b4",
+              "text": "完成事件驱动器功能。",
+              "claimIds": ["claim-lint-1"],
+              "metricIds": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "highlightClaimIds": []
+}

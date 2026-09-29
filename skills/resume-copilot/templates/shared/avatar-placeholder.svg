@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 112" width="88" height="112" role="img" aria-label="头像占位图">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EEF2F7"/>
+      <stop offset="1" stop-color="#DCE4EE"/>
+    </linearGradient>
+  </defs>
+  <rect width="88" height="112" fill="url(#bg)"/>
+  <circle cx="44" cy="43" r="16.5" fill="#1B365D" opacity="0.30"/>
+  <path d="M13 112c0-18 14-30.5 31-30.5S75 94 75 112z" fill="#1B365D" opacity="0.30"/>
+</svg>

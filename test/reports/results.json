@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-29T14:51:20.393Z",
+  "generatedAt": "2026-09-29T17:23:20.566Z",
   "node": "v22.22.2",
   "totals": {
-    "total": 52,
-    "passed": 52,
+    "total": 70,
+    "passed": 70,
     "warned": 0,
     "failed": 0
   },
@@ -11,8 +11,8 @@
     {
       "name": "T1 · Package & structure integrity",
       "summary": {
-        "total": 9,
-        "passed": 9,
+        "total": 12,
+        "passed": 12,
         "warned": 0,
         "failed": 0
       },
@@ -61,23 +61,41 @@
         },
         {
           "id": "T1.8",
-          "title": "every theme entry references shared css + render js",
+          "title": "every theme entry wires css + layout delta + preview data + render js",
+          "status": "PASS",
+          "detail": "10 themes wired (css + data + renderer + avatar toggle)"
+        },
+        {
+          "id": "T1.9",
+          "title": "each of the 9 themes overrides all 10 upstream tokens with valid CSS",
+          "status": "PASS",
+          "detail": "9 themes × 10 tokens"
+        },
+        {
+          "id": "T1.10",
+          "title": "shared/sample-data.js stays in sync with sample-data.json",
+          "status": "PASS",
+          "detail": "preview data matches the schema fixture"
+        },
+        {
+          "id": "T1.11",
+          "title": "bin entry exists and package.json points at it",
           "status": "PASS",
           "detail": ""
         },
         {
-          "id": "T1.9",
-          "title": "bin entry exists and package.json points at it",
+          "id": "T1.12",
+          "title": "avatar preview toggle is wired on every theme and stays preview-only",
           "status": "PASS",
-          "detail": ""
+          "detail": "11 preview pages wired; toggle is sample-only and print-hidden"
         }
       ]
     },
     {
       "name": "T2 · JSON Schema validation",
       "summary": {
-        "total": 12,
-        "passed": 12,
+        "total": 13,
+        "passed": 13,
         "warned": 0,
         "failed": 0
       },
@@ -109,6 +127,12 @@
         {
           "id": "T2.fixtures/valid/career-profile.min.json",
           "title": "fixtures/valid/career-profile.min.json validates against career-profile.schema.json",
+          "status": "PASS",
+          "detail": "schema-valid"
+        },
+        {
+          "id": "T2.fixtures/valid/resume-view.agent.json",
+          "title": "fixtures/valid/resume-view.agent.json validates against resume-view.schema.json",
           "status": "PASS",
           "detail": "schema-valid"
         },
@@ -159,8 +183,8 @@
     {
       "name": "T3 · Cross-reference integrity",
       "summary": {
-        "total": 4,
-        "passed": 4,
+        "total": 5,
+        "passed": 5,
         "warned": 0,
         "failed": 0
       },
@@ -187,24 +211,30 @@
           "id": "T3.4",
           "title": "resume-view bullets always carry ≥1 claimId (schema-level guarantee)",
           "status": "PASS",
-          "detail": "5 bullets all traceable"
+          "detail": "21 bullets all traceable"
+        },
+        {
+          "id": "T3.5",
+          "title": "golden agent resume view only uses Strategy-selected claims and confirmed metrics",
+          "status": "PASS",
+          "detail": "2 bullets respect Strategy selection"
         }
       ]
     },
     {
       "name": "T4 · Kami renderer contract",
       "summary": {
-        "total": 9,
-        "passed": 9,
+        "total": 16,
+        "passed": 16,
         "warned": 0,
         "failed": 0
       },
       "results": [
         {
           "id": "T4.1",
-          "title": "renders header name, target role, education",
+          "title": "maps header slots onto the Kami header (education on its own line)",
           "status": "PASS",
-          "detail": ""
+          "detail": "header slots → 2 lines left / 2 lines right"
         },
         {
           "id": "T4.2",
@@ -214,15 +244,15 @@
         },
         {
           "id": "T4.3",
-          "title": "renders summary, skills, sections, subBlocks, tags",
+          "title": "maps summary / skills / sections onto Kami blocks",
           "status": "PASS",
-          "detail": ""
+          "detail": "summary/skills/sections → .summary/.skill-row/.project"
         },
         {
           "id": "T4.4",
-          "title": "renders section-<type> class per section type",
+          "title": "emits only upstream Kami classes, all covered by the stylesheets",
           "status": "PASS",
-          "detail": ""
+          "detail": "25 classes emitted across both header variants, all upstream + all styled"
         },
         {
           "id": "T4.5",
@@ -232,7 +262,7 @@
         },
         {
           "id": "T4.6",
-          "title": "handles missing header with a safe placeholder",
+          "title": "handles missing Resume View data with a safe placeholder",
           "status": "PASS",
           "detail": ""
         },
@@ -250,9 +280,51 @@
         },
         {
           "id": "T4.9",
-          "title": "renders plain-string bullets as well as {text} objects",
+          "title": "renders **keyword** as theme accent, leaking no literal **",
           "status": "PASS",
-          "detail": ""
+          "detail": "3 .hl + 3 .em-brand"
+        },
+        {
+          "id": "T4.10",
+          "title": "does not force a page break (adaptive flow)",
+          "status": "PASS",
+          "detail": "no hard break emitted; CSS guards entry splitting"
+        },
+        {
+          "id": "T4.11",
+          "title": "maps sections[type=education] onto .edu-row inside .no-break",
+          "status": "PASS",
+          "detail": "education slot → .no-break + .edu-row"
+        },
+        {
+          "id": "T4.12",
+          "title": "renders summaryBullets / bullets / subBlocks, drops tags by design",
+          "status": "PASS",
+          "detail": "summaryBullets / bullets / subBlocks rendered; tags dropped by design"
+        },
+        {
+          "id": "T4.13",
+          "title": "shared stylesheet ships the upstream A4 rules",
+          "status": "PASS",
+          "detail": "A4 @page + no-break + dense + 仓耳今楷 all present"
+        },
+        {
+          "id": "T4.14",
+          "title": "header layout delta is isolated in kami-layout.css",
+          "status": "PASS",
+          "detail": "header deviation contained in one override file"
+        },
+        {
+          "id": "T4.15",
+          "title": "header.avatar switches to the photo layout, absent by default",
+          "status": "PASS",
+          "detail": "avatar layout gated by header.avatar; text slots intact"
+        },
+        {
+          "id": "T4.16",
+          "title": "entry.link renders as a short-label anchor, meta stays plain text",
+          "status": "PASS",
+          "detail": "link → <a>github</a>; meta stays text"
         }
       ]
     },
@@ -287,7 +359,7 @@
           "id": "T5.4",
           "title": "`install` copies the full skill to --target",
           "status": "PASS",
-          "detail": "56 files copied"
+          "detail": "62 files copied"
         },
         {
           "id": "T5.5",
@@ -383,6 +455,53 @@
           "title": "two-part answer contract consistent across schema and all docs",
           "status": "PASS",
           "detail": "4 docs document overview + 原理详解"
+        }
+      ]
+    },
+    {
+      "name": "T7 · Resume content lint",
+      "summary": {
+        "total": 6,
+        "passed": 6,
+        "warned": 0,
+        "failed": 0
+      },
+      "results": [
+        {
+          "id": "T7.1",
+          "title": "duty-statement fixture is schema-valid (schema alone cannot catch it)",
+          "status": "PASS",
+          "detail": "schema passes — proving the lint adds coverage the schema lacks"
+        },
+        {
+          "id": "T7.2",
+          "title": "lint flags every vague duty statement in the negative fixture",
+          "status": "PASS",
+          "detail": "b1, b2, b3, b4"
+        },
+        {
+          "id": "T7.3",
+          "title": "lint passes the golden resume fixture (Rule 2 clean)",
+          "status": "PASS",
+          "detail": "2 bullets, 0 duty statements"
+        },
+        {
+          "id": "T7.4",
+          "title": "every golden-fixture bullet is traceable (≥1 claimId)",
+          "status": "PASS",
+          "detail": "2 bullets all carry claimIds"
+        },
+        {
+          "id": "T7.5",
+          "title": "golden-fixture bullets use Ownership-appropriate verbs",
+          "status": "PASS",
+          "detail": "no ownership/verb mismatch"
+        },
+        {
+          "id": "T7.6",
+          "title": "templates/shared/sample-data.json is Rule 2 clean",
+          "status": "PASS",
+          "detail": "21 sample bullets, 0 duty statements"
         }
       ]
     }

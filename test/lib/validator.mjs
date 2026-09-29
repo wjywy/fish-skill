@@ -158,6 +158,15 @@ export function createValidator(schemaDir) {
       }
     }
 
+    if (typeof data === 'string' && typeof schema.maxLength === 'number') {
+      if (data.length > schema.maxLength) {
+        ctx.errors.push({
+          path: ctx.path,
+          message: `String length ${data.length} > maxLength ${schema.maxLength}`,
+        });
+      }
+    }
+
     if (typeof data === 'number') {
       if (typeof schema.minimum === 'number' && data < schema.minimum) {
         ctx.errors.push({ path: ctx.path, message: `${data} < minimum ${schema.minimum}` });
@@ -172,6 +181,12 @@ export function createValidator(schemaDir) {
         ctx.errors.push({
           path: ctx.path,
           message: `Array length ${data.length} < minItems ${schema.minItems}`,
+        });
+      }
+      if (typeof schema.maxItems === 'number' && data.length > schema.maxItems) {
+        ctx.errors.push({
+          path: ctx.path,
+          message: `Array length ${data.length} > maxItems ${schema.maxItems}`,
         });
       }
       if (schema.uniqueItems === true) {

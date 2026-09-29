@@ -3,39 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{姓名}} · 简历</title>
+<title>{{姓名}} · 简历（带头像）</title>
 <meta name="author" content="{{姓名}}">
 <meta name="description" content="{{摘要}}">
 <meta name="keywords" content="{{关键词}}">
-<meta name="generator" content="Kami Family (kami-copper)">
+<meta name="generator" content="Kami Family (kami-default · avatar)">
 <link rel="stylesheet" href="shared/kami-family.css" />
 <!-- 本 skill 的版式微调，必须在上游样式之后加载 -->
 <link rel="stylesheet" href="shared/kami-layout.css" />
-<style>
-  /* 主题：kami-copper —— 只覆盖颜色变量，结构完全复用 shared/kami-family.css */
-  :root {
-    --parchment: #faf5ef;
-    --ivory: #fffaf6;
-    --border: #e8dacc;
-    --border-soft: #f0e6db;
-    --near-black: #37271e;
-    --stone: #806351;
-    --olive: #664b3d;
-    --brand: #8a5a3c;
-    --brand-tint: #f6ebdf;
-    --dark-warm: #49362c;
-  }
-</style>
 </head>
 <body>
 <main id="kami-root"></main>
-<!-- 预览用样例数据。生成正式简历时把这一行换成真实 Resume View。 -->
+<!-- 预览用样例数据。生成正式简历时把下面两行换成真实 Resume View。 -->
 <script src="shared/sample-data.js"></script>
 <script src="shared/kami-render.js"></script>
 <script>
+  // 头像为可选槽位：给 header 加 avatar（图片 URL 或相对路径）即渲染成「头像 + 文字块」版式。
+  // 这里用 shared/avatar-sample.jpg 占位；换真实照片把路径改掉即可。
+  // （没有照片时，也可以用 shared/avatar-placeholder.svg 这个通用占位图。）
+  window.KAMI_RESUME_DATA.header.avatar = "shared/avatar-sample.jpg";
   renderKamiResume({ target: "#kami-root", data: window.KAMI_RESUME_DATA });
 </script>
-<!-- 预览专用：页头头像开关。生成正式简历时删掉这一行（非样例数据下它也不会出现）。 -->
+<!-- 预览专用：页头头像开关（本页默认已打开头像）。生成正式简历时删掉这一行。 -->
 <script src="shared/preview-avatar.js"></script>
 </body>
 </html>

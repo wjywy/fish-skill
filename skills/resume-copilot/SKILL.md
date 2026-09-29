@@ -205,6 +205,13 @@ Renderer 只负责展示。Kami 规则见 `renderers/kami/README.md`。
 
 默认主题 `kami-default`；用户未指定主题时不得阻塞生成。
 
+**生成前必须先问一句：要不要个人头像。** 头像对应两套页头版式 —— `header.avatar`
+有值时为「头像在左 + 文字块在右」，留空则为标准页头。这是版式差异而非文案差异，
+不能替用户默认。
+
+字段写法与版式强相关（页头教育信息只到年份、项目地址写 `entry.link`、技术栈不渲染等），
+见 `workflows/resume-generation.md` 的「字段口径」一节。
+
 ### Interview expansion cardinality
 
 在 Interview Knowledge 中，一个 Generated Answer 可以产生多个高价值 Follow-up Nodes。必须提取并保留所有有价值的 sibling；默认一次只执行其中一个，当前分支耗尽后再返回其余 sibling。不要把“one-at-a-time execution”误解为“one-answer-one-question”。

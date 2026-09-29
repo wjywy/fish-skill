@@ -1,4 +1,11 @@
-{
+/* ===== templates/shared/sample-data.js（预览专用样例数据）
+   把 shared/sample-data.json 的内容挂到 window.KAMI_RESUME_DATA，
+   好让 10 个主题页直接双击打开就能看到完整简历（file:// 下 fetch() 会被
+   浏览器拦截，所以这里用经典 <script src> 而不是 fetch）。
+
+   ⚠️ 生成正式简历时，必须把这个 <script> 替换成真实 Resume View，
+      否则页面会渲染样例数据。生成流程见 templates/README.md。 ===== */
+window.KAMI_RESUME_DATA = {
   "id": "resume-view-sample",
   "targetId": "target-backend-ai",
   "header": {
@@ -315,4 +322,4 @@
     "theme": "kami-default",
     "format": "html"
   }
-}
+};

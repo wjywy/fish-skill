@@ -1,0 +1,51 @@
+{
+  "id": "B9",
+  "title": "Resume Generation — Strategy compliance & bullet traceability",
+  "sourceOfTruth": [
+    "workflows/resume-generation.md §顺序 1–12",
+    "workflows/resume-generation.md §渲染与分页",
+    "workflows/resume-generation.md §三层职责",
+    "schemas/resume-view.schema.json §$defs.resumeBullet",
+    "policies/evidence-policy.md §写入原则",
+    "policies/metric-policy.md §可用条件"
+  ],
+  "preconditions": {
+    "targetRole": "Agent 应用开发工程师",
+    "careerProfile": {
+      "claims": [
+        { "id": "claim-selected-1", "statement": "基于 LangGraph 构建多 Agent Workflow", "ownership": "OWNER", "evidenceLevel": "A", "resumeEligible": true },
+        { "id": "claim-selected-2", "statement": "围绕长任务设计可恢复的异步事件链路", "ownership": "DIRECT", "evidenceLevel": "A", "resumeEligible": true },
+        { "id": "claim-excluded-risk", "statement": "使用两阶段提交保证跨服务一致性", "ownership": "OBSERVED", "evidenceLevel": "C", "interviewRisk": "HIGH", "resumeEligible": false }
+      ],
+      "metrics": [
+        { "id": "metric-confirmed", "confidence": "confirmed", "resumeEligible": true, "label": "任务事件投递延迟", "before": "秒级抖动", "after": "稳定 P99 < 200ms" },
+        { "id": "metric-inferred", "confidence": "inferred", "resumeEligible": false, "label": "吞吐提升" }
+      ]
+    },
+    "strategy": {
+      "selectedClaimIds": ["claim-selected-1", "claim-selected-2"],
+      "excludedClaims": [{ "claimId": "claim-excluded-risk", "reason": "not_resume_eligible" }]
+    }
+  },
+  "userInput": "按这个 Strategy 生成 Resume View。",
+  "mustDo": [
+    "每条 bullet 生成稳定 id，并记录直接支撑它的 claimIds 与实际使用的 metricIds",
+    "只使用 selectedClaimIds 中的 Claim",
+    "Metric 只引用 confidence=confirmed 且 resumeEligible=true 的指标",
+    "把 project / summary / subBlocks 组织为 Resume View schema 的结构（sections[].entries[]）",
+    "需要主题强调色的技术词与指标用 **关键词** 标记，且不整句高亮"
+  ],
+  "mustNotDo": [
+    "使用被排除的 claim-excluded-risk",
+    "引用 metric-inferred（confidence=inferred）",
+    "生成没有 claimIds 的 bullet",
+    "让 Renderer 决定内容（三层职责混淆）",
+    "为了凑满页数或槽位而编造内容（Rule 5）"
+  ],
+  "rubric": [
+    { "id": "B9-R1", "criterion": "每条 bullet 有稳定 id + claimIds + metricIds", "weight": 3 },
+    { "id": "B9-R2", "criterion": "未绕过 Strategy 使用未选中的 Claim", "weight": 3 },
+    { "id": "B9-R3", "criterion": "Metric 仅引用 confirmed 且 resumeEligible 的指标", "weight": 2 },
+    { "id": "B9-R4", "criterion": "无重复 Claim / 重复技术词", "weight": 2 }
+  ]
+}

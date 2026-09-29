@@ -2,33 +2,40 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{姓名}} · 简历</title>
 <meta name="author" content="{{姓名}}">
 <meta name="description" content="{{摘要}}">
 <meta name="keywords" content="{{关键词}}">
-<meta name="generator" content="Kami Family">
+<meta name="generator" content="Kami Family (kami-sepia)">
 <link rel="stylesheet" href="shared/kami-family.css" />
+<!-- 本 skill 的版式微调，必须在上游样式之后加载 -->
+<link rel="stylesheet" href="shared/kami-layout.css" />
 <style>
+  /* 主题：kami-sepia —— 只覆盖颜色变量，结构完全复用 shared/kami-family.css */
   :root {
-    --kami-paper: #f7f2ea;
-    --kami-paper-alt: #fdfaf5;
-    --kami-line: #e3d7c7;
-    --kami-line-soft: #ede4d8;
-    --kami-text-strong: #34281e;
-    --kami-text-muted: #786554;
-    --kami-text-secondary: #5e4c3d;
-    --kami-accent: #6b4a32;
-    --kami-accent-soft: #f3e9de;
+    --parchment: #f7f2ea;
+    --ivory: #fdfaf5;
+    --border: #e3d7c7;
+    --border-soft: #ede4d8;
+    --near-black: #34281e;
+    --stone: #786554;
+    --olive: #5e4c3d;
+    --brand: #6b4a32;
+    --brand-tint: #f3e9de;
+    --dark-warm: #44372c;
   }
 </style>
 </head>
 <body>
-
 <main id="kami-root"></main>
+<!-- 预览用样例数据。生成正式简历时把这一行换成真实 Resume View。 -->
+<script src="shared/sample-data.js"></script>
 <script src="shared/kami-render.js"></script>
 <script>
-  // 生成最终简历时，将 Resume View JSON 赋给 window.KAMI_RESUME_DATA。
   renderKamiResume({ target: "#kami-root", data: window.KAMI_RESUME_DATA });
 </script>
+<!-- 预览专用：页头头像开关。生成正式简历时删掉这一行（非样例数据下它也不会出现）。 -->
+<script src="shared/preview-avatar.js"></script>
 </body>
 </html>

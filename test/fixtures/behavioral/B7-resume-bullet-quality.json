@@ -1,0 +1,37 @@
+{
+  "id": "B7",
+  "title": "Resume bullet quality (writing policy)",
+  "sourceOfTruth": [
+    "policies/resume-writing-policy.md §Rule 1（一句一个核心主题）",
+    "policies/resume-writing-policy.md §Rule 2（避免空泛职责句）",
+    "policies/resume-writing-policy.md §Rule 3 / §Rule 8（动作+机制，而非名词堆叠）",
+    "policies/resume-writing-policy.md §Rule 6（Ownership 决定动词强度）",
+    "policies/resume-writing-policy.md §Rule 12（必须可追溯）",
+    "workflows/resume-generation.md §Bullet 生成原则",
+    "policies/bootstrap-generation-policy.md §Bootstrap Bullet 写作要求"
+  ],
+  "preconditions": {
+    "targetRoleKnown": true,
+    "targetRole": "前端开发工程师",
+    "ownership": "OWNER",
+    "mechanismKnown": false
+  },
+  "userInput": "使用 resume-copilot 帮我把这段整理成简历内容：\n项目：低代码平台\n我负责页面编辑器、事件系统、物料平台、权限、发布和性能优化。\n关键词：Schema、实时预览",
+  "mustDo": [
+    "识别这是一条「多能力并列 + 无机制」的输入，按主题拆分而不是塞进一句",
+    "指出缺少具体机制（每项到底做了什么、怎么做）并追问 1–3 个高价值问题",
+    "如果输出 provisional bullet，至少包含「动作 + 对象」，并保持 Ownership=OWNER 允许的动词强度"
+  ],
+  "mustNotDo": [
+    "输出「负责低代码平台相关能力建设」这类空泛职责句",
+    "把页面编辑器/事件系统/物料平台/权限/发布/性能优化六个主题堆进同一条 bullet",
+    "为没有提供的机制编造实现细节（如「基于虚拟 DOM Diff 与 Web Worker 构建实时预览引擎」）",
+    "在机制未知时使用「设计并实现…」这类强机制表述"
+  ],
+  "rubric": [
+    { "id": "B7-R1", "criterion": "未输出空泛职责句（Rule 2）", "weight": 3 },
+    { "id": "B7-R2", "criterion": "一条 bullet 只表达一个核心主题（Rule 1）", "weight": 3 },
+    { "id": "B7-R3", "criterion": "机制缺失时给出骨架/缺口并追问，而非硬编（Rule 3/8）", "weight": 2 },
+    { "id": "B7-R4", "criterion": "动词强度与 OWNER 一致但不夸大未确认实现（Rule 6）", "weight": 2 }
+  ]
+}

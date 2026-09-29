@@ -1,0 +1,40 @@
+{
+  "id": "B8",
+  "title": "Resume Strategy — JD matching without inventing claims",
+  "sourceOfTruth": [
+    "workflows/resume-strategy.md §2 Target Role 是硬性输入",
+    "workflows/resume-strategy.md §3 JD 解析",
+    "workflows/resume-strategy.md §4 Claim 候选过滤",
+    "workflows/resume-strategy.md §6 不是「JD 有什么就硬塞什么」",
+    "workflows/resume-strategy.md §8 Coverage 分析"
+  ],
+  "preconditions": {
+    "targetRole": "Agent 应用开发工程师",
+    "claims": [
+      { "id": "claim-agent-workflow", "statement": "基于 LangGraph 构建 Supervisor + Specialist 多 Agent Workflow", "ownership": "OWNER", "evidenceLevel": "A" },
+      { "id": "claim-fe-perf", "statement": "通过精简状态订阅降低 React 交互阶段长任务", "ownership": "DIRECT", "evidenceLevel": "A" },
+      { "id": "claim-k8s-observe", "statement": "接触过 Kubernetes 部署与联调", "ownership": "OBSERVED", "evidenceLevel": "C" },
+      { "id": "claim-legacy-guess", "statement": "疑似参与过某个微服务拆分", "ownership": "NONE", "evidenceLevel": "D" }
+    ],
+    "jdText": "岗位职责：负责多 Agent 工作流的设计与落地，熟悉 LangGraph；负责服务在生产环境的 Kubernetes 部署与治理。任职要求：具备 RAG 检索链路优化经验。"
+  },
+  "userInput": "这是目标岗位 JD，结合我的 Career Profile 帮我生成一版针对这个岗位的简历策略。\nJD：负责多 Agent 工作流的设计与落地，熟悉 LangGraph；负责服务在生产环境的 Kubernetes 部署与治理。具备 RAG 检索链路优化经验。",
+  "mustDo": [
+    "把 JD 拆成结构化 requirements，每条带 category / statement / importance / keywords / evidenceNeeded",
+    "对每个 requirement 输出 covered / weakly_covered / gap",
+    "把 Kubernetes 标为 gap（只有 OBSERVED + evidenceLevel C 的 Claim，不足以支撑 MUST）",
+    "过滤掉 evidenceLevel = D 与 ownership = NONE 的 Claim"
+  ],
+  "mustNotDo": [
+    "为 Kubernetes 缺口编造一条 Claim，或写「熟悉 Kubernetes」",
+    "使用固定权重公式（如 35% 结果 + 20% ownership）做通用打分",
+    "把 evidenceLevel = D 的 claim-legacy-guess 选入简历",
+    "跳过 Strategy 直接从全部 Claim 挑选内容"
+  ],
+  "rubric": [
+    { "id": "B8-R1", "criterion": "JD 被解析为结构化 requirements（含 importance）", "weight": 3 },
+    { "id": "B8-R2", "criterion": "未为缺口编造 Claim（Kubernetes 标为 gap）", "weight": 3 },
+    { "id": "B8-R3", "criterion": "输出 covered / weakly_covered / gap 三类覆盖", "weight": 2 },
+    { "id": "B8-R4", "criterion": "过滤掉 evidenceLevel=D 与 ownership=NONE 的 Claim", "weight": 2 }
+  ]
+}

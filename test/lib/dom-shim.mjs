@@ -2,13 +2,36 @@
 // browser or jsdom. kami-render.js only touches:
 //   - `document.querySelector(selector)` (for the target)
 //   - `document.body` (default target)
+//   - `document.body.classList` (dense-mode toggle for the 2-page discipline)
 //   - `element.innerHTML = ...`
 // so a tiny fake is enough to exercise the real rendering + escaping logic.
 
 import fs from 'node:fs';
 
+function createClassList(el) {
+  const set = new Set();
+  return {
+    add(name) {
+      set.add(name);
+      el._classes = [...set];
+    },
+    remove(name) {
+      set.delete(name);
+      el._classes = [...set];
+    },
+    contains(name) {
+      return set.has(name);
+    },
+    toString() {
+      return [...set].join(' ');
+    },
+  };
+}
+
 function createElement() {
-  return { innerHTML: '' };
+  const el = { innerHTML: '', _classes: [] };
+  el.classList = createClassList(el);
+  return el;
 }
 
 export function createDom() {

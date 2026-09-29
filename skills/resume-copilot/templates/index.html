@@ -133,11 +133,20 @@
       <section class="hero">
         <h1>Kami Family 模板总览</h1>
         <p>
-          当前模板体系已统一收口到 Kami family。9 个主题页共用同一套 Kami 骨架，由共享 CSS 与共享渲染脚本驱动，只保留主题变量差异。
+          10 个主题页共用上游 Kami 的同一套样式表（<code>shared/kami-family.css</code>，逐字节对齐 tw93/Kami），
+          由 <code>shared/kami-render.js</code> 把 Resume View 的内容槽位映射进 Kami 的类名，
+          因此成品样式与 Kami 一致；内容槽位仍是本 skill 自己的模型。
+          每页都接了 <code>shared/sample-data.js</code>，双击即可看到完整样例简历。
+        </p>
+        <p>
+          <strong>有无个人头像是版式差异，与主题无关</strong>：主题只覆盖颜色变量，头像只改页头排布，
+          所以 10 套主题都支持两种页头。打开任意主题页，用右上角的
+          「显示头像 / 隐藏头像」开关即可当场对比（打印时开关自动隐藏，不会进入 A4 页面）。
         </p>
         <div class="file-list">
           <h2>公开主题页</h2>
           <ul>
+            <li>kami-base.html</li>
             <li>kami-ivory.html</li>
             <li>kami-mono.html</li>
             <li>kami-navy.html</li>
@@ -152,6 +161,20 @@
       </section>
 
       <section class="grid">
+        <article class="card">
+          <span class="badge">默认 · Kami 原版</span>
+          <h2>kami-base</h2>
+          <p class="meta">上游 tw93/Kami 的原始配色（羊皮纸 + 橄榄绿强调），未做任何变量覆盖。用户未指定主题时回退到这里。</p>
+          <a href="kami-base.html">打开模板</a>
+        </article>
+
+        <article class="card">
+          <span class="badge">版式变体 · 带头像</span>
+          <h2>avatar-demo</h2>
+          <p class="meta">与 kami-base 同款样式，打开时默认带个人头像（可选槽位 <code>header.avatar</code>）：头像在左、文字块在右。页内开关可随时关掉对比无头像版式。</p>
+          <a href="avatar-demo.html">打开模板</a>
+        </article>
+
         <article class="card">
           <span class="badge">Kami family</span>
           <h2>kami-ivory</h2>

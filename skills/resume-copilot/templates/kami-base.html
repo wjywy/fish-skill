@@ -2,19 +2,25 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{姓名}} · 简历</title>
 <meta name="author" content="{{姓名}}">
 <meta name="description" content="{{摘要}}">
 <meta name="keywords" content="{{关键词}}">
-<meta name="generator" content="Kami Family">
+<meta name="generator" content="Kami Family (kami-default)">
 <link rel="stylesheet" href="shared/kami-family.css" />
+<!-- 本 skill 的版式微调，必须在上游样式之后加载 -->
+<link rel="stylesheet" href="shared/kami-layout.css" />
 </head>
 <body>
 <main id="kami-root"></main>
+<!-- 预览用样例数据。生成正式简历时把这一行换成真实 Resume View。 -->
+<script src="shared/sample-data.js"></script>
 <script src="shared/kami-render.js"></script>
 <script>
-  // 生成最终简历时，将 Resume View JSON 赋给 window.KAMI_RESUME_DATA。
   renderKamiResume({ target: "#kami-root", data: window.KAMI_RESUME_DATA });
 </script>
+<!-- 预览专用：页头头像开关。生成正式简历时删掉这一行（非样例数据下它也不会出现）。 -->
+<script src="shared/preview-avatar.js"></script>
 </body>
 </html>

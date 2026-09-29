@@ -2,6 +2,60 @@
 
 Kami Renderer 负责把 `Resume View` 渲染成 A4 技术简历。它只负责展示，不决定事实、Claim、内容选择或正文措辞。
 
+## 与上游 Kami 的关系
+
+**内容槽位不变，样式对齐。** 这两件事分开：
+
+- `Resume View` 沿用本 skill 自己的内容模型
+  （`header / summary / skills / sections[].entries[]`，见
+  `../../schemas/resume-view.schema.json`），不改成 Kami 的
+  `metrics / timeline / projects` 结构。
+- 渲染器把上面的槽位**映射**进上游 Kami 的 DOM 类名，从而让
+  `templates/shared/kami-family.css`（上游 `<style>` 的逐字节拷贝，497 行 0 差异）
+  原样生效，成品样式与 Kami 完全一致。
+
+槽位 → 类名的完整对照表见 `../../templates/README.md`。要点：
+
+```text
+header.name            → .name.serif           （页头第 1 行左格）
+header.targetRole      → .role                 （页头第 1 行右格）
+header.educationInline → .alias                （页头第 2 行左格，只到年份）
+header.contacts[]      → .contact              （页头第 2 行右格），.sep 分隔
+header.avatar          → .avatar + .header-main（可选；头像在左、文字块在右）
+summary                → .summary（可省略）
+skills[]               → .skill-row > .skill-label + .skill-body
+sections[].title/range → .section-title (+ .sub)
+entry.time             → .proj-role            （条目标题行左格：在职时间）
+entry.title            → .proj-name.serif      （中格：公司 / 项目名称）
+entry.meta             → .proj-kind            （右格：所在部门）
+entry.link             → .proj-kind            （追加在 meta 之后，渲染成超链接）
+entry.tags[]           → 不渲染（技术栈不上简历）
+entry.summaryBullets[] → .proj-row（label ·）
+entry.bullets[]        → .proj-row（label ·）
+entry.subBlocks[]      → .proj-row（label |，分标题加粗、单起一行）
+subBlocks[].bullets[]  → .proj-row（label ·）
+type=education         → .no-break + .edu-row
+```
+
+`T4.4` 断言渲染器只输出上游类名且每个类名都有样式覆盖——唯二例外是 `.avatar` /
+`.header-main`，由版式覆盖文件自己定义并覆盖。该断言同时跑无头像与有头像两种页头。
+
+### 与上游唯一的版式差异：页头
+
+上游是「`alias` 与姓名同行 + 两栏底部对齐」，本 skill 改成 **2×2 栅格**：
+
+```text
+张知行                                          后端开发工程师 / AI 应用方向
+华东理工大学 · 软件工程 · 2021–2025    github.com/zhangzhixing · …@example.com
+```
+
+第 1 行姓名 / 目标岗位底部对齐，第 2 行教育信息 / 联系方式按首行基线对齐。
+若 `header.avatar` 有值，文字块左侧再加一列头像，且文字块与头像**等高**：
+第 1 行贴头像顶、第 2 行贴头像底。
+
+这处差异收在 `templates/shared/kami-layout.css` 一个文件里（必须在上游样式之后加载），
+所以 `kami-family.css` 仍是上游的干净拷贝。`T4.14` / `T4.15` 会守住这一点。
+
 ## 默认主题
 
 用户侧默认主题 ID：`kami-default`，当前映射到 `templates/kami-base.html`。
@@ -34,28 +88,74 @@ Kami Renderer 直接消费 `../../schemas/resume-view.schema.json`。核心结�
 
 ```text
 Resume View
-├── header
-├── skills[]
-├── sections[]
-│   └── entries[]
-│       ├── summaryBullets[]
-│       ├── bullets[]
-│       └── subBlocks[]
+├── header            { name, targetRole, educationInline, avatar?, contacts[] }
+├── summary           string | null
+├── skills[]          { label, description }
+├── sections[]        { type, title, range }
+│   └── entries[]     { time, title, meta, link? }
+│       ├── summaryBullets[]   { id, text, claimIds, metricIds }
+│       ├── bullets[]          { id, text, claimIds, metricIds }
+│       ├── subBlocks[]        { title, bullets[] }
+│       └── tags[]             （保留在数据里，不渲染）
 └── renderOptions
 ```
 
-调用：
+两条与版式强相关的字段口径：
+
+- `header.avatar`：**决定页头版式**（有值 = 头像版，留空 = 标准版），所以生成前
+  必须先问用户是否需要头像，不能默认。
+- `entry.link`：项目地址，渲染成超链接，显示文字取站点短名
+  （`github.com/xxx/yyy` → `github`），`href` 是完整 URL。网址写在 `meta` 里
+  也能识别（旧数据兼容），但新数据应写进 `link`。
+
+每条 bullet 都带 `claimIds`（用到指标时带 `metricIds`），所以
+Fact → Claim → Resume View 的追溯链在样式对齐之后依然完整。
+`highlightClaimIds` / `notes` / `renderOptions` 属于内部元数据，不渲染。
+
+## 分页
+
+不做固定分页，内容在 A4 页面盒内自然流动：
+
+- `@page { size: A4 }`（上游样式）定义页面盒。
+- `.project { break-inside: avoid }` 保证单个经历条目不被拆断。
+- `sections[type=education]` 用 `.no-break` 保持在一页内。
+- 页数由内容决定，不强制 2 页。需要压缩时可在 `<body>` 上加 `resume--dense`
+  启用上游的紧凑变体。
+- 内容溢出时优先删内容（回到 Resume Strategy），**不要**改 CSS 字号或页边距。
+
+## 文本强调约定
+
+描述类字段里用 `**关键词**` 标记需要主题强调色的词：
+
+```json
+{ "text": "把刷新耗时由 **7h+** 降至约 **5min**。" }
+```
+
+渲染器先转义再解析，输出 `<span class="hl">关键词</span>`（`skills[].description` 里输出
+`<span class="em-brand">`，与上游模板惯例一致）。标记本身无法注入 HTML，也不会以字面
+`**` 泄漏到页面上。**每条内容至少保留一处强调，但不要整句高亮。**
+
+## 调用
 
 ```js
 renderKamiResume({ target: "#kami-root", data: resumeView });
 ```
 
-`../../templates/shared/sample-data.json` 与 Resume View Schema 保持一致，可用于开发预览。缺少 `renderOptions` 或 `theme` 时使用 `kami-default`。
+`../../templates/shared/sample-data.json` 与 Resume View Schema 保持一致，可用于开发预览；
+`../../templates/shared/sample-data.js` 是它的经典 `<script>` 版本，让主题页在 `file://`
+下也能直接渲染。缺少 `renderOptions` 或 `theme` 时使用 `kami-default`。
 
 ## 结构与主题分离
 
-- `templates/shared/kami-render.js`：共享结构。
-- `templates/shared/kami-family.css`：共享排版。
-- `../../templates/kami-*.html`：主题变量入口。
+- `templates/shared/kami-render.js`：唯一的骨架来源（槽位 → Kami DOM 映射）。
+- `templates/shared/kami-family.css`：上游样式逐字节拷贝。
+- `templates/shared/kami-layout.css`：与上游不同的版式微调（页头 2×2 栅格 + 可选头像）。
+- `templates/shared/preview-avatar.js`：**预览专用**的页头头像开关，只在样例数据下挂载。
+- `templates/kami-*.html`：主题变量入口，只写 `:root { --parchment: …; }` 覆盖。
+- `templates/avatar-demo.html`：带头像版式的入口页（非主题，故不叫 `kami-*`）。
+
+主题与头像正交：主题只控制颜色变量，头像只改页头排布，所以**每套主题都支持
+「有头像 / 无头像」两种页头**。每个主题页都装了 `preview-avatar.js`，
+可以当场切换对比；`T1.12` 守住「装在每个主题页上」且「不会进正式简历」这两点。
 
 主题只控制颜色与视觉变量；不得修改 Career Profile、Resume Strategy、Claim 或 Metric。

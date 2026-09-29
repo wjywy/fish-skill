@@ -37,6 +37,13 @@
             "null"
           ]
         },
+        "avatar": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "个人头像的图片地址（URL 或相对路径）。填写时页头渲染成「头像在左 + 文字块在右」的版式；留空或省略则用标准页头。生成前应先询问用户是否需要头像。"
+        },
         "contacts": {
           "type": "array",
           "items": {
@@ -140,7 +147,15 @@
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "description": "条目右侧的说明文字（工作经历写所在部门，如「后端开发实习生 / 上海」）。"
+                },
+                "link": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "条目右侧的地址链接（项目经历写项目地址）。渲染成超链接，显示文字取站点名（github.com/xxx/yyy → github）。"
                 },
                 "summaryBullets": {
                   "type": "array",

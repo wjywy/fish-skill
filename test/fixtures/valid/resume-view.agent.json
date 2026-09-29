@@ -1,0 +1,57 @@
+{
+  "id": "view-agent-001",
+  "targetId": "target-agent",
+  "header": {
+    "name": "示例用户",
+    "targetRole": "Agent 应用开发工程师",
+    "educationInline": null,
+    "contacts": []
+  },
+  "summary": "关注 Multi-Agent 编排与长任务可靠通信链路。",
+  "skills": [
+    {
+      "label": "Agent 应用",
+      "description": "LangGraph 多 Agent 编排、共享状态与动态路由。"
+    },
+    {
+      "label": "可靠性工程",
+      "description": "事务 Outbox、至少一次投递、幂等与断线恢复。"
+    }
+  ],
+  "sections": [
+    {
+      "type": "project",
+      "title": "项目经历",
+      "range": null,
+      "entries": [
+        {
+          "time": null,
+          "title": "A2A Agent 平台",
+          "meta": "核心开发",
+          "bullets": [
+            {
+              "id": "b-1",
+              "text": "基于 LangGraph 构建 Supervisor + Specialist 多 Agent Workflow，通过共享状态传递与 Supervisor 动态路由完成任务拆解、上下文传递与结果聚合。",
+              "claimIds": ["claim-selected-1"],
+              "metricIds": []
+            },
+            {
+              "id": "b-2",
+              "text": "围绕 long-running Task 设计可恢复的异步事件链路，将 Task / Status / Artifact 事件按任务顺序持久化至事务 Outbox，并支持断线重订阅；任务事件投递延迟由秒级抖动收敛至稳定 P99 < 200ms。",
+              "claimIds": ["claim-selected-2"],
+              "metricIds": ["metric-confirmed"]
+            }
+          ],
+          "tags": ["LangGraph", "PostgreSQL", "Outbox"]
+        }
+      ]
+    }
+  ],
+  "highlightClaimIds": ["claim-selected-1"],
+  "notes": [],
+  "renderOptions": {
+    "renderer": "kami",
+    "theme": "kami-default",
+    "format": "html"
+  }
+}
