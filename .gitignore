@@ -1,3 +1,7 @@
 node_modules/
 .preview/
+
+# WorkBuddy 工作区数据（会话记忆 / 项目记忆）：仅本地保留，不进仓库。
+# 注意：.gitignore 只对「未跟踪」文件生效；若某个文件已被 git 跟踪，
+# 必须先 `git rm -r --cached .workbuddy-ai` 取消跟踪，否则仍会被推送。
 .workbuddy-ai/
