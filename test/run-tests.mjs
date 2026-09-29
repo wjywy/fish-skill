@@ -879,9 +879,12 @@ function T6() {
       if (!byBasename.has(b)) byBasename.set(b, []);
       byBasename.get(b).push(f);
     }
+    // Local-only, gitignored paths: they cannot exist in a cloned repo, so docs
+    // may name them without the link check failing.
     const skip = (ref) =>
       ref.includes('*') ||
       ref.includes('.workbuddy-ai') ||
+      ref.includes('.preview') ||
       path.basename(ref) === 'MEMORY.md';
 
     const broken = [];

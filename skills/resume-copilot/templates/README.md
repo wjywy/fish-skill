@@ -65,6 +65,30 @@
 且覆盖文件确实声明了这条差异；`T4.15` 断言头像版式只由 `header.avatar` 触发；
 `T1.12` 断言预览开关装在每个主题页上、且不会出现在正式简历里。
 
+## 权威关系：本目录是唯一基准
+
+**`skills/resume-copilot/templates/` 是简历版式的唯一权威来源。** 仓库根目录下的
+`.preview/upstream/` 只是**本地只读参照物**，不是模板、不参与渲染，也不进版本库：
+
+| | `skills/resume-copilot/templates/` | `.preview/upstream/` |
+| --- | --- | --- |
+| 性质 | 本 skill 的产物（模板 + 渲染器 + 样式） | 上游 tw93/Kami 的原件，只读 |
+| 谁在用 | 生成简历时实际加载的就是它 | **没有任何代码引用**，只供人工比对 |
+| 进 git | 是 | 否（`.preview/` 已在 `.gitignore`，且从未提交过） |
+| 冲突时 | **以它为准** | 被参照，不被执行 |
+
+上游原件渲染出来当然是**上游版式**（`alias` 与姓名同行、条目没有三段式标题、
+没有 `|` 分标题、没有头像槽位）—— 这些正是本 skill 刻意改掉的地方。
+所以两者"看起来不一样"是预期的：`.preview/upstream/` 代表**改之前**的样子，
+用来核对 `kami-family.css` 是否仍是上游 `<style>` 的逐字节拷贝（497 行、0 差异）。
+
+`.preview/upstream/` 里的四个文件：
+
+- `.preview/upstream/resume-cn-template.html` —— 上游中文简历模板原件，`kami-family.css` 的来源。
+- `.preview/upstream/demo-musk-resume-en.html` —— 上游英文简历示例。
+- `.preview/upstream/resume-writing.md` —— 上游的简历写作指南。
+- `.preview/upstream/resume.json` —— 上游的简历内容契约。
+
 ## Kami family 结构
 
 - `shared/kami-family.css`
