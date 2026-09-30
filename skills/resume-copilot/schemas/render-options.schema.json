@@ -15,15 +15,10 @@
       "type": "string",
       "enum": [
         "kami-default",
-        "kami-ivory",
         "kami-mono",
         "kami-navy",
-        "kami-slate",
-        "kami-teal",
-        "kami-forest",
-        "kami-burgundy",
-        "kami-sepia",
-        "kami-copper"
+        "kami-copper",
+        "kami-seal"
       ],
       "default": "kami-default"
     },

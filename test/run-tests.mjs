@@ -43,6 +43,36 @@ const validator = createValidator(SCHEMA_DIR);
 const only = process.argv.slice(2).find((a) => /^T\d+$/.test(a));
 const emitJson = process.argv.includes('--json');
 
+// The theme entry pages. Shared by T1 (structure / wiring) and T4 (render
+// contract / contrast), so it lives at module scope rather than inside a suite.
+//
+// 曾经有 10 套，2026-09-30 收敛成 5 套：实测 10 套的 --brand 明度全落在
+// 16%–39%、饱和度 0%–67%，差别小到撑不起"10 种设计"。保留 base（上游原色）
+// + 4 套差异真正可感知的。新增 / 删除主题时这里必须同步 —— T6.3 会拿
+// render-options.schema.json 的 theme 枚举和目录里的 kami-*.html 对账。
+const THEMES = [
+  'kami-base.html',
+  'kami-mono.html',
+  'kami-navy.html',
+  'kami-copper.html',
+  'kami-seal.html',
+];
+
+// 取选择器列表**完全等于** selector 的规则块。
+// 直接写 `/\.role \{/` 会误命中 `.name,\n.role {` 这类多选规则，
+// 也会命中注释里提到的同名词，所以这里老老实实解析一遍。
+function ruleBlock(rawCss, selector) {
+  const css = String(rawCss).replace(/\/\*[\s\S]*?\*\//g, '');
+  const want = selector.replace(/\s*,\s*/g, ', ');
+  const re = /([^{}]+)\{([^}]*)\}/g;
+  let m;
+  while ((m = re.exec(css)) !== null) {
+    const sels = m[1].split(',').map((x) => x.trim()).filter(Boolean);
+    if (sels.join(', ') === want) return m[2];
+  }
+  return null;
+}
+
 const suites = [];
 function suite(name) {
   console.log(`\n\x1b[1m${name}\x1b[0m`);
@@ -102,19 +132,6 @@ function T1() {
     'resume-bullet-patterns.md',
     'resume-strategy.example.json',
   ];
-  const THEMES = [
-    'kami-base.html',
-    'kami-ivory.html',
-    'kami-mono.html',
-    'kami-navy.html',
-    'kami-slate.html',
-    'kami-teal.html',
-    'kami-forest.html',
-    'kami-burgundy.html',
-    'kami-sepia.html',
-    'kami-copper.html',
-  ];
-
   s.check('T1.1', 'SKILL.md exists with YAML frontmatter', () => {
     const p = path.join(SKILL_ROOT, 'SKILL.md');
     assert(exists(p), 'SKILL.md missing');
@@ -191,11 +208,11 @@ function T1() {
     return { detail: `${THEMES.length} themes wired (css + data + renderer + avatar toggle)` };
   });
 
-  // The 9 themes are a colour-only extension layer on top of the upstream Kami
-  // stylesheet, so each must override the *upstream* token names — and must use
-  // real CSS. A comma-separated `:root` block silently collapses into a single
-  // custom-property declaration, leaving every other token undefined.
-  s.check('T1.9', 'each of the 9 themes overrides all 10 upstream tokens with valid CSS', () => {
+  // The non-base themes are a colour-only extension layer on top of the upstream
+  // Kami stylesheet, so each must override the *upstream* token names — and must
+  // use real CSS. A comma-separated `:root` block silently collapses into a
+  // single custom-property declaration, leaving every other token undefined.
+  s.check('T1.9', `each of the ${THEMES.length - 1} non-base themes overrides all 10 upstream tokens with valid CSS`, () => {
     const UPSTREAM_TOKENS = [
       '--parchment',
       '--ivory',
@@ -249,7 +266,7 @@ function T1() {
   });
 
   // The avatar toggle is a *preview* affordance. It has to be wired on every
-  // theme page (that is what proves all 10 themes handle both header variants)
+  // theme page (that is what proves every theme handles both header variants)
   // and it must stay out of a generated resume, so it may only mount when the
   // page is still showing the shipped sample.
   s.check('T1.12', 'avatar preview toggle is wired on every theme and stays preview-only', () => {
@@ -279,6 +296,78 @@ function T1() {
     // A fixed-position control would otherwise print onto the A4 sheet.
     assert(/@media\s*print/.test(code), 'the toggle must be hidden when printing');
     return { detail: `${THEMES.length + 1} preview pages wired; toggle is sample-only and print-hidden` };
+  });
+
+  s.check('T1.13', 'common.css stays scoped to the gallery page', () => {
+    // 去掉注释再查：文件头的历史说明里会提到这些名字，
+    // 我们要防的是"规则复活"，不是"名字被提及"。
+    const css = readText(path.join(TEMPLATE_DIR, 'shared', 'common.css')).replace(
+      /\/\*[\s\S]*?\*\//g,
+      ''
+    );
+
+    // 这些类和变量曾经定义在 common.css 里，但审查实测是 0 引用 ——
+    // 简历版式完全由 Kami 样式表承担。删掉它们是为了不让下一个人
+    // 误以为改这里能影响简历。
+    for (const dead of [
+      '.resume-page',
+      '.item-title-row',
+      '.bullet-list',
+      '.tag-list',
+      '--page-width',
+      '--page-height',
+      '--page-padding',
+      '--text-strong',
+      '--text-muted',
+      '--line-soft',
+      '--accent-blue',
+      '--accent-green',
+      '--accent-gold',
+    ]) {
+      assertExcludes(css, dead, `${dead} was deleted from common.css — do not reintroduce it`);
+    }
+
+    // 总览页真正依赖的最小重置必须还在。
+    assertIncludes(css, 'box-sizing: border-box', 'the box-sizing reset is still needed');
+    assertIncludes(css, '--font-sans', 'the gallery page still needs its sans stack');
+
+    // 简历页一个都不该加载它。
+    const linked = [...THEMES, 'avatar-demo.html'].filter((t) =>
+      readText(path.join(TEMPLATE_DIR, t)).includes('common.css')
+    );
+    assert(linked.length === 0, `resume pages must not load common.css: ${linked.join(', ')}`);
+    return { detail: 'gallery-only; the dead rules stay deleted' };
+  });
+
+  // 仓耳今楷是 36 MB 的第三方字体，且授权不允许再分发 —— 仓库里不能有，
+  // 但必须留一条"把它装到本机"的路径，否则断网打印会掉字体。
+  s.check('T1.14', 'font binaries stay out of the repo, with an installer outside it', () => {
+    const script = path.join(SKILL_ROOT, 'scripts', 'ensure-fonts.sh');
+    assert(exists(script), 'missing scripts/ensure-fonts.sh');
+    assert((fs.statSync(script).mode & 0o111) !== 0, 'ensure-fonts.sh must be executable');
+
+    const code = readText(script);
+    // 下载目标必须能覆盖、且默认落在 skill 目录之外 ——
+    // install 是整目录拷贝、npm pack 会带上 skills/，放进来的话包体积会被撑爆。
+    assertIncludes(code, 'RESUME_FONT_DIR:-', 'the font dir must be overridable');
+    assertIncludes(code, 'XDG_DATA_HOME', 'the default font dir should follow the XDG convention');
+    assertExcludes(code, 'SKILL_DIR}/fonts', 'never download fonts back into the skill tree');
+    // 体积校验 + 半包清理，缺一个就可能把一个 404 页面当成字体装上。
+    assertIncludes(code, 'MIN_SIZE_CN', 'downloads must be size-validated');
+    assertIncludes(code, 'trap cleanup_tmp EXIT', 'an interrupted run must sweep its temp files');
+
+    const binaries = listFiles(
+      REPO_ROOT,
+      (f) =>
+        /\.(ttf|otf|woff2?)$/i.test(f) &&
+        !f.includes(`${path.sep}.git${path.sep}`) &&
+        !f.includes(`${path.sep}node_modules${path.sep}`)
+    );
+    assert(
+      binaries.length === 0,
+      `font binaries must never be committed: ${binaries.map((f) => path.relative(REPO_ROOT, f)).join(', ')}`
+    );
+    return { detail: 'installer present + executable; 0 font binaries in the repo' };
   });
 }
 
@@ -504,17 +593,20 @@ function T4() {
 
   s.check('T4.1', 'maps header slots onto the Kami header (education on its own line)', () => {
     const html = renderToHtml(RENDER_JS, sample);
-    // Left column: name on line 1, education on line 2 — the alias must NOT be
-    // nested inside .name, or the two collapse onto one line.
+    const education = sample.header.educationInline.split(' · ');
+    const schoolMajor = education.slice(0, -1).join(' · ');
+    const years = education.at(-1);
+    // 左列：姓名在第 1 行，教育块在第 2 行内部再拆成两行；教育不能嵌在 .name。
     assertIncludes(html, 'class="name serif"', 'name wrapper missing');
     assertIncludes(html, `class="name serif">${sample.header.name}</div>`, 'name must close before the alias');
     assert(!/class="name serif">[^<]*<span class="alias"/.test(html), 'alias must not be inline inside .name');
-    assertIncludes(html, `class="alias">${sample.header.educationInline}</div>`, 'education must be its own block line');
-    // Right column: role as a block line, then the contacts line.
+    assertIncludes(html, `class="alias"><span>${schoolMajor}</span><span>${years}</span></div>`, 'education must be two paired rows');
+    // 右列：岗位在第 1 行，联系方式块内部逐行配对。
     assertIncludes(html, `class="role">${sample.header.targetRole}</div>`, 'targetRole should be a block line');
     assertIncludes(html, 'class="contact"', 'contact column missing');
-    assertIncludes(html, 'class="sep"', 'contact separator missing');
-    return { detail: 'header slots → 2 lines left / 2 lines right' };
+    assertIncludes(html, `<a href="${sample.header.contacts[0].href}">${sample.header.contacts[0].value}</a>`, 'first contact missing');
+    assertIncludes(html, `<a href="${sample.header.contacts[1].href}">${sample.header.contacts[1].value}</a>`, 'second contact missing');
+    return { detail: 'header slots → name/role row + two paired education/contact rows' };
   });
 
   s.check('T4.2', 'contacts: href → <a>, no href → <span>', () => {
@@ -528,14 +620,12 @@ function T4() {
     assertIncludes(html2, '<span>13800000000</span>', 'plain contact should be a span');
   });
 
-  s.check('T4.3', 'maps summary / skills / sections onto Kami blocks', () => {
+  s.check('T4.3', 'maps skills / sections onto Kami blocks without a summary', () => {
     const html = renderToHtml(RENDER_JS, sample);
-    // summary 是可省略槽位：样例不带，就单独注入一份验证映射，
-    // 同时确认槽位为空时不输出空壳块。
-    assertExcludes(html, 'class="summary"', 'empty summary slot should render nothing');
+    assertExcludes(html, 'class="summary"', 'resume must not render a summary block');
     const withSummary = renderToHtml(RENDER_JS, { ...sample, summary: '一句话概述。' });
-    assertIncludes(withSummary, 'class="summary"', 'summary block missing');
-    assertIncludes(withSummary, '一句话概述。', 'summary text missing');
+    assertExcludes(withSummary, 'class="summary"', 'legacy summary must be ignored');
+    assertExcludes(withSummary, '一句话概述。', 'legacy summary text must be ignored');
     assertIncludes(html, 'class="section-title"', 'section title missing');
     assertIncludes(html, 'class="skill-row"', 'skill row missing');
     assertIncludes(html, 'class="skill-label"', 'skill label missing');
@@ -550,7 +640,7 @@ function T4() {
     assertIncludes(html, 'class="proj-label"', 'proj-label missing');
     assertIncludes(html, 'class="proj-text"', 'proj-text missing');
     assertIncludes(html, sample.sections[1].entries[0].title, 'entry title missing');
-    return { detail: 'summary/skills/sections → .summary/.skill-row/.project' };
+    return { detail: 'skills/sections → .skill-row/.project; summary is ignored' };
   });
 
   // The whole point of the mapping: nothing the renderer emits may fall outside
@@ -669,6 +759,7 @@ function T4() {
   // then its own `·` list. Tech-stack tags are intentionally not rendered.
   s.check('T4.12', 'renders summaryBullets / bullets / subBlocks, drops tags by design', () => {
     const html = renderToHtml(RENDER_JS, sample);
+    const layout = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-layout.css'));
     // Compare against the rendered *text*: `**kw**` becomes a span, so neither
     // the raw source nor the marker-stripped source is a substring of the HTML.
     const text = html.replace(/<[^>]+>/g, '');
@@ -683,13 +774,20 @@ function T4() {
     assertIncludes(text, plain(proj.summaryBullets[0].text), 'project summaryBullet text missing');
     assertIncludes(text, plain(oss.bullets[0].text), 'plain entry.bullets text missing');
 
-    // 分标题：| 标记 + 加粗标题单起一行，其下才是该分标题的 · 列表
-    assertIncludes(html, '<div class="proj-label">|</div>', 'subBlock title should get a | label');
+    // 分标题：`｜` 与标题文字放在同一个 proj-text 单元格，
+    // 因而和正文文字齐平，而不是和正文左侧的 `·` 齐平；描述区域不画下划线。
+    assertExcludes(html, '<div class="proj-label">|</div>', 'the pipe must not sit in the bullet-label cell');
     assertIncludes(
       html,
-      `<strong>${plain(work.subBlocks[0].title)}</strong>`,
-      'subBlock title should be bold on its own row'
+      `<strong>｜${plain(work.subBlocks[0].title)}</strong>`,
+      'subBlock title should keep a pipe aligned with its text'
     );
+    // 描述区不画任何线：分标题行显式 border-top: none，只靠留白分层。
+    assert(
+      /\.proj-row:has\(\.proj-text > strong\)[\s\S]{0,160}border-top:\s*none/.test(layout),
+      'description groups must not have an underline'
+    );
+    assertExcludes(layout, 'border-top: 0.35pt solid color-mix', 'the old description underline must stay deleted');
     assertIncludes(text, plain(work.subBlocks[0].bullets[0].text), 'subBlock bullet 1 missing');
     assertIncludes(text, plain(work.subBlocks[0].bullets[1].text), 'subBlock bullet 2 missing');
     assertIncludes(text, plain(proj.subBlocks[0].bullets[0].text), 'project subBlock bullet missing');
@@ -715,30 +813,56 @@ function T4() {
 
   // The header layout is the one place this skill deliberately departs from
   // upstream: the header becomes a 2×2 grid (name / role on row 1, education /
-  // contacts on row 2), row 1 is bottom-aligned and row 2 baseline-aligned, and
-  // the optional avatar stretches the text block to the photo's height. That
-  // delta lives in exactly one file, so the upstream stylesheet stays a clean
-  // verbatim copy.
+  // contacts on row 2), every row is **baseline**-aligned, and the optional
+  // avatar stretches the text block to the photo's height. That delta lives in
+  // exactly one file, so the upstream stylesheet stays a clean verbatim copy.
+  //
+  // 为什么是基线而不是 end（盒子底边）：25pt 姓名与 10.6pt 岗位的下伸部空间
+  // 不同，盒子底边对齐后两条基线仍差约 3pt，岗位看起来"飘在姓名下方"。
+  // 基线对齐才是文字意义上的底部对齐；剩下的 1.5px 墨水底差用 .role 的
+  // top 偏移做光学补偿。
   s.check('T4.14', 'header layout delta is isolated in kami-layout.css', () => {
     const family = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-family.css'));
     const layout = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-layout.css'));
+    const CSS = layout.replace(/\/\*[\s\S]*?\*\//g, '');
 
     // Upstream keeps its own rule; the delta is what overrides it.
     assertIncludes(family, 'align-items: flex-end', 'upstream .header rule changed — the copy is no longer verbatim');
     assertIncludes(layout, '.header', 'layout delta must target .header');
     assertIncludes(layout, 'display: grid', 'header must become a 2x2 grid');
     assertIncludes(layout, 'grid-template-columns', 'grid must define the two columns');
-    assertIncludes(layout, 'align-items: end', 'row 1 (name / role) must be bottom-aligned');
-    assertIncludes(layout, 'align-self: baseline', 'row 2 (education / contacts) must share a baseline');
+
+    // 三行全部基线对齐（不再用 align-items: end）。
+    assertIncludes(ruleBlock(CSS, '.header, .header-main'), 'align-items: baseline', 'the header grid must baseline-align its rows');
+    assertIncludes(ruleBlock(CSS, '.name, .role'), 'align-self: baseline', 'row 1 (name / role) must share a baseline');
+    assertIncludes(ruleBlock(CSS, '.alias, .contact'), 'align-self: baseline', 'row 2 (education / contacts) must share a baseline');
+
+    // 上游 .alias::before 的空伪元素会占掉左列第 1 个栅格行，把教育信息整体
+    // 下挤一行距（.contact 没有伪元素，所以左列永远偏低）。必须禁掉。
+    assert(
+      /content:\s*none/.test(ruleBlock(CSS, '.alias::before') || ''),
+      "the upstream .alias::before pseudo-element must be disabled, or the left column sits a row lower"
+    );
+
+    // 光学补偿：基线重合不等于墨水底边 / 墨水中心重合。
+    assert(
+      /top:\s*[\d.]+pt/.test(ruleBlock(CSS, '.role') || ''),
+      'name/role need an optical offset — the 25pt ink bottom sits lower than the 10.6pt one'
+    );
+    assert(
+      /top:\s*-[\d.]+pt/.test(ruleBlock(CSS, '.contact') || ''),
+      'contacts need an optical offset — Latin lowercase ink centre sits lower than CJK'
+    );
+
     assertIncludes(layout, '.name', 'layout delta must target .name');
-    assertIncludes(layout, 'display: block', '.name must stop being a flex container');
+    assertIncludes(ruleBlock(CSS, '.name'), 'display: block', '.name must stop being a flex container');
     assertIncludes(layout, '.alias', 'layout delta must size the education line');
     assertIncludes(layout, '.role', 'role must be its own grid cell');
     assertIncludes(layout, 'grid-row: 1', 'name and role must share grid row 1');
     assertIncludes(layout, '.contact', 'layout delta must place the contacts cell');
-    // 头像变体：文字块与头像等高，第 1 行贴顶、第 2 行贴底。
+    // 头像变体：文字块与头像等高，第 1 行贴顶、第 3 行贴底。
     assertIncludes(layout, ':has(.avatar)', 'avatar variant must switch .header to a flex row');
-    assertIncludes(layout, 'align-content: space-between', 'avatar variant must pin row 1 to the top and row 2 to the bottom');
+    assertIncludes(layout, 'align-content: space-between', 'avatar variant must pin row 1 to the top and row 3 to the bottom');
     return { detail: 'header deviation contained in one override file' };
   });
 
@@ -753,24 +877,42 @@ function T4() {
       ...sample,
       header: { ...sample.header, avatar: 'shared/avatar-sample.jpg' },
     });
+    const educationParts = sample.header.educationInline.split(' · ');
+    const schoolMajor = educationParts.slice(0, -1).join(' · ');
+    const years = educationParts.at(-1);
     assertIncludes(withAvatar, 'class="avatar"', 'avatar image missing');
     assertIncludes(withAvatar, 'src="shared/avatar-sample.jpg"', 'avatar src missing');
     assertIncludes(withAvatar, 'class="header-main"', 'avatar layout must wrap the text block');
     // 文字块内容一个都不能少
     assertIncludes(withAvatar, `class="name serif">${sample.header.name}</div>`, 'name lost in avatar layout');
-    assertIncludes(withAvatar, `class="alias">${sample.header.educationInline}</div>`, 'education lost in avatar layout');
+    assertIncludes(withAvatar, `class="alias"><span>${schoolMajor}</span><span>${years}</span></div>`, 'education lost in avatar layout');
     assertIncludes(withAvatar, 'class="contact"', 'contacts lost in avatar layout');
     return { detail: 'avatar layout gated by header.avatar; text slots intact' };
   });
 
-  // 项目地址：entry.link 渲染成超链接，href 是完整网址、显示文字是站点短名；
+  // 项目地址：entry.link 渲染成超链接，href 是完整网址、显示文字是「站点/末段」
+  // 短形（github.com/zhangzhixing/qa-workbench → github/qa-workbench）；
   // entry.meta 仍是纯文本（工作经历用它写所在部门）。
   s.check('T4.16', 'entry.link renders as a short-label anchor, meta stays plain text', () => {
     const html = renderToHtml(RENDER_JS, sample);
     const work = sample.sections[0].entries[0];
     const proj = sample.sections[1].entries[0];
 
-    assertIncludes(html, `<a href="${proj.link}">github</a>`, 'project link should show the site name and point at the full URL');
+    assertIncludes(
+      html,
+      `<a href="${proj.link}">github/qa-workbench</a>`,
+      'project link should show "site/last-segment" and point at the full URL'
+    );
+    // 链接必须落在**中格**里（左格是名称、右格是时间），
+    // 两个字段都有时用「·」拼在同一格，链接不能把 meta 挤掉。
+    const kindCells = [...html.matchAll(/<span class="proj-kind">([\s\S]*?)<\/span>\s*<span class="proj-role">/g)].map(
+      (m) => m[1]
+    );
+    assert(kindCells.length >= 3, `expected one middle cell per entry, got ${kindCells.length}`);
+    assert(
+      kindCells.some((c) => c.includes(`<a href="${proj.link}">`)),
+      'the project link must live in the middle cell, not next to the name or the time'
+    );
     assertIncludes(html, `<span class="proj-kind">${work.meta}</span>`, 'work meta should stay plain text, not a link');
 
     // 兼容旧数据：网址写在 meta 里时同样渲染成链接
@@ -781,6 +923,122 @@ function T4() {
     });
     assertIncludes(html2, '<a href="https://github.com/zhangzhixing/qa-workbench">github</a>', 'a URL in meta should still become a link');
     return { detail: 'link → <a>github</a>; meta stays text' };
+  });
+
+  s.check('T4.17', 'entry header keeps name / link+kind / time columns', () => {
+    const layout = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-layout.css'));
+
+    // 左列下限固定，避免中列随短公司名飘动；**时间列必须是固定宽度**：
+    // 若按内容伸缩（max-content），各条目时间长短不一会让中列宽度逐条漂移，
+    // 居中的中格文字也就一条一个位置（实测差 36px），纵向扫视时不再成列。
+    assert(
+      /grid-template-columns:\s*minmax\(30mm,\s*max-content\)\s+minmax\(0,\s*1fr\)\s+28mm/.test(
+        ruleBlock(layout, '.proj-head') || ''
+      ),
+      'the entry header needs name(min 30mm) / flexible middle / fixed 28mm time columns'
+    );
+    assert(
+      /text-align:\s*left/.test(ruleBlock(layout, '.proj-head .proj-name') || ''),
+      'entry names must be left-aligned'
+    );
+    assert(
+      /text-align:\s*center/.test(ruleBlock(layout, '.proj-head .proj-kind') || ''),
+      'the middle cell (link / kind) must be centred'
+    );
+    const role = ruleBlock(layout, '.proj-head .proj-role') || '';
+    assert(/grid-column:\s*3/.test(role), 'entry times must stay in the right column');
+    assert(/text-align:\s*right/.test(role), 'entry times must remain right-aligned');
+    return { detail: 'name left + middle centred + time right, on a fixed 28mm column' };
+  });
+
+  s.check('T4.18', 'paper grain and print colour retention live in the layout delta', () => {
+    const layout = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-layout.css'));
+    const family = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-family.css'));
+
+    // 上游拷贝必须保持冻结：这些改动只能落在覆盖层。
+    assertExcludes(family, 'feTurbulence', 'upstream copy must stay verbatim — grain belongs in the delta');
+
+    assertIncludes(layout, 'feTurbulence', 'the grain layer is what turns a flat tint into paper');
+    assertIncludes(layout, 'data:image/svg+xml', 'the grain must be inlined — no external asset to 404');
+    assertIncludes(layout, 'print-color-adjust: exact', 'print must try to keep the parchment tint');
+    assertIncludes(layout, '@media print', 'print overrides must be scoped to print');
+
+    // 打印分隔线：从各主题自己的 --olive 派生，而不是一个写死的灰 ——
+    // 否则 5 套主题会在打印时串成同一种颜色。
+    assert(
+      /--border:\s*color-mix\(in srgb, var\(--olive\)/.test(layout),
+      "print dividers must derive from each theme's own olive"
+    );
+    // 主题页的 <style> 在样式表之后加载，同特异度下它会赢；
+    // 打印覆盖必须提特异度才压得住。
+    assert(/html:root\s*\{/.test(layout), 'print overrides need html:root to outrank the theme block');
+    return { detail: 'grain inlined; tint kept; dividers darkened per theme' };
+  });
+
+  s.check('T4.19', 'every theme keeps its secondary text at WCAG AA', () => {
+    const srgb = (c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+    const luminance = (hex) => {
+      const [r, g, b] = [1, 3, 5].map((i) => srgb(parseInt(hex.slice(i, i + 2), 16) / 255));
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const contrast = (a, b) => {
+      const [l1, l2] = [luminance(a), luminance(b)];
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    };
+
+    // --stone 用在联系方式 / 教育信息这类最小字号的说明文字上，
+    // 是最需要达标的位置（收敛前的 kami-slate 曾以 4.34:1 踩线）。
+    const fails = [];
+    for (const t of THEMES) {
+      const css = readText(path.join(TEMPLATE_DIR, t));
+      const read = (name) => (css.match(new RegExp(`--${name}:\\s*(#[0-9A-Fa-f]{6})`)) || [])[1];
+      const stone = read('stone');
+      const paper = read('parchment');
+      if (!stone || !paper) continue; // kami-base 用上游原值，没有覆盖
+      const ratio = contrast(stone, paper);
+      if (ratio < 4.5) fails.push(`${t}: --stone ${stone} on ${paper} = ${ratio.toFixed(2)}:1`);
+    }
+    assert(fails.length === 0, `AA text contrast (<4.5:1) failed:\n    ${fails.join('\n    ')}`);
+
+    // 上游原值本身也必须达标，否则 kami-base 就是个反例。
+    const base = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-family.css'));
+    const bStone = base.match(/--stone:\s*(#[0-9A-Fa-f]{6})/)[1];
+    const bPaper = base.match(/--parchment:\s*(#[0-9A-Fa-f]{6})/)[1];
+    const bRatio = contrast(bStone, bPaper);
+    assert(bRatio >= 4.5, `upstream base palette fails AA: ${bRatio.toFixed(2)}:1`);
+    return { detail: `${THEMES.length} themes audited; lowest --stone on --parchment passes AA` };
+  });
+
+  // 上游拷贝冻结，所以补字体来源只能靠覆盖层重声明同名 @font-face。
+  // 同 family + 同 weight + 同 style 时后者整条生效（实测：上游那条在
+  // 渲染后 status 始终是 unloaded，从未被请求）。
+  s.check('T4.20', 'the layout delta redeclares @font-face with a local() source first', () => {
+    const layout = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-layout.css'));
+    const family = readText(path.join(TEMPLATE_DIR, 'shared', 'kami-family.css'));
+
+    assertExcludes(family, 'local(', 'upstream copy must stay verbatim — the font delta belongs in the override');
+
+    const faces = layout.match(/@font-face\s*\{[^}]*\}/g) || [];
+    assert(faces.length === 2, `the delta must redeclare both weights, found ${faces.length}`);
+
+    for (const v of [
+      { weight: '400', ps: 'TsangerJinKai02-W04', file: 'TsangerJinKai02-W04.ttf' },
+      { weight: '500', ps: 'TsangerJinKai02-W05', file: 'TsangerJinKai02-W05.ttf' },
+    ]) {
+      const face = faces.find((f) => f.includes(`font-weight: ${v.weight}`));
+      assert(face, `missing the ${v.weight} face`);
+
+      // local() 必须排第一：命中后完全不联网。
+      // 实测 Chrome 只认 PostScript 名 / 全名，纯族名会静默失效 ——
+      // 所以这里点名要 PostScript 名，而不是只检查有没有 local(。
+      assert(/src:\s*local\(/.test(face), `${v.weight}: local() must be the first source`);
+      assertIncludes(face, `local("${v.ps}")`, `${v.weight}: the PostScript name is the only reliably matching form`);
+
+      // 上游的两条来源必须原样保留，否则私有构建与联网路径会断。
+      assertIncludes(face, `url("../fonts/${v.file}")`, `${v.weight}: keep the local relative source`);
+      assertIncludes(face, 'cdn.jsdelivr.net', `${v.weight}: keep the CDN fallback`);
+    }
+    return { detail: 'local() first; relative + CDN fallbacks kept; upstream copy untouched' };
   });
 }
 
@@ -858,6 +1116,34 @@ function T5() {
     const r = run(['frobnicate']);
     assert(r.code === 1, `expected exit 1, got ${r.code}`);
     assertIncludes(r.stderr, 'Unknown command', 'no unknown-command message');
+  });
+
+  // ensure-fonts.sh 是唯一会写系统字体目录的东西，所以它的只读模式必须真的只读，
+  // 且要能在空目录上给出 MISS（不能因为找不到字体就崩）。
+  s.check('T5.9', 'ensure-fonts.sh --check is read-only and reports MISS on an empty dir', () => {
+    const script = path.join(SKILL_ROOT, 'scripts', 'ensure-fonts.sh');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fish-fonts-'));
+    const r = execFileSync('bash', [script, '--check'], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        RESUME_FONT_DIR: path.join(tmp, 'fonts'),
+        RESUME_MACOS_FONT_DIR: path.join(tmp, 'sys'),
+      },
+    });
+    assertIncludes(r, 'MISS', 'an empty font dir must be reported as MISS');
+    assert(fs.readdirSync(tmp).length === 0, '--check must not write anything');
+    return { detail: '--check: read-only, MISS on empty, exit 0' };
+  });
+
+  s.check('T5.10', 'install carries scripts/ over and keeps it executable', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fish-skill-'));
+    const r = run(['install', 'resume-copilot', '--target', tmp]);
+    assert(r.code === 0, `exit ${r.code}: ${r.stderr}`);
+    const installed = path.join(tmp, 'resume-copilot', 'scripts', 'ensure-fonts.sh');
+    assert(exists(installed), 'scripts/ensure-fonts.sh was not installed');
+    assert((fs.statSync(installed).mode & 0o111) !== 0, 'the installed copy lost its executable bit');
+    return { detail: 'scripts/ copied with mode preserved' };
   });
 }
 
@@ -995,8 +1281,8 @@ function T6() {
     return { detail: `${declared.length} schemas referenced` };
   });
 
-  // T6.10 — the two-part answer contract is consistent across schema + docs.
-  s.check('T6.10', 'two-part answer contract consistent across schema and all docs', () => {
+  // T6.10 — internal answer fields are documented without imposing visible sections.
+  s.check('T6.10', 'internal answer fields consistent across schema and docs', () => {
     const schema = readJson(path.join(SCHEMA_DIR, 'generated-answer.schema.json'));
     assert(schema.required.includes('overview'), 'generated-answer: overview not required');
     assert(schema.required.includes('principleDetail'), 'generated-answer: principleDetail not required');
@@ -1008,9 +1294,10 @@ function T6() {
       ['README.zh.md', path.join(REPO_ROOT, 'README.zh.md')],
     ];
     for (const [label, p] of docs) {
-      assertIncludes(readText(p), '原理详解', `${label} does not document the 原理详解 section`);
+      assertIncludes(readText(p), 'overview', `${label} does not document the overview field`);
+      assertIncludes(readText(p), 'principleDetail', `${label} does not document the principleDetail field`);
     }
-    return { detail: `${docs.length} docs document overview + 原理详解` };
+    return { detail: `${docs.length} docs document internal overview + principleDetail` };
   });
 }
 

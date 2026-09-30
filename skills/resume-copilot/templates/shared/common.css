@@ -1,93 +1,29 @@
+/* ===== templates/shared/common.css
+
+   只服务一个页面：templates/index.html（模板总览页）。
+   简历本体不加载它 —— 5 个主题页与 avatar-demo 只用
+   kami-family.css + kami-layout.css。
+
+   历史说明：这里曾经定义过 .resume-page / .section-title / .item-title-row /
+   .bullet-list / .tag-list，以及 14 个页面级变量（--page-* / --text-* /
+   --paper* / --accent-*）。2026-09-30 审查实测它们**全部是 0 引用**：
+   简历版式早已完全由 Kami 样式表承担，.section-title 还与 kami-family.css
+   里的同名规则重复（真正生效的是后者）。故整体删除，只留总览页用到的部分。 */
+
 :root {
-  --page-width: 210mm;
-  --page-height: 297mm;
-  --page-padding: 16mm;
   --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --font-serif: "Noto Serif SC", "Songti SC", "STSong", serif;
-  --text-strong: #111827;
-  --text-body: #1f2937;
-  --text-muted: #6b7280;
-  --line-soft: #e5e7eb;
-  --paper: #ffffff;
-  --paper-alt: #f8fafc;
-  --accent-blue: #1d4ed8;
-  --accent-green: #166534;
-  --accent-gold: #9a6700;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
+html {
+  background: #f5f4ed;
+}
+
 body {
   margin: 0;
-  padding: 0;
-  background: #eef2f7;
-  color: var(--text-body);
+  color: #1f2937;
   font-family: var(--font-sans);
-}
-
-body {
-  padding: 24px 0;
-}
-
-.resume-page {
-  width: var(--page-width);
-  min-height: var(--page-height);
-  margin: 0 auto;
-  padding: var(--page-padding);
-  background: var(--paper);
-  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
-}
-
-.section-title {
-  margin: 0 0 10px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.item-title-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: baseline;
-}
-
-.bullet-list {
-  margin: 8px 0 0;
-  padding-left: 18px;
-}
-
-.bullet-list li {
-  margin-bottom: 6px;
-  line-height: 1.55;
-}
-
-.tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.tag {
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: var(--paper-alt);
-  font-size: 12px;
-}
-
-@media print {
-  body {
-    padding: 0;
-    background: #fff;
-  }
-
-  .resume-page {
-    box-shadow: none;
-    margin: 0;
-  }
 }

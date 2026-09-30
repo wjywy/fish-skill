@@ -36,6 +36,13 @@ Run one suite at a time with its id, e.g. `node test/run-tests.mjs T4`.
 | Header layout matches the agreed design | T4.1, T4.14, T4.15 |
 | Optional photo header is gated by `header.avatar` | T4.15 |
 | Project address renders as a short-label link | T4.16 |
+| Entry header stays vertically scannable | T4.17 |
+| Paper texture is real, not just a tint | T4.18 |
+| Print keeps the paper tint and the dividers | T4.18 |
+| Text contrast holds across all 10 themes | T4.19 |
+| Gallery stylesheet cannot masquerade as resume CSS | T1.13 |
+| The serif face resolves without the network | T4.20, T5.9 |
+| Font binaries stay out of the package | T1.14 |
 | Pagination is adaptive, no hard break | T4.10 |
 | `**keyword**` becomes theme-accent emphasis | T4.9 |
 | Renderer is safe against injected markup | T4.5, T4.6 |
@@ -70,6 +77,8 @@ Run one suite at a time with its id, e.g. `node test/run-tests.mjs T4`.
 | T1.10 | `shared/sample-data.js` vs `sample-data.json` | Byte-equal after parsing | The preview data and the schema fixture must not drift |
 | T1.11 | `bin/fish-skill.mjs` + `package.json` | File exists and `package.json#bin` points at it | Otherwise `npx fish-skill …` cannot run |
 | T1.12 | Every theme page + `shared/preview-avatar.js` | The avatar toggle is wired on all 10 themes and on `avatar-demo.html`; it mounts **only** for the shipped sample, flips `header.avatar` both ways, and is hidden by `@media print` | Proves all 10 themes handle both header variants, without leaking a preview control into a delivered resume |
+| T1.13 | `shared/common.css` + every theme page | The gallery-only sheet stays minimal — the 13 zero-reference leftovers (`.resume-page` / `.item-title-row` / `.bullet-list` / `.tag-list`, plus the `--page-*` / `--text-*` / `--accent-*` variables) stay deleted, and no resume page loads it | Stops a future edit from "fixing" the resume by touching a stylesheet the resume never loads |
+| T1.14 | `scripts/ensure-fonts.sh` + the whole repo | The installer exists, is executable, defaults its download dir **outside** the skill tree (XDG), validates size, traps temp files — and the repo contains **zero** `.ttf/.otf/.woff/.woff2` binaries | 36 MB of third-party fonts may not ship (licence + package size), but the offline path must not silently disappear either |
 
 ### T2 — JSON Schema validation
 
@@ -96,11 +105,11 @@ passes is worthless):
 | `render-options-bad-theme.json` | `theme: "kami-neon"` | `render-options.schema.json` | `theme` |
 | `interview-node-bad-status.json` | `status: "PENDING_REVIEW"` | `interview-knowledge-node.schema.json` | `status` |
 
-T2.10 enforces the **two-part answer contract** on the shipped example: every
-`generatedAnswers[]` entry must carry a non-empty `overview` (part 1, logic +
-project scenario) and `principleDetail` (part 2, detailed principle), must not
-carry the legacy `canonicalAnswer` field, and the principle section must be the
-longer of the two.
+T2.10 enforces the **internal answer fields** on the shipped example: every
+`generatedAnswers[]` entry must carry a non-empty `overview` (opening answer)
+and `principleDetail` (mechanism expansion), must not carry the legacy
+`canonicalAnswer` field, and the mechanism content must be longer. The visible
+Markdown can combine both fields into one natural spoken answer.
 
 ### T3 — Cross-reference integrity
 
@@ -126,7 +135,7 @@ class names so the verbatim `kami-family.css` applies.
 | --- | --- | --- |
 | T4.1 | sample Resume View | header slots → `.header` / `.name.serif` (row 1 left) / `.alias` (row 2 left, `educationInline`) / `.role` (row 1 right) / `.contact` (row 2 right) / `.sep` |
 | T4.2 | contact with `href` / without | `<a href>` vs `<span>` |
-| T4.3 | sample, plus a variant with `summary` injected | skills → `.skill-row` + `.skill-label` / `.skill-body`; entries → `.project` / `.proj-head` / `.proj-name` / `.proj-role` / `.proj-lines` / `.proj-row` / `.proj-label` / `.proj-text`; `summary` → `.summary`, and an empty `summary` slot renders no block at all |
+| T4.3 | sample, plus a legacy variant with `summary` injected | skills → `.skill-row` + `.skill-label` / `.skill-body`; entries → `.project` / `.proj-head` / `.proj-name` / `.proj-role` / `.proj-lines` / `.proj-row` / `.proj-label` / `.proj-text`; legacy `summary` must not render |
 | T4.4 | sample, both header variants | every emitted class is in the upstream Kami vocabulary (only `.avatar` / `.header-main` are additions, defined by the override file) **and** is matched by a rule in `kami-family.css` + `kami-layout.css` (nothing renders unstyled) |
 | T4.5 | name = `<script>alert(1)</script>`, role = `a"b&c` | escaped to `&lt;script&gt;`, `&quot;`, `&amp;`; raw tag absent |
 | T4.6 | `{ sections: [] }` (no header) | "Missing Resume View data" placeholder, no crash |
@@ -140,6 +149,10 @@ class names so the verbatim `kami-family.css` applies.
 | T4.14 | `shared/kami-layout.css` | the header deviation is isolated: upstream still says `align-items: flex-end`, the delta file says grid + `align-items: end` (row 1) + `align-self: baseline` (row 2) + `:has(.avatar)` + `align-content: space-between` |
 | T4.15 | sample with / without `header.avatar` | avatar layout is gated by the slot: no `.avatar` / `.header-main` when empty; with it, `<img class="avatar">` + `.header-main` wrap the same name / education / contacts |
 | T4.16 | `entry.link` (and a legacy URL in `entry.meta`) | `<a href="…">github</a>` — short site label, full URL in `href`; plain `meta` stays text |
+| T4.17 | `shared/kami-layout.css` | `.proj-head` uses **company / flexible role / time** columns: company left, role centred, time right; all three remain visible | The title row must preserve the user's scan order without duplicating or hiding the entry time |
+| T4.18 | `shared/kami-layout.css` vs `shared/kami-family.css` | The grain layer is an **inlined** `feTurbulence` data-URI, `print-color-adjust: exact` is set, print dividers derive from each theme's own `--olive`, and the override uses `html:root`; the upstream copy contains **no** `feTurbulence` | Keeps the paper texture real, keeps print from washing out, and keeps the delta in the delta file |
+| T4.19 | All 10 themes + upstream base palette | Every theme's `--stone` on its own `--parchment` reaches **≥ 4.5:1** (WCAG AA), and the upstream base palette passes too | `--stone` carries the smallest text on the sheet (contacts, education) — it is the last place that may fail contrast |
+| T4.20 | `shared/kami-layout.css` vs `shared/kami-family.css` | The delta redeclares **both** weights (400/500) of `@font-face "TsangerJinKai02"`; each puts a `local()` **first** and names the PostScript form (`TsangerJinKai02-W04` / `-W05`), then keeps the upstream relative URL and the jsDelivr fallback; the upstream copy contains **no** `local(` | Only a later same-family/same-weight rule supersedes the upstream src. PostScript is the one `local()` spelling that actually matches (measured: family names silently fail), so the offline path depends on it |
 
 ### T5 — CLI
 
@@ -153,6 +166,8 @@ class names so the verbatim `kami-family.css` applies.
 | T5.6 | install twice with `--force` | exit 0 |
 | T5.7 | `install does-not-exist` | exit 1, "Unknown skill" |
 | T5.8 | `frobnicate` | exit 1, "Unknown command" |
+| T5.9 | `scripts/ensure-fonts.sh --check` with an empty `RESUME_FONT_DIR` | prints `MISS`, exit 0, and writes **nothing** | The only component that touches the system font dirs must have a genuinely read-only mode |
+| T5.10 | `install` then inspect `scripts/ensure-fonts.sh` | file copied and still executable | `copyDir` must preserve the mode, or the installed script cannot be run |
 
 ### T6 — Internal spec consistency
 
@@ -169,7 +184,7 @@ Static analysis of the prose + schemas, catching drift between docs and assets.
 | T6.7 | `kami-default → kami-base.html` documented consistently and matches the schema default |
 | T6.8 | `hardMaxDepth` default is 20 in the schema and node `depth.maximum` is 20 |
 | T6.9 | All 15 schemas are referenced from `SKILL.md` |
-| T6.10 | The two-part answer contract is consistent across `generated-answer.schema.json` + all four docs (`SKILL.md`, `workflows/interview-knowledge.md`, both READMEs) |
+| T6.10 | The internal answer fields are consistent across `generated-answer.schema.json` + all four docs (`SKILL.md`, `workflows/interview-knowledge.md`, both READMEs) |
 
 ### T7 — Resume content lint
 
@@ -195,7 +210,7 @@ explicitly, so a hit is a real policy violation rather than a style opinion.
 ## Findings raised by T1–T7
 
 See `test/reports/test-report.md` for the scored summary and remediation notes.
-As of the last run the suite reports **70/70 pass** — all findings closed:
+As of the last run the suite reports **78/78 pass** — all findings closed:
 
 - **`examples/claim-graph.example.json`** conformed to neither its schema nor its
   own internal pointers → rewritten to the two-part answer contract, dangling
@@ -222,4 +237,3 @@ As of the last run the suite reports **70/70 pass** — all findings closed:
   theme-accent emphasis and the stylesheet shipped `.hl` / `.em-brand`, but the
   renderer had no way to emit them, so users saw literal asterisks. The renderer
   now parses `**…**` after escaping; T4.9 asserts no literal `**` survives.
-

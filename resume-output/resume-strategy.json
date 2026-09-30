@@ -1,0 +1,89 @@
+{
+  "id": "strategy-backend-20260930",
+  "targetId": "target-backend",
+  "objective": "突出已验证的 Node.js 工具、数据建模和测试经验；不把该项目写成生产后端服务经验。",
+  "requirements": [
+    {
+      "id": "req-node",
+      "category": "skill",
+      "statement": "具备 JavaScript / Node.js 开发经验",
+      "importance": "MUST"
+    },
+    {
+      "id": "req-quality",
+      "category": "skill",
+      "statement": "具备数据契约与自动化测试实践",
+      "importance": "IMPORTANT"
+    },
+    {
+      "id": "req-service",
+      "category": "architecture",
+      "statement": "具备服务端接口、数据库和生产系统实践",
+      "importance": "IMPORTANT"
+    }
+  ],
+  "requirementCoverage": [
+    {
+      "requirementId": "req-node",
+      "status": "covered",
+      "claimIds": [
+        "claim-cli",
+        "claim-renderer",
+        "claim-tests"
+      ]
+    },
+    {
+      "requirementId": "req-quality",
+      "status": "covered",
+      "claimIds": [
+        "claim-model",
+        "claim-tests"
+      ]
+    },
+    {
+      "requirementId": "req-service",
+      "status": "gap",
+      "claimIds": [],
+      "notes": "当前材料未提供服务端接口或数据库项目证据。"
+    }
+  ],
+  "selectedExperienceIds": [
+    "exp-fish-skill"
+  ],
+  "selectedClaimIds": [
+    "claim-cli",
+    "claim-model",
+    "claim-renderer",
+    "claim-tests"
+  ],
+  "excludedClaims": [],
+  "sectionPlan": [
+    {
+      "section": "projects",
+      "priority": 1,
+      "budget": "4 bullets",
+      "experienceIds": [
+        "exp-fish-skill"
+      ]
+    },
+    {
+      "section": "skills",
+      "priority": 2
+    },
+    {
+      "section": "education",
+      "priority": 3
+    }
+  ],
+  "emphasis": [
+    "Node.js CLI",
+    "JSON Schema",
+    "自动化测试"
+  ],
+  "coverageGaps": [
+    "尚无已提供的服务端接口、数据库或实习项目材料。"
+  ],
+  "riskNotes": [
+    "不要把 fish-skill 描述为线上后端服务或引入不存在的 QPS、用户规模。"
+  ]
+}

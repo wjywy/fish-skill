@@ -1,0 +1,75 @@
+{
+  "id": "view-backend-20260930",
+  "targetId": "target-backend",
+  "header": {
+    "name": "【姓名待填】",
+    "targetRole": "后端开发工程师",
+    "educationInline": "重庆邮电大学 · 生物信息学（本科） · 2025.06 毕业",
+    "contacts": [
+      { "label": "电话", "value": "【电话待填】" },
+      { "label": "邮箱", "value": "【邮箱待填】" }
+    ]
+  },
+  "skills": [
+    {
+      "label": "语言与运行时",
+      "description": "JavaScript（ES Modules）、Node.js；基于文件系统 API 开发命令行工具与数据处理脚本。"
+    },
+    {
+      "label": "工程实践",
+      "description": "JSON Schema 数据约束、可追溯事实建模、自动化测试、HTML 生成与基础安全转义。"
+    }
+  ],
+  "sections": [
+    {
+      "type": "project",
+      "title": "项目经历",
+      "range": null,
+      "entries": [
+        {
+          "time": "2026.09 - 至今",
+          "title": "fish-skill · Coding Agent Skill 工具集",
+          "meta": "个人项目",
+          "link": "https://github.com/wjywy/fish-skill",
+          "bullets": [
+            {
+              "id": "bullet-cli",
+              "text": "独立开发 **Node.js CLI**，扫描 skills 目录下的 SKILL.md 识别可安装 Skill，提供 list、check、install 命令；通过递归复制与目标目录参数完成按需安装，并以 --force 显式控制覆盖已有目录。",
+              "claimIds": ["claim-cli"],
+              "metricIds": []
+            },
+            {
+              "id": "bullet-model",
+              "text": "围绕简历事实可信度，设计 **Fact → Experience → Claim → Resume View** 数据链路，配套 JSON Schema 与证据规则，区分仓库能力、个人贡献和指标来源，使简历表述能够回溯到原始事实。",
+              "claimIds": ["claim-model"],
+              "metricIds": []
+            },
+            {
+              "id": "bullet-renderer",
+              "text": "实现 **Resume View → HTML** 生成脚本，将简历数据、样式和渲染逻辑组装为可直接打开的页面，支持单文件输出与 **5 套主题**预览，并保留浏览器打印导出 PDF 的路径。",
+              "claimIds": ["claim-renderer"],
+              "metricIds": []
+            },
+            {
+              "id": "bullet-tests",
+              "text": "构建无额外 npm 依赖的**自动化测试**，覆盖 Schema 校验、数据引用完整性、CLI 行为与渲染器契约；当前 **78 项确定性检查通过**。",
+              "claimIds": ["claim-tests"],
+              "metricIds": ["metric-checks"]
+            }
+          ],
+          "tags": ["Node.js", "JavaScript", "JSON Schema", "HTML"]
+        }
+      ]
+    }
+  ],
+  "highlightClaimIds": ["claim-cli", "claim-model", "claim-renderer", "claim-tests"],
+  "notes": [
+    "姓名、电话、邮箱由用户稍后填写。",
+    "未获得其他工作、实习或项目经历材料；本版仅采用已确认的 fish-skill 项目。"
+  ],
+  "renderOptions": {
+    "renderer": "kami",
+    "theme": "kami-default",
+    "format": "html"
+  }
+}

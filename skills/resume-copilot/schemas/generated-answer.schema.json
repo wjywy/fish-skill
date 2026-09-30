@@ -51,12 +51,12 @@
     "overview": {
       "type": "string",
       "minLength": 1,
-      "description": "第一部分：一段话的逻辑与项目场景。先给结论与机制主线，再说明它在本项目中的落点。保持简洁，项目场景只能来自已验证事实。"
+      "description": "内部开场内容：用候选人口吻直接回答问题，说明结论、关键做法和已验证的项目落点。最终 Markdown 不需要显示字段名或固定分栏。"
     },
     "principleDetail": {
       "type": "string",
       "minLength": 1,
-      "description": "第二部分：原理详解。不依赖项目个性化事实，展开通用技术原理、机制、边界、失败恢复与取舍，是可直接复习的主体。"
+      "description": "内部机制内容：沿开场自然展开，按前提、步骤、状态变化和结果解释因果链，给出可推演的例子；按题目需要补失败边界、取舍和验证。最终 Markdown 以连贯的候选人回答呈现，不强制显示“原理详解”标签；列表、短代码、表格和流程图按理解需要使用。"
     },
     "projectAside": {
       "type": [
@@ -73,5 +73,5 @@
   },
   "$id": "generated-answer.schema.json",
   "additionalProperties": false,
-  "description": "参考答案固定两部分：overview（一段话的逻辑与项目场景）+ principleDetail（原理详解）。二者共同构成用户可见答案；projectAside 为可选旁白。"
+  "description": "内部用 overview 和 principleDetail 保证直接回答与机制展开都完整；用户可见 Markdown 将它们写成一段连贯、具体、可口述的回答，不强制分栏。项目事实与未实现的设计建议必须区分；Markdown 流程图用图片直接展示并保留 Mermaid 源码。"
 }

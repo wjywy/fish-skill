@@ -13,6 +13,7 @@ Two layers of testing, because the skill has two kinds of correctness:
 npm test                     # all deterministic suites
 npm run test:report          # same + writes test/reports/results.json
 node test/run-tests.mjs T7   # one suite (T1…T7)
+npm run test:diagram          # Mermaid → PNG Markdown 图片；需要 Chrome / Chromium
 ```
 
 No dependencies, no network. Node ≥ 18.
@@ -43,7 +44,7 @@ test/
 
 ## Current status
 
-**Deterministic: 70/70 checks pass** (exit 0) — see `reports/test-report.md`.
+**Deterministic: 78/78 checks pass** (exit 0) — see `reports/test-report.md`.
 
 **Behavioural: 9/9 scenarios pass** with no anti-patterns fired — see
 `behavioral/results.md`.

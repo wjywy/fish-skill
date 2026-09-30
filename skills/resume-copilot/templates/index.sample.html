@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kami Family 模板总览</title>
+    <link rel="stylesheet" href="shared/common.css" />
+    <style>
+      /* 这一页刻意与产物同源：同样的羊皮纸底、同样的发丝分隔线、同样的直角。
+         没有渐变、没有阴影、没有圆角卡片、没有胶囊徽章 ——
+         总览页是简历的"目录"，不该比简历本身更花哨。 */
+      body {
+        padding: 40px 24px 72px;
+        background: #f5f4ed;
+        color: #141413;
+      }
+
+      .gallery {
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        padding-bottom: 26px;
+        border-bottom: 1px solid #e8e6dc;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 500;
+        letter-spacing: 0.5pt;
+      }
+
+      .hero p {
+        max-width: 78ch;
+        margin: 14px 0 0;
+        color: #6b6a64;
+        line-height: 1.85;
+      }
+
+      .hero strong {
+        color: #141413;
+      }
+
+      .hero code,
+      .foot code,
+      .note code {
+        padding: 1px 4px;
+        background: #eceae0;
+        font-size: 0.92em;
+      }
+
+      .hero .lede {
+        color: #3d3d3a;
+      }
+
+      .section-head {
+        margin: 40px 0 0;
+        color: #6b6a64;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+      }
+
+      .themes {
+        margin-top: 14px;
+        border-top: 1px solid #e8e6dc;
+      }
+
+      .theme {
+        display: grid;
+        grid-template-columns: 42px 168px minmax(0, 1fr) auto;
+        gap: 20px;
+        align-items: baseline;
+        padding: 15px 4px;
+        border-bottom: 1px solid #e8e6dc;
+      }
+
+      .theme:hover {
+        background: #faf9f5;
+      }
+
+      .chip {
+        display: flex;
+        gap: 2px;
+        align-self: center;
+      }
+
+      .chip i {
+        display: block;
+        width: 17px;
+        height: 17px;
+        border: 1px solid rgba(20, 20, 19, 0.14);
+      }
+
+      .theme h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 500;
+        font-family: "SFMono-Regular", "JetBrains Mono", "Fira Code", monospace;
+      }
+
+      .theme .note {
+        margin: 0;
+        color: #6b6a64;
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .theme a {
+        color: #1b365d;
+        font-size: 13px;
+        white-space: nowrap;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(27, 54, 93, 0.3);
+      }
+
+      .theme a:hover {
+        border-bottom-color: #1b365d;
+      }
+
+      .foot {
+        max-width: 78ch;
+        margin: 32px 0 0;
+        color: #6b6a64;
+        font-size: 13px;
+        line-height: 1.85;
+      }
+
+      @media (max-width: 860px) {
+        .theme {
+          grid-template-columns: 42px minmax(0, 1fr);
+          gap: 8px 16px;
+        }
+
+        .theme .note,
+        .theme a {
+          grid-column: 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="gallery">
+      <section class="hero">
+        <h1>Kami Family 模板总览</h1>
+        <p>
+          6 个预览页共用上游 Kami 的同一套样式表（<code>shared/kami-family.css</code>，逐字节对齐
+          tw93/Kami），由 <code>shared/kami-render.js</code> 把 Resume View 的内容槽位映射进 Kami
+          的类名。内容槽位仍是本 skill 自己的模型，只有样式对齐上游。
+        </p>
+        <p class="lede">
+          <strong>4 套主题共享同一套版式，但各自认领一个明确的美学方向。</strong>
+          mono 是唯一的无彩色款（打印黑白无损），navy 是对比最硬的冷调商务，
+          copper 是最暖的工匠叙事，seal 是唯一敢用高饱和的朱砂印 ——
+          不是同一份设计的 4 种配色，而是 4 个能区分开的选型。
+        </p>
+        <p>
+          有无个人头像是<strong>版式差异，与主题无关</strong>：主题只覆盖颜色变量，头像只改页头排布。
+          打开任意主题页，用右上角的「显示头像 / 隐藏头像」开关即可当场对比（打印时开关自动隐藏）。
+        </p>
+        <p>
+          这一页与产物同源：羊皮纸底叠了一层 5% 的颗粒纸纹，见
+          <code>shared/kami-layout.css</code> 的 GRAIN 段。
+        </p>
+      </section>
+
+      <p class="section-head">主题</p>
+      <section class="themes">
+        <article class="theme">
+          <span class="chip"><i style="background: #1b365d"></i><i style="background: #f5f4ed"></i></span>
+          <h2>kami-base</h2>
+          <p class="note">上游原配色，未做任何变量覆盖。羊皮纸底 + 藏青强调。用户未指定主题时回退到这里。</p>
+          <a href="kami-base.html">打开</a>
+        </article>
+
+        <article class="theme">
+          <span class="chip"><i style="background: #2a2a2a"></i><i style="background: #fbfaf7"></i></span>
+          <h2>kami-mono</h2>
+          <p class="note"><strong>极简黑白。</strong>全家族唯一无彩色的一套：纯黑强调 + 近白纸。黑白打印零损耗，适合投递走打印 / 传真等灰度链路的场合。</p>
+          <a href="kami-mono.html">打开</a>
+        </article>
+
+        <article class="theme">
+          <span class="chip"><i style="background: #163a70"></i><i style="background: #f7f8fb"></i></span>
+          <h2>kami-navy</h2>
+          <p class="note"><strong>冷调商务。</strong>深藏青（对比 10.6:1，全家族最硬）+ 冷白纸。最正式、最"大厂"的一套，后端 / 基建类岗位的首选。</p>
+          <a href="kami-navy.html">打开</a>
+        </article>
+
+        <article class="theme">
+          <span class="chip"><i style="background: #8a5a3c"></i><i style="background: #faf5ef"></i></span>
+          <h2>kami-copper</h2>
+          <p class="note"><strong>暖调工匠。</strong>铜棕强调 + 全家族最暖的羊皮纸。暖但不艳，适合强调动手与叙事的岗位。</p>
+          <a href="kami-copper.html">打开</a>
+        </article>
+
+        <article class="theme">
+          <span class="chip"><i style="background: #b0362a"></i><i style="background: #faf6f0"></i></span>
+          <h2>kami-seal</h2>
+          <p class="note"><strong>朱砂印。</strong>唯一的高饱和款：印章朱红强调 + 暖米白纸。记忆点最跳（brand 饱和度约 60%），对比仍守 AA（5.7:1）。想被记住选这套。</p>
+          <a href="kami-seal.html">打开</a>
+        </article>
+      </section>
+
+      <p class="section-head">版式变体</p>
+      <section class="themes">
+        <article class="theme">
+          <span class="chip"><i style="background: #1b365d"></i><i style="background: #f5f4ed"></i></span>
+          <h2>avatar-demo</h2>
+          <p class="note">与 kami-base 同款配色，默认带个人头像（可选槽位 <code>header.avatar</code>）：头像在左、文字块在右，两行分别贴齐头像上下边。</p>
+          <a href="avatar-demo.html">打开</a>
+        </article>
+      </section>
+
+      <p class="foot">
+        4 套主题 + base 覆盖的变量集合完全一致（<code>--parchment</code> / <code>--ivory</code> /
+        <code>--border</code> / <code>--border-soft</code> / <code>--near-black</code> /
+        <code>--dark-warm</code> / <code>--olive</code> / <code>--stone</code> /
+        <code>--brand</code> / <code>--brand-tint</code>），没有哪套漏改；
+        全部主题的正文用色对比度 ≥ 4.5:1（AA）。
+        版式细节与打印注意事项见 <code>README.md</code>。
+      </p>
+    </main>
+  </body>
+</html>

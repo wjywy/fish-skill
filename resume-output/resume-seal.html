@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>【姓名待填】 · 简历</title>
+<meta name="author" content="【姓名待填】">
+<meta name="generator" content="Kami Family (build-resume.mjs · single · kami-seal)">
+    <style>
+  /* W04 / regular face for body text */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("../fonts/TsangerJinKai02-W04.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* W05 / medium face for headings (no synthetic bold) */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("../fonts/TsangerJinKai02-W05.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+@page {
+    size: A4;
+    margin: 11mm 13mm 11mm 13mm;
+    background: #f5f4ed;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --border:    #e8e6dc;
+    --border-soft: #e5e3d8;
+    --near-black: #141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --brand-tint: #EEF2F7;          /* solid equivalent of rgba(1B365D, 0.08), avoids tag double-rectangle bug */
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Source Han Serif CN", "Noto Serif CJK SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+    --sans: var(--serif);
+  }
+
+  html, body { background: var(--parchment); }
+
+  @media screen {
+    body { max-width: 210mm; margin: 0 auto; padding: 11mm 13mm; }
+  }
+
+  body {
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 9.2pt;
+    line-height: 1.42;
+    letter-spacing: 0.3pt;
+    widows: 3;
+    orphans: 3;
+  }
+
+  .serif {
+    font-family: var(--serif);
+  }
+
+  a { color: var(--brand); text-decoration: none; }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 4.2mm;
+    padding-bottom: 2.3mm;
+    border-bottom: 0.6pt solid var(--border);
+  }
+  .header > div:first-child { flex-shrink: 0; }
+  .name {
+    font-family: var(--serif);
+    font-size: 26.5pt;
+    font-weight: 500;
+    letter-spacing: 0.5pt;
+    color: var(--near-black);
+    line-height: 1;
+    margin-bottom: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 2.2mm;
+    white-space: nowrap;
+  }
+  .alias {
+    font-size: 12.5pt;
+    font-weight: 400;
+    color: var(--stone);
+    letter-spacing: 0.2pt;
+  }
+  .alias::before {
+    content: "";
+  }
+  .tagline { font-size: 9.5pt; color: var(--olive); line-height: 1.3; }
+  .tagline .accent { color: var(--brand); font-weight: 500; }
+
+  .contact {
+    text-align: right;
+    font-size: 9pt;
+    color: var(--stone);
+    line-height: 1.5;
+    margin-bottom: -0.5mm;
+  }
+  .contact a { color: var(--dark-warm); }
+  .contact .loc { color: var(--olive); font-weight: 500; }
+  .contact .role { color: var(--brand); font-size: 10.5pt; font-weight: 500; }
+  .contact .sep { color: var(--border); margin: 0 0.4em; }
+
+  /* METRICS */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 6mm;
+    margin-bottom: 3mm;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .metric {
+    background: transparent;
+    padding: 1mm 0 1.2mm;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7mm;
+    min-width: 0;
+    break-inside: avoid;
+  }
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 13pt;
+    font-weight: 500;
+    color: var(--brand);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .metric-label {
+    font-size: 9pt;
+    color: var(--olive);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .metric-value .unit {
+    font-size: 10.5pt;
+    margin-left: 0.3mm;
+    font-weight: 500;
+    color: var(--brand);
+  }
+
+  .metrics--stack .metric {
+    gap: 0.5mm;
+    padding-bottom: 2mm;
+    border-bottom: 0.3pt dotted var(--border);
+  }
+
+  /* SECTION */
+  .section-title {
+    font-family: var(--serif);
+    font-size: 12.5pt;
+    font-weight: 500;
+    color: var(--near-black);
+    border-bottom: 0.5pt solid var(--border);
+    padding: 0 0 1mm 0;
+    margin: 5.8mm 0 1.7mm 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2mm;
+  }
+  .section-title .sub {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 9pt;
+    color: var(--stone);
+    letter-spacing: 0.3pt;
+  }
+
+  section:first-of-type .section-title { margin-top: 0; }
+  .page-break > .section-title { margin-top: 0; }
+
+  /* Unify gap from section-title bottom border to first content's first line = 3mm
+     (section-title margin-bottom 1.8mm + first-child top spacing 1.2mm) */
+  .section-title + .skill-row { padding-top: 1.2mm; }
+  .section-title + .edu-row { padding-top: 1.2mm; }
+
+  /* SUMMARY */
+  .summary { font-size: 9.2pt; line-height: 1.42; color: var(--near-black); }
+  .summary .em-brand { color: var(--brand); }
+  .summary .hl { color: var(--brand); }
+
+  /* TIMELINE */
+  .timeline { display: flex; gap: 6mm; margin-bottom: 2mm; margin-left: 0; margin-right: 0; }
+  .tl-step {
+    flex: 1; background: transparent;
+    padding: 0.8mm 0;
+    break-inside: avoid;
+  }
+  .tl-top {
+    display: flex; align-items: baseline; gap: 1.5mm;
+    margin-bottom: 0.5mm;
+  }
+  .tl-year {
+    font-family: var(--serif);
+    font-size: 11pt; font-weight: 500;
+    color: var(--brand); line-height: 1;
+  }
+  .tl-head {
+    font-size: 11pt; font-weight: 500;
+    color: var(--near-black);
+  }
+  .tl-body { font-size: 9pt; color: var(--olive); line-height: 1.4; letter-spacing: 0.3pt; }
+
+  /* PROJECTS */
+  .project {
+    padding: 2.6mm 0;
+    break-inside: avoid;
+  }
+  .project:first-of-type { padding-top: 1.2mm; }
+  .proj-head {
+    display: block; margin-bottom: 0.75mm;
+  }
+  .proj-name {
+    font-family: var(--serif);
+    font-size: 11pt; font-weight: 500; color: var(--near-black);
+  }
+  .proj-kind { font-size: 11pt; color: var(--olive); margin-left: 1.5mm; }
+  .proj-role {
+    font-size: 9pt; color: var(--brand); font-weight: 500;
+    float: right; background: #EEF2F7;
+    padding: 0.4mm 1.2mm; border-radius: 2pt; letter-spacing: 0.05pt;
+    white-space: nowrap;
+  }
+  .proj-lines { display: table; width: 100%; }
+  .proj-row { display: table-row; }
+  .proj-label {
+    display: table-cell; width: 11mm;
+    font-size: 9pt; color: var(--brand);
+    font-weight: 500; letter-spacing: 0.2pt;
+    padding: 0.2mm 0 0.4mm 0; vertical-align: top;
+  }
+  .proj-text {
+    display: table-cell; font-size: 9pt;
+    color: var(--near-black); line-height: 1.4; letter-spacing: 0.3pt;
+    padding: 0 0 0.4mm 0.5mm;
+  }
+  .proj-text .hl { color: var(--brand); }
+
+  .team-culture {
+    margin-top: 2mm; padding: 1.5mm 2.5mm;
+    background: var(--ivory);
+    border-radius: 2pt;
+    font-size: 9pt; color: var(--olive); line-height: 1.4;
+    break-inside: avoid;
+  }
+  .team-culture .hl { color: var(--brand); }
+
+  /* PAGE 2 FORCE BREAK */
+  .page-break { break-before: page; }
+
+  /* OPEN SOURCE - NEW ENHANCED LAYOUT */
+  .os-intro {
+    font-size: 9.2pt; line-height: 1.4; letter-spacing: 0.3pt;
+    color: var(--near-black);
+    padding: 0; margin: 1.2mm 0 2mm 0;
+    background: transparent;
+    break-inside: avoid;
+  }
+  .os-intro .hl { color: var(--brand); }
+  .os-intro .strong { color: var(--near-black); }
+
+  .os-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 8mm; row-gap: 1mm;
+  }
+  .os-item {
+    display: flex; align-items: baseline;
+    gap: 2mm; padding: 1mm 0 1mm 0;
+    border-bottom: 0.3pt dotted var(--border);
+    break-inside: avoid;
+  }
+  .os-item:last-child,
+  .os-item:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .os-name {
+    font-family: var(--serif);
+    font-size: 10pt; font-weight: 500;
+    flex-shrink: 0; min-width: 14mm;
+  }
+  .os-name a { color: var(--brand); }
+  .os-desc { font-size: 9pt; color: var(--olive); line-height: 1.4; flex: 1; }
+  .os-star {
+    font-size: 9pt; color: var(--dark-warm);
+    font-weight: 500; white-space: nowrap; flex-shrink: 0; min-width: 7.5mm; text-align: right;
+  }
+  .os-star.big { color: var(--brand); font-size: 9.2pt; }
+
+  .os-highlight {
+    margin-top: 2.5mm;
+    padding: 1.8mm 2.8mm;
+    background: var(--ivory);
+    border-radius: 2pt;
+    font-size: 9pt; line-height: 1.4;
+    color: var(--near-black);
+    letter-spacing: 0.3pt;
+    break-inside: avoid;
+  }
+  .os-highlight .hl { color: var(--brand); }
+  .os-highlight .tag {
+    display: inline-block;
+    background: transparent; color: var(--brand);
+    font-size: 9pt; font-weight: 500;
+    padding: 0; border-radius: 0;
+    margin-right: 1.2mm; letter-spacing: 0.3pt;
+    transform: none;
+  }
+
+  /* AI CONVICTION - NEW SECTION */
+  .convictions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2.5mm;
+    margin-top: 1.2mm;
+  }
+  .conv-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0 2mm 0 0;
+    break-inside: avoid;
+  }
+  .conv-head, .ai-card-head {
+    font-family: var(--serif);
+    font-size: 9.8pt; font-weight: 500;
+    color: var(--near-black); margin-bottom: 0.9mm;
+    display: flex; align-items: baseline; gap: 1.5mm;
+  }
+  .conv-head .year, .ai-card-head .year {
+    color: var(--brand); font-weight: 500;
+    font-size: 9pt;
+  }
+  .conv-body, .ai-card-body {
+    font-size: 9pt; color: var(--olive);
+    line-height: 1.4; letter-spacing: 0.3pt;
+  }
+  .conv-body .hl, .ai-card-body .hl { color: var(--brand); }
+  .conv-body .em-brand, .ai-card-body .em-brand { color: var(--brand); }
+
+  /* INFLUENCE */
+  .handle-strip {
+    background: transparent;
+    padding: 0; margin: 1.2mm 0 2mm 0;
+    display: flex; align-items: baseline; gap: 3mm;
+    break-inside: avoid;
+  }
+  .handle-strip .handle {
+    font-family: var(--serif);
+    font-size: 9.8pt; font-weight: 500; color: var(--brand);
+    flex-shrink: 0;
+  }
+  .handle-strip .follower { font-size: 9pt; color: var(--stone); flex-shrink: 0; }
+  .handle-strip .desc { font-size: 9pt; color: var(--olive); line-height: 1.4; letter-spacing: 0.3pt; flex: 1; }
+
+  .impact-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 5.5mm; }
+  .inf-block-title {
+    margin-top: 2.5mm;
+    font-family: var(--serif);
+    font-size: 9.8pt; font-weight: 500;
+    color: var(--near-black);
+    margin-bottom: 1.5mm; padding-bottom: 0.5mm;
+    border-bottom: 0.3pt dotted var(--border);
+    display: flex; align-items: baseline; gap: 2mm;
+  }
+  .inf-block-title .small {
+    font-family: var(--serif);
+    font-size: 9pt; color: var(--stone);
+    font-weight: 400; margin-left: 0; letter-spacing: 0.2pt;
+  }
+  .art-row {
+    padding: 1.6mm 0;
+    border-bottom: 0.3pt dotted var(--border-soft);
+  }
+  .talk-row {
+    display: flex; justify-content: space-between;
+    align-items: flex-start;
+    gap: 2mm; padding: 1.6mm 0;
+    border-bottom: 0.3pt dotted var(--border-soft);
+  }
+  .art-row:last-of-type, .talk-row:last-of-type { border-bottom: none; }
+  .art-header {
+    display: flex; align-items: baseline;
+    justify-content: space-between;
+    gap: 2mm; padding-right: 3mm;
+  }
+  .art-title, .talk-title {
+    font-size: 9pt; color: var(--near-black);
+    font-weight: 500; line-height: 1.4;
+    flex: 1 1 auto; min-width: 0;
+  }
+  .art-stats, .talk-venue {
+    font-size: 9pt; color: var(--stone);
+    line-height: 1.4; margin-top: 0.5mm; padding-left: 0; letter-spacing: 0.3pt;
+    white-space: nowrap;
+  }
+  .art-stats .em-brand {
+    color: var(--brand);
+  }
+  .art-date {
+    font-size: 9pt; color: var(--stone);
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+  }
+  .art-stats .lang-cn, .art-stats .lang-en {
+    display: inline-block;
+    font-size: 9pt; font-weight: 500;
+    margin-right: 0.5mm;
+    letter-spacing: 0.2pt;
+    color: var(--stone);
+  }
+  .talk-date {
+    font-size: 9pt; color: var(--stone); font-weight: 500;
+    white-space: nowrap; font-variant-numeric: tabular-nums;
+    padding-top: 0.3mm;
+  }
+
+  /* SKILLS */
+  .skill-row {
+    display: flex; gap: 2.5mm; padding: 1.7mm 0;
+    border-bottom: 0.3pt dotted var(--border);
+    align-items: baseline;
+  }
+  .skill-row:last-of-type { border-bottom: none; }
+  .skill-label {
+    font-size: 9pt; font-weight: 500;
+    color: var(--brand); letter-spacing: 0.3pt;
+    width: 22mm; flex-shrink: 0;
+    line-height: 1.36;
+  }
+  .skill-body { font-size: 9pt; color: var(--near-black); line-height: 1.4; letter-spacing: 0.3pt; flex: 1; }
+  .skill-body .em-brand { color: var(--brand); }
+
+  .no-break { break-inside: avoid; }
+
+  /* EDUCATION */
+  .edu-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline; font-size: 9.5pt; padding: 1.7mm 0;
+  }
+  .edu-row .school {
+    font-family: var(--serif);
+    font-weight: 500; font-size: 10.7pt;
+  }
+  .edu-row .major { color: var(--olive); font-size: 9.5pt; }
+  .edu-row .date { color: var(--stone); font-variant-numeric: tabular-nums; font-size: 9pt; }
+
+  /* TABLE (kami-table) */
+  table, .kami-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin: 6pt 0;
+    break-inside: avoid;
+  }
+  table th, .kami-table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dark-warm);
+    padding: 5pt 6pt;
+    border-bottom: 0.6pt solid var(--border);
+    background: transparent;
+  }
+  table td, .kami-table td {
+    padding: 4pt 6pt;
+    border-bottom: 0.25pt solid var(--border);
+    vertical-align: top;
+  }
+  table.compact th, .kami-table.compact th { padding: 3pt 4pt; font-size: 8pt; }
+  table.compact td, .kami-table.compact td { padding: 2.5pt 4pt; font-size: 8pt; line-height: 1.4; }
+  table.financial td:not(:first-child), .kami-table.financial td:not(:first-child) {
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  table.financial th:not(:first-child), .kami-table.financial th:not(:first-child) { text-align: right; }
+  table.striped tbody tr:nth-child(even) td, .kami-table.striped tbody tr:nth-child(even) td {
+    background: var(--ivory);
+  }
+  table .total td, .kami-table .total td {
+    font-weight: 500; border-top: 0.6pt solid var(--border); border-bottom: none; color: var(--near-black);
+  }
+
+  /* DENSE VARIANT: add class="resume--dense" to <body> when 5+ projects overflow */
+  body.resume--dense { font-size: 9pt; }
+  body.resume--dense .proj-text { line-height: 1.38; }
+  body.resume--dense .tl-body { font-size: 8.5pt; }
+  body.resume--dense .project { padding: 1.6mm 0; }
+  body.resume--dense .section-title { margin-top: 4.2mm; margin-bottom: 1.2mm; }
+
+    </style>
+    <!-- 本 skill 的版式微调，加载顺序必须在上游样式之后 -->
+    <style>
+/* ===== templates/shared/kami-layout.css（本 skill 的版式微调）
+
+   在 kami-family.css（上游 Kami 样式的逐字节拷贝）之后加载，只覆盖少数
+   与上游排布不同的地方。改动保持最小，颜色与字体一律沿用上游变量，
+   所以 5 套主题（base + mono / navy / copper / seal）在这里同样生效。
+
+   本文件承载六件事：
+     1. 字体（FONT）—— 给上游 @font-face 补 local() 来源，让本机装好的字体被命中
+     2. 页头（HEADER）—— 姓名/教育 × 岗位/联系方式 的 2×2 栅格，可选头像等高
+     3. 条目标题（.proj-head）—— 三段式，且三段各自对齐成一条可纵向扫视的竖线
+     4. 分隔线（RULES）—— 页头/标题线加深到 olive 调 --rule（描述区维持无线）
+     5. 纸纹（GRAIN）—— 给 --parchment 叠一层极淡颗粒，让它真的像纸
+     6. 打印（PRINT）—— 保住纸感底色、分隔线打印时再加深一档
+   其余版式全部沿用上游。 ===== */
+
+/* ===== FONT —— 补 local() 来源
+
+   kami-family.css 是上游样式表的逐字节拷贝，不能改（T1.8 守着加载顺序，
+   上游同步流程守着内容）。它的 @font-face 只有两条 src：
+     1) 本地相对路径 ../fonts/*.ttf  —— 仓库里刻意没有这个目录，必然落空
+     2) jsDelivr CDN                 —— 联网才行
+   于是「断网 / CDN 不可达」时会回退到系统宋体，而 PDF 文字层会因此把
+   常用字映射到康熙部首码位（行→U+2F98、工→U+2F00…），ATS 关键词匹配全挂。
+   （完整实测见 templates/README.md「字体依赖」。）
+
+   这里在后加载的本文件里重声明同名 @font-face —— 同 family + 同 weight +
+   同 style 时后者整条生效（实测见下），于是我们能替换 src 列表而不碰上游文件。
+   新顺序：local(精确名) → 本地相对路径 → CDN → local(族名兜底)。
+
+     · local() 放最前，是为了让「本机已经装好」这种情况被**确定性**命中，
+       完全不碰网络。scripts/ensure-fonts.sh 负责把字体装到系统能找到的位置
+       （macOS 会额外链进 ~/Library/Fonts，因为浏览器走 CoreText，不读 XDG 目录）。
+     · 中间两条原样保留上游语义：仓库私有构建放 templates/fonts/ 时走本地，
+       否则走 CDN。
+     · 最后一条是**故意放最后**的兜底，理由见下。
+
+   【实测一：同名 @font-face，后者覆盖前者】
+   无头 Chrome 里放两条同 family/weight/style 的规则（先指向不存在的文件、
+   后指向真实文件），渲染后看 document.fonts 的 status：先那条始终是
+   `unloaded`（从未被请求），后那条 `loaded`。所以本文件能安全地接管 src。
+
+   【实测二：local() 认全名 / PostScript 名，不认纯族名】
+   在 macOS Chrome 上逐个试已装字体（2026-09-30）：
+
+     | local() 实参            | 类型            | 是否命中 |
+     | ----------------------- | --------------- | -------- |
+     | `PingFang SC`           | 族名            | 否       |
+     | `PingFangSC-Regular`    | PostScript 名   | 是       |
+     | `Songti SC`             | 族名            | 否       |
+     | `STSong`                | PostScript 名   | 是       |
+     | `Songti SC Regular`     | 全名            | 是       |
+     | `Hiragino Sans GB`      | 族名            | 否       |
+     | `HiraginoSansGB-W3`     | PostScript 名   | 是       |
+
+   结论：**只写族名会静默失效**，所以 PostScript 名必须排在第一位。
+
+   【实测三：两个字体的 name 表共用排版族名】
+   2026-09-30 用 fontTools 读下载回来的两个字体的 name 表：
+
+     | 字段              | W04                   | W05                   |
+     | ----------------- | --------------------- | --------------------- |
+     | id1 legacy family | `TsangerJinKai02 W04` | `TsangerJinKai02 W05` |
+     | id4 full name     | 仅中文 `仓耳今楷02 W04` | 仅中文 `仓耳今楷02 W05` |
+     | id6 PostScript    | `TsangerJinKai02-W04` | `TsangerJinKai02-W05` |
+     | id16 typo family  | `TsangerJinKai02`     | `TsangerJinKai02`     |
+
+   两个文件**共用一个排版族名**，只靠 id1 / id6 区分字重。所以裸族名
+   `TsangerJinKai02` 会命中"该族的默认字面"，对 W05 来说就是**解析错**；
+   加上实测二已知 Chrome 根本不认族名，它就排在 CDN 之后 —— 别的引擎若能认，
+   也只是拿一个仓耳字面（字形对、字重偏轻），总好过掉到 --serif 换一套字。 */
+@font-face {
+  font-family: "TsangerJinKai02";
+  src:
+    local("TsangerJinKai02-W04"),
+    local("TsangerJinKai02 W04"),
+    local("仓耳今楷02 W04"),
+    url("../fonts/TsangerJinKai02-W04.ttf") format("truetype"),
+    url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype"),
+    local("TsangerJinKai02");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "TsangerJinKai02";
+  src:
+    local("TsangerJinKai02-W05"),
+    local("TsangerJinKai02 W05"),
+    local("仓耳今楷02 W05"),
+    url("../fonts/TsangerJinKai02-W05.ttf") format("truetype"),
+    url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype"),
+    local("TsangerJinKai02");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* HEADER —— 2×2 栅格，但右下的联系方式与左下的教育信息各自再分两行：
+     第 1 行：姓名（左）        |  目标岗位（右）              —— 基线对齐（+ 岗位光学下沉）
+     第 2 行：学校 · 专业（左）  |  联系方式 ①（右）            —— 首行基线对齐
+             在校时间（左）      |  联系方式 ②（右）            —— 墨水中心光学对齐
+   上游是「两栏 flex、底对齐」，这里改成栅格，让左右两行的对应关系可控。
+   有头像时，栅格挪到 .header-main，.header 本身变成「文字块 + 头像」并排。
+
+   为什么教育信息与联系方式要占两行：它们各自都不短，挤在同一行时两端都会
+   顶到页边，字号又只有 9pt，读起来是糊在一起的一整片。拆成两行后每行
+   「一个教育信息 + 一个联系方式」，密度立刻降下来，而且天然形成对齐。
+   （两行的对齐靠下面 .alias / .contact 的同一绝对行高，不是靠两个独立行。） */
+.header,
+.header-main {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 8mm;
+  /* 第 1 行（姓名/岗位）与第 2、3 行（教育/联系方式）之间留足呼吸感：
+     行距给到 2.5mm，姓名块与信息块在视觉上分成上下两组。 */
+  row-gap: 2.5mm;
+  align-items: baseline;
+}
+
+/* 第 1 行：姓名与目标岗位**基线对齐**。
+   盒子底边对齐（end）在字号差 14pt 时是错的：两种字号的下伸部空间不同，
+   盒子底对齐后文字基线仍差约 3pt，视觉上"岗位飘在姓名下方"。
+   基线对齐才是文字意义上的"底部对齐"。 */
+.name,
+.role {
+  align-self: baseline;
+}
+
+/* 第 2、3 行：教育信息与联系方式按「首行基线」对齐，而不是底部对齐。 */
+.alias,
+.contact {
+  align-self: baseline;
+}
+
+/* 关键修正：上游 .alias::before { content: "" } 的空伪元素在 .alias 变成
+   两行小栅格后会**占据第 1 个栅格行**，把「学校 · 专业」「在校时间」整体
+   往下挤一行距，而 .contact 没有伪元素 —— 左列因此永远比右列低。
+   这里必须把它禁掉，两列的行才能逐行配平。 */
+.alias::before {
+  content: none;
+  display: none;
+}
+
+/* 头像（可选）：header.avatar 存在时渲染 <img class="avatar">，占最右一列。 */
+.avatar {
+  width: 22mm;
+  height: 28mm;
+  object-fit: cover;
+  border-radius: 2pt;
+  border: 0.6pt solid var(--border);
+  background: var(--ivory);
+}
+
+/* 有头像时：页头改为「文字块 + 头像」并排（头像在右，DOM 里排在文字块之后）。
+   文字块与头像等高（stretch），再用 align-content: space-between 把三行撑开 ——
+   第 1 行贴头像顶、第 3 行贴头像底。
+   头像自身固定 22×28mm，所以用 align-self: center 让它在这条线上居中，
+   文字块比头像高时也不会把照片顶到最上面。
+   栏间收窄到 5mm：头像占掉约 83px 后右栏只剩约 305px。 */
+.header:has(.avatar) {
+  display: flex;
+  align-items: stretch;
+  gap: 5mm;
+}
+
+.header:has(.avatar) .header-main {
+  flex: 1;
+  column-gap: 5mm;
+  align-content: space-between;
+}
+
+.header:has(.avatar) .avatar {
+  align-self: center;
+}
+
+/* 姓名不再是承载别名的 flex 容器，改为栅格第 1 行左格 */
+.name {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  font-size: 25pt;
+  font-weight: 600;
+  letter-spacing: 0.7pt;
+  line-height: 1;
+}
+
+/* 目标岗位：第 1 行右格，与姓名底部对齐。
+   line-height 收紧到 1，避免上游 1.5 的行距把底边抬高。
+   颜色沿用上游 .contact .role 的 --brand（现在它不在 .contact 里了，需补回）。
+
+   光学底部对齐：基线对齐只保证两条基线重合，但字形"墨水底边"在基线
+   之下的距离随字号缩放 —— 25pt 的姓名墨底比 10.6pt 的岗位墨底低约 1.5px，
+   岗位文字看起来浮在姓名底边之上。用相对定位把岗位文字压下 1.1pt 补齐
+   （补偿量 ≈ 下伸率 × 字号差，按实际渲染字体量测得出；换字体后若出现
+   可感知偏差，微调这个值即可）。 */
+.role {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: right;
+  font-size: 10.6pt;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--brand);
+  position: relative;
+  top: 1.1pt;
+}
+
+/* 教育信息：占第 2 行左格（内部再分两行，见下）。 */
+.alias {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 9.2pt;
+  color: var(--olive);
+}
+
+/* 联系方式：占第 2 行右格，与 .alias 逐行配对。 */
+.contact {
+  grid-column: 2;
+  grid-row: 2;
+  margin-bottom: 0;
+  /* 光学垂直居中：基线对齐只对齐基线，但 Latin 小写的墨水中心
+     （x 高度矮、降部又往下伸）比同行的中文/数字低约 2px，
+     联系方式看起来"沉"在学校/时间那行下面。
+     整块上移 1.5pt 让两列文字的墨水中心齐平
+     （补偿量按实际渲染字体量测得出，换字体后可微调）。 */
+  position: relative;
+  top: -1pt;
+}
+
+/* 教育信息与联系方式各自是一个「两行小栅格」，逐行配对：
+     第 1 行：学校 · 专业  ↔  联系方式 ①
+     第 2 行：在校时间     ↔  联系方式 ②
+   两边用同一个**绝对行高**（13pt，而不是相对倍数），所以两个独立栅格的
+   行高完全相等 —— 第 1 行对第 1 行、第 2 行对第 2 行严格对齐，不会因为
+   9.2pt 与 9pt 的字号差而错开零点几毫米。
+   这样就不必给每一行起新类名：渲染器输出的类名必须全部落在上游词表里（T4.4），
+   能靠结构解决的就不加类。 */
+.alias,
+.contact {
+  display: grid;
+  row-gap: 1.1mm;
+  line-height: 13pt;
+  align-content: start;
+}
+
+/* 在校时间比学校 · 专业退一级 */
+.alias > span:nth-child(2) {
+  color: var(--stone);
+}
+
+/* 条目标题行（.proj-head）—— 三段式：
+     左 = 公司 / 项目名称    中 = 岗位 · 地点    右 = 在职时间
+   上游是「名称 + 内联 meta + 右浮时间胶囊」，这里改成三段栅格。
+
+   列宽「至少 30mm 的公司列 + 弹性岗位列 + **固定 28mm** 时间列」：
+     公司列下限 30mm   → 常见公司名（≤7 个汉字）宽度一致 → 岗位列起点恒定；
+                        更长的公司名可以撑开这一列，不会被截断或折行；
+     岗位列 1fr        → 占据剩余空间，岗位文字在其中居中；
+     时间列固定 28mm   → **关键**：各条目时间长短不一（"2024" vs "2024.06 - 2024.09"），
+                        若按内容伸缩，中间列的宽度会随条目漂移，居中的岗位文字
+                        也就一条一个位置；固定列宽后，所有条目的中间模块共用
+                        同一条中心线，横向扫视时才有"一列"的感觉。
+   于是两端各有一条可纵向扫视的锚点，中间一列跟着公司名走。
+
+   早期版本用 1fr auto 1fr 把公司名居中，更"设计"但不可扫描 ——
+   HR 扫简历靠固定锚点（公司齐左、时间齐右），居中会让眼睛每行都要左右跳。 */
+.proj-head {
+  display: grid;
+  grid-template-columns: minmax(30mm, max-content) minmax(0, 1fr) 28mm;
+  column-gap: 5mm;
+  align-items: baseline;
+}
+
+/* 左格：公司 / 项目名称。项目链接（.proj-name a）紧随其后 —— 它是对这个条目的
+   补充说明，不该孤零零飘到最右端去跟时间抢位置。
+   链接不加自己的类名：T4.4 要求渲染器输出的类名全在上游词表里，
+   而上游已经有 `a { color: var(--brand) }` 兜底，这里只是把它压小、压淡。 */
+.proj-head .proj-name {
+  grid-column: 1;
+  text-align: left;
+}
+
+/* 中格链接（entry.link 的「站点/末段」短文本）：压小、压淡，
+   不抢左格标题的视觉；点击仍跳完整网址。 */
+.proj-head .proj-kind a {
+  color: var(--stone);
+}
+
+/* 中格：岗位 · 地点。**居中对齐** —— 三列里左列是公司、右列是时间，
+   岗位夹在中间时靠左会紧贴公司名，看起来像公司名的一部分；
+   居中之后它才读得出是"独立的一段"，三列也才左右均衡。
+   上游 .proj-kind 是 11pt --olive 且带 margin-left，这里降到 9.5pt
+   并去掉左外边距（栅格的 column-gap 已经在管间距了）。 */
+.proj-head .proj-kind {
+  grid-column: 2;
+  text-align: center;
+  margin-left: 0;
+  font-size: 9.5pt;
+  color: var(--olive);
+}
+
+/* 右格：在职时间。取消上游 .proj-role 的右浮胶囊（float / 底色 / 内边距），
+   改为右对齐纯文本。用 --stone 而不是 --brand：三格里时间最不需要逐字读，
+   让它退到后面，公司名才能留在视觉第一层。
+   tabular-nums 让等宽数字上下对齐，右边缘那条竖线才真的是直的。 */
+.proj-head .proj-role {
+  grid-column: 3;
+  justify-self: end;
+  float: none;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  text-align: right;
+  font-size: 9pt;
+  font-weight: 500;
+  color: var(--stone);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05pt;
+  white-space: nowrap;
+}
+
+/* 条目正文（.proj-lines）—— 分标题 + 无序列表：
+     | 分标题（加粗、主题色；竖线与文字齐平）
+     · 对应内容
+   工作经历与项目经历的描述区域**不画任何下划线或分割线**。
+   层次只靠分标题的字重、主题色、悬挂标记和组间留白表达，避免表格感。 */
+.proj-lines .proj-label {
+  width: 3.6mm;
+  color: var(--stone);
+}
+
+.proj-text > strong {
+  font-weight: 700;
+  color: var(--brand);
+  letter-spacing: 0.15pt;
+}
+
+/* 分标题行不加 border；只增加组间留白。全宽竖线 `｜` 写在
+   .proj-text 内、紧贴标题文字，二者基线自然齐平（不与 · 对齐）。 */
+.proj-row:has(.proj-text > strong) .proj-label,
+.proj-row:has(.proj-text > strong) .proj-text {
+  border-top: none;
+  padding-top: 2.2mm;
+}
+
+/* 第一组紧贴条目标题，避免额外留白。 */
+.proj-lines .proj-row:first-child .proj-label,
+.proj-lines .proj-row:first-child .proj-text {
+  padding-top: 0;
+}
+
+/* ===== RULES —— 分隔线加深
+
+   用户反馈：模板里现存的分隔线（页头底线、板块标题线、技能行点线）
+   在屏幕上太淡了。上游统一用 --border（暖灰 #e8e6dc），在羊皮纸底上
+   对比度只有 1.1:1 左右，几乎不可见。
+
+   这里把三条可见的线统一换成 olive 调的 --rule：
+     · 页头底线         0.6pt solid --border → 0.75pt solid --rule
+     · 板块标题线       0.5pt solid --border → 0.75pt solid --rule
+     · 技能行点线       0.3pt dotted --border → 0.75pt dotted --rule
+   浓度是三轮用户反馈的产物：先说"淡淡的看不清"→ 加深到 45% 又说"太重"→
+   回调到 30% 仍嫌重 → 最终 20%，线宽同步从 1pt 收回 0.75pt。
+   注意：工作/项目经历的**描述区**维持无线（用户明确要求过），本块不碰 .proj-row。
+   --rule 走变量而不是写死颜色：打印时（见 PRINT 块）会加深到 70%，
+   屏幕上保持 20% —— 打印机的着色比屏幕衰减得更厉害。 */
+:root {
+  --rule: color-mix(in srgb, var(--olive) 20%, transparent);
+}
+
+.header {
+  border-bottom: 0.75pt solid var(--rule);
+}
+
+.section-title {
+  border-bottom: 0.75pt solid var(--rule);
+}
+
+.skill-row {
+  border-bottom: 0.75pt dotted var(--rule);
+}
+
+/* ===== GRAIN —— 纸纹
+
+   上游只给了一个纯色底（--parchment #f5f4ed）。它叫"羊皮纸"，但没有任何
+   纸的质感，看上去只是一块米色。这里叠一层极淡的颗粒，纸感立刻成立。
+
+   用内联 data-URI 的 feTurbulence，不依赖任何外部资源：
+     · type='fractalNoise' —— 连续噪声，比 turbulence 更像纸纤维
+     · feColorMatrix saturate='0' —— 去色，避免颗粒带出彩色噪点
+     · opacity 5% —— 看得见质感，看不出噪点
+   只挂在 html 上，并把 body 的底色让开：否则 body 的不透明底色会把
+   html 的颗粒盖掉；两边都挂又会在 body 区域叠出双倍密度、出现摩尔纹。 */
+html {
+  background-color: var(--parchment);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.05'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+body {
+  background-color: transparent;
+}
+
+/* ===== PRINT —— 打印
+
+   两个问题都只在打印路径上暴露，而打印正是这个工具最主要的交付方式
+   （生成 HTML → 打印成 PDF → 投递）。
+
+   ① 纸感底色丢失。Chrome 打印对话框的「背景图形」默认关闭，羊皮纸底会
+      变成纯白，整套 Kami 的纸感归零。print-color-adjust: exact 让浏览器
+      尽量保留背景，但它不是万能药 —— 用户仍需在打印对话框里勾选
+      「背景图形 / Background graphics」。README 里写明了这一点。
+
+   ② 分隔线消失。上游 --border 与纸底的对比度只有 1.2–1.4:1，屏幕上是
+      若有若无，灰度打印时基本看不见，区块划分随之丢失。这里用 color-mix
+      从各主题自己的 --olive 派生一条更深的线，5 套主题都留在自己的色系里。
+
+      70% 是实测的最小可行值：
+        · 5 套主题全部 >= 3:1（最低 kami-base 3.15，最高 kami-mono 3.81）
+        · 再浅就压不到 3:1（65% 时最低只有 2.87），再深就把简历压成表格
+      只作用于打印，屏幕上的细腻观感原样保留。
+      不支持 color-mix 的浏览器会忽略整条声明，自动回退到主题原值。 */
+html,
+body {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media print {
+  /* 用 html:root 而非 :root —— 主题页的 <style> 在样式表之后加载，
+     同特异度下它会赢。加上 html 前缀提高特异度才压得住。 */
+  html:root {
+    --border: color-mix(in srgb, var(--olive) 70%, transparent);
+    --border-soft: color-mix(in srgb, var(--olive) 45%, transparent);
+    /* 分隔线：屏幕 45%，打印加深到 70% —— 打印着色衰减更厉害 */
+    --rule: color-mix(in srgb, var(--olive) 70%, transparent);
+  }
+}
+
+    </style>
+    <style>
+:root {
+  --parchment: #faf6f0;
+  --ivory: #fffdf8;
+  --border: #ecdcd2;
+  --border-soft: #f4e9e0;
+  --near-black: #2b1d18;
+  --dark-warm: #4a2f27;
+  --olive: #8a4a38;
+  --stone: #7d5c50;
+  --brand: #b0362a;
+  --brand-tint: #f9e9e4;
+}
+</style>
+    <style>
+
+.avatar-bar {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 12px/1 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+.avatar-bar button,
+.avatar-bar label {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  cursor: pointer;
+  background: var(--ivory, #faf9f5);
+  color: var(--dark-warm, #3d3d3a);
+  border: 1px solid var(--border, #e8e6dc);
+  border-radius: 0;
+  font: inherit;
+}
+.avatar-bar button:hover,
+.avatar-bar label:hover {
+  border-color: var(--brand, #1b365d);
+  color: var(--brand, #1b365d);
+}
+.avatar-bar input[type="file"] { display: none; }
+.avatar-bar .tip { color: var(--stone, #6b6a64); font-weight: 400; }
+@media print {
+  .avatar-bar { display: none; }
+}
+</style>
+</head>
+<body>
+<main id="kami-root"></main>
+
+<!-- 未设置 header.avatar：标准页头（无头像）。需要头像时在数据里加 header.avatar 后重新生成。 -->
+<!-- 正式数据（Resume View）。换数据重跑：node build-resume.mjs --data <json> -->
+<script>
+window.KAMI_RESUME_DATA = {
+  "id": "view-backend-20260930",
+  "targetId": "target-backend",
+  "header": {
+    "name": "【姓名待填】",
+    "targetRole": "后端开发工程师",
+    "educationInline": "重庆邮电大学 · 生物信息学（本科） · 2025.06 毕业",
+    "contacts": [
+      {
+        "label": "电话",
+        "value": "【电话待填】"
+      },
+      {
+        "label": "邮箱",
+        "value": "【邮箱待填】"
+      }
+    ]
+  },
+  "skills": [
+    {
+      "label": "语言与运行时",
+      "description": "JavaScript（ES Modules）、Node.js；基于文件系统 API 开发命令行工具与数据处理脚本。"
+    },
+    {
+      "label": "工程实践",
+      "description": "JSON Schema 数据约束、可追溯事实建模、自动化测试、HTML 生成与基础安全转义。"
+    }
+  ],
+  "sections": [
+    {
+      "type": "project",
+      "title": "项目经历",
+      "range": null,
+      "entries": [
+        {
+          "time": "2026.09 - 至今",
+          "title": "fish-skill · Coding Agent Skill 工具集",
+          "meta": "个人项目",
+          "link": "https://github.com/wjywy/fish-skill",
+          "bullets": [
+            {
+              "id": "bullet-cli",
+              "text": "独立开发 **Node.js CLI**，扫描 skills 目录下的 SKILL.md 识别可安装 Skill，提供 list、check、install 命令；通过递归复制与目标目录参数完成按需安装，并以 --force 显式控制覆盖已有目录。",
+              "claimIds": [
+                "claim-cli"
+              ],
+              "metricIds": []
+            },
+            {
+              "id": "bullet-model",
+              "text": "围绕简历事实可信度，设计 **Fact → Experience → Claim → Resume View** 数据链路，配套 JSON Schema 与证据规则，区分仓库能力、个人贡献和指标来源，使简历表述能够回溯到原始事实。",
+              "claimIds": [
+                "claim-model"
+              ],
+              "metricIds": []
+            },
+            {
+              "id": "bullet-renderer",
+              "text": "实现 **Resume View → HTML** 生成脚本，将简历数据、样式和渲染逻辑组装为可直接打开的页面，支持单文件输出与 **5 套主题**预览，并保留浏览器打印导出 PDF 的路径。",
+              "claimIds": [
+                "claim-renderer"
+              ],
+              "metricIds": []
+            },
+            {
+              "id": "bullet-tests",
+              "text": "构建无额外 npm 依赖的**自动化测试**，覆盖 Schema 校验、数据引用完整性、CLI 行为与渲染器契约；当前 **78 项确定性检查通过**。",
+              "claimIds": [
+                "claim-tests"
+              ],
+              "metricIds": [
+                "metric-checks"
+              ]
+            }
+          ],
+          "tags": [
+            "Node.js",
+            "JavaScript",
+            "JSON Schema",
+            "HTML"
+          ]
+        }
+      ]
+    }
+  ],
+  "highlightClaimIds": [
+    "claim-cli",
+    "claim-model",
+    "claim-renderer",
+    "claim-tests"
+  ],
+  "notes": [
+    "姓名、电话、邮箱由用户稍后填写。",
+    "未获得其他工作、实习或项目经历材料；本版仅采用已确认的 fish-skill 项目。"
+  ],
+  "renderOptions": {
+    "renderer": "kami",
+    "theme": "kami-default",
+    "format": "html"
+  }
+};
+</script>
+<script>
+/* ===== templates/shared/kami-render.js（Kami 共享结构渲染器）
+
+   职责：把 Resume View（内容槽位：header / skills / sections）渲染成
+   上游 tw93/Kami 的 DOM 结构，从而直接套用 shared/kami-family.css
+   （该 CSS 是上游 <style> 的逐字节拷贝），让成品与 Kami 的样式完全一致。
+
+   注意「槽位」与「样式」是两件事：
+   - 内容槽位沿用本 skill 自己的模型（sections[].entries[].bullets / subBlocks / tags…），
+     不改成 Kami 的 metrics / timeline / projects 结构。
+   - 样式对齐通过类名映射实现：本渲染器把槽位内容放进 Kami 的类名里
+     （.project / .proj-row / .skill-row / .edu-row…），而不是反过来改数据模型。
+
+   槽位 → Kami DOM 映射
+     header.name             → .name.serif（页头第 1 行左格）
+     header.targetRole       → .role（页头第 1 行右格）
+     header.educationInline  → .alias.edu-school + .alias.edu-years
+                               （页头第 2、3 行左格；在最后一个 · 处拆成
+                                「学校 · 专业」与「在校时间」，教育信息只到年份）
+     header.contacts[]       → .contact.contact-N（页头第 2、3 行右格，逐行配对）
+     header.avatar           → .avatar + .header-main（可选；文字块在左、头像在右）
+     skills[]                → .skill-row > .skill-label + .skill-body
+     sections[].title/range  → .section-title（+ .sub）
+     entry.title             → .proj-name.serif（三段式标题左格：公司 / 项目名称）
+     entry.link              → .proj-kind 内的短链接（站点/末段，如 github/qa-workbench），
+                               与 entry.meta 同格，用「·」分隔
+     entry.meta              → .proj-kind（三段式标题中格：岗位 · 地点）
+     entry.time              → .proj-role（三段式标题右格：在职时间）
+     entry.tags[]            → 不渲染（技术栈不上简历）
+     entry.summaryBullets[]  → .proj-row，label = ·
+     entry.bullets[]         → .proj-row，label = ·
+     entry.subBlocks[]       → .proj-row，.proj-text > strong = `｜分组标题`
+                               （全宽竖线直接和标题文字在同一个文字单元格）
+       subBlocks[].bullets[] → .proj-row，label = ·（列在分标题之下）
+     sections[type=education] → .edu-row（.school / .major / .date）
+
+   页头排布与上游不同（上游 alias 与姓名同行、两栏底部对齐），差异集中在
+   shared/kami-layout.css，见该文件顶部说明。
+
+   文本约定：描述类字段里的 **关键词** 会渲染为 <span class="hl">关键词</span>
+   （主题强调色）——这是 Kami 版式里「关键技术词与指标高亮」的落地方式。
+
+   分页：不做固定分页。内容按 A4 自然流动，条目内部由 CSS 的
+   .project { break-inside: avoid } 与 .no-break 保证不被拆断。 ===== */
+(function (global) {
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  /* 先转义，再把 **…** 变成强调 span，标记本身无法注入 HTML */
+  function inline(value) {
+    return esc(value).replace(/\*\*([^*]+)\*\*/g, '<span class="hl">$1</span>');
+  }
+
+  /* skill-body 里按模板惯例使用 .em-brand（与 .hl 同色，仅语义区分） */
+  function inlineBrand(value) {
+    return inline(value).replace(/<span class="hl">/g, '<span class="em-brand">');
+  }
+
+  /* meta 填的是网址时渲染成超链接（项目地址）；否则按普通文字处理。 */
+  function isUrl(value) {
+    return /^https?:\/\//i.test(String(value == null ? "" : value).trim());
+  }
+
+  /* 链接的显示文字取站点名：github.com/xxx/yyy → github（href 仍是完整网址） */
+  function linkLabel(url) {
+    const s = String(url == null ? "" : url).trim();
+    let host = "";
+    try {
+      host = new URL(s).hostname;
+    } catch (e) {
+      host = s.replace(/^https?:\/\//i, "").split(/[/?#]/)[0];
+    }
+    host = host.replace(/^www\./i, "");
+    return host.split(".")[0] || host || s;
+  }
+
+  /* 超链接：显示站点短名，点击跳完整网址 */
+  function linkAnchor(url) {
+    return `<a href="${esc(url)}">${esc(linkLabel(url))}</a>`;
+  }
+
+  /* 访问链接的中格短文本：站点名 + 末段路径，
+     github.com/zhangzhixing/qa-workbench → github/qa-workbench（href 仍是完整网址） */
+  function linkShort(url) {
+    const s = String(url == null ? "" : url).trim();
+    let text = s.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+    const slash = text.indexOf("/");
+    const host = slash >= 0 ? text.slice(0, slash) : text;
+    const path = slash >= 0 ? text.slice(slash + 1) : "";
+    const site = host.replace(/^www\./i, "").split(".")[0] || host;
+    const last = path.split("/").filter(Boolean).pop() || "";
+    return last ? `${site}/${last}` : site;
+  }
+
+  function resolveTarget(target) {
+    if (!target) return document.body;
+    if (typeof target === "string") return document.querySelector(target);
+    return target;
+  }
+
+  function sectionTitle(text, sub) {
+    const s = sub ? `<span class="sub">${esc(sub)}</span>` : "";
+    return `<div class="section-title">${esc(text)}${s}</div>`;
+  }
+
+  /* Resume Bullet 允许是 { id, text, claimIds, metricIds } 或纯字符串 */
+  function bulletText(bullet) {
+    if (bullet && typeof bullet === "object") return bullet.text || "";
+    return bullet || "";
+  }
+
+  function projRow(label, text, bold) {
+    const body = bold ? `<strong>${inline(text)}</strong>` : inline(text);
+    return `      <div class="proj-row">
+        <div class="proj-label">${esc(label)}</div>
+        <div class="proj-text">${body}</div>
+      </div>`;
+  }
+
+  /* ---------------- PAGE 1 ---------------- */
+
+  /* 页头教育信息拆两行用：把「华东理工大学 · 软件工程 · 2021.9–2025.6」拆成
+       { left: "华东理工大学 · 软件工程", years: "2021.9–2025.6" }
+     只在「最后一个 · 的右半确实是年份段（含 4 位数字）」时才拆；
+     否则整串留在第一行 —— 宁可少拆一行，也不去猜用户的分隔习惯。 */
+  function splitEducation(text) {
+    const s = String(text == null ? "" : text).trim();
+    if (!s) return { left: "", years: "" };
+    const i = s.lastIndexOf("·");
+    if (i > 0) {
+      const left = s.slice(0, i).trim();
+      const years = s.slice(i + 1).trim();
+      if (left && /\d{4}/.test(years)) return { left: left, years: years };
+    }
+    return { left: s, years: "" };
+  }
+
+  function renderHeader(h) {
+    // 页头是一个 3×2 栅格（排布见 kami-layout.css）：
+    //   第 1 行：姓名（左）        |  目标岗位（右）
+    //   第 2 行：学校 · 专业（左）  |  联系方式 ①（右）
+    //   第 3 行：在校时间（左）     |  联系方式 ②（右）
+    //
+    // 教育信息与联系方式**逐行配对**，而不是各占一整串挤在同一行：
+    // 两串长文本同行时两端都会顶到边、字号又只有 9pt，读起来是"一整片"，
+    // 中间还会出现一段说不清该不该有的空白。
+    //
+    // 实现方式：.alias 与 .contact 各自是一个"两行小栅格"（见 kami-layout.css），
+    // 两边用同一个**绝对行高**，于是第 1 行对第 1 行、第 2 行对第 2 行天然对齐。
+    // 这样不必给每一行起新类名 —— 渲染器输出的类名必须全部落在上游词表里
+    // （T4.4），所以能靠结构解决的就不加类。
+    const edu = splitEducation(h.educationInline);
+    const contacts = h.contacts || [];
+    const twoRows = Boolean(edu.years) || contacts.length > 1;
+
+    const aliasRows = twoRows ? [edu.left, edu.years] : [edu.left];
+    const contactRows = twoRows ? [contacts.slice(0, 1), contacts.slice(1)] : [contacts];
+
+    // 一格里的多个联系方式才需要 · 分隔；拆到两行时每行只有一个。
+    const contactCell = (list) => {
+      if (!list || !list.length) return "";
+      const parts = list.map((c) =>
+        c.href ? `<a href="${esc(c.href)}">${esc(c.value)}</a>` : `<span>${esc(c.value)}</span>`
+      );
+      return `<span>${parts.join('<span class="sep">·</span>')}</span>`;
+    };
+
+    const alias = aliasRows.map((t) => `<span>${esc(t)}</span>`).join("");
+    const contact = contactRows.map(contactCell).join("");
+
+    const cells = `<div class="name serif">${esc(h.name)}</div>
+  <div class="role">${esc(h.targetRole)}</div>
+  <div class="alias">${alias}</div>
+  <div class="contact">${contact}</div>`;
+
+    // 头像在右：DOM 里排在文字块之后，flex 顺序自然落到右侧。
+    // 有头像时文字块整体左移，且与头像等高（见 kami-layout.css）。
+    if (h.avatar) {
+      return `<div class="header">
+  <div class="header-main">
+  ${cells}
+  </div>
+  <img class="avatar" src="${esc(h.avatar)}" alt="${esc(h.name || "")}" />
+</div>`;
+    }
+
+    return `<div class="header">
+  ${cells}
+</div>`;
+  }
+
+  function renderSkills(skills) {
+    if (!skills || !skills.length) return "";
+    const rows = skills.map(
+      (s) => `  <div class="skill-row">
+    <div class="skill-label">${esc(s.label)}</div>
+    <div class="skill-body">${inlineBrand(s.description)}</div>
+  </div>`
+    );
+    return `<section>
+  ${sectionTitle("专业技能")}
+${rows.join("\n")}
+</section>`;
+  }
+
+  /* ---------------- sections ---------------- */
+
+  function renderEntry(entry) {
+    // 条目标题行三段式（排布见 kami-layout.css 的 .proj-head）：
+    //   左 = 公司 / 项目名称（.proj-name）
+    //   中 = 访问链接（entry.link，「站点/末段」短文本）与 项目类型 / 岗位 · 地点
+    //        （entry.meta），两者都有时用「·」分隔；都没有则留空格
+    //   右 = 时间（entry.time）
+    // 三个格子始终输出（缺字段时留空格子），避免栅格错位。
+    // 类名一律复用上游：.proj-name / .proj-kind / .proj-role。
+    //
+    // 时间放最右：它是三个里最不需要逐字读的，右对齐还能形成一条
+    // 纵向可扫视的锚点。
+    const name = `<span class="proj-name serif">${esc(entry.title)}</span>`;
+
+    // 中格：访问链接 + 项目类型。链接显示「站点/末段」短形，点击跳完整网址；
+    // meta 里直接写网址的旧数据仍渲染成链接。
+    const mid = [];
+    if (entry.link) {
+      mid.push(`<a href="${esc(entry.link)}">${esc(linkShort(entry.link))}</a>`);
+    }
+    if (entry.meta) {
+      mid.push(isUrl(entry.meta) ? linkAnchor(entry.meta) : esc(entry.meta));
+    }
+    const meta = mid.join(" · ");
+
+    const rows = [];
+    // 顶层概述：· 无序列表
+    for (const b of entry.summaryBullets || []) rows.push(projRow("·", bulletText(b)));
+    for (const b of entry.bullets || []) rows.push(projRow("·", bulletText(b)));
+
+    // 分标题：把全宽 `｜` 和标题文字放进同一个文字单元格，二者自然基线齐平；
+    // 不使用 label 单元格，否则竖线会和下面的 · 符号齐平，视觉位置会偏左。
+    // 其下是该分标题对应的 · 列表。
+    for (const sub of entry.subBlocks || []) {
+      rows.push(projRow("", `｜${sub.title}`, true));
+      for (const b of sub.bullets || []) rows.push(projRow("·", bulletText(b)));
+    }
+
+    return `  <div class="project">
+    <div class="proj-head">
+      ${name}
+      <span class="proj-kind">${meta}</span>
+      <span class="proj-role">${esc(entry.time || "")}</span>
+    </div>
+    <div class="proj-lines">
+${rows.join("\n")}
+    </div>
+  </div>`;
+  }
+
+  function renderEduEntry(entry) {
+    const bits = [entry.meta, ...(entry.bullets || []).map(bulletText)].filter(Boolean);
+    const tail = bits.length ? `<span class="major">　· ${bits.map(esc).join(" · ")}</span>` : "";
+    return `  <div class="edu-row">
+    <div>
+      <span class="school serif">${esc(entry.title)}</span>${tail}
+    </div>
+    <div class="date">${esc(entry.time || "")}</div>
+  </div>`;
+  }
+
+  /* section.range 含 4 位年份（时间跨度）时不显示到标题行右侧：
+     每一段经历自己都带 entry.time，标题行再写一遍就是重复。
+     技术栈（AI / RAG）、开源社区名等标签一律不放 range ——
+     样例数据已删掉这类字段，标题行右侧保持干净。 */
+  function isDateRange(text) {
+    return /\d{4}/.test(String(text == null ? "" : text));
+  }
+
+  function renderSection(section) {
+    const isEducation = section.type === "education";
+    const cls = isEducation ? ' class="no-break"' : "";
+    const body = (section.entries || [])
+      .map(isEducation ? renderEduEntry : renderEntry)
+      .join("\n");
+    const sub = isDateRange(section.range) ? null : section.range;
+    return `<section${cls} data-section-type="${esc(section.type || "other")}">
+  ${sectionTitle(section.title, sub)}
+${body}
+</section>`;
+  }
+
+  /* ---------------- entry ---------------- */
+
+  function renderKamiResume(options = {}) {
+    const target = resolveTarget(options.target);
+    if (!target) throw new Error("renderKamiResume target not found");
+
+    const data = options.data || global.KAMI_RESUME_DATA;
+    if (!data || !data.header) {
+      target.innerHTML = "<p>Missing Resume View data.</p>";
+      return target;
+    }
+
+    target.innerHTML = [
+      renderHeader(data.header),
+      renderSkills(data.skills),
+      ...(data.sections || []).map(renderSection),
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    return target;
+  }
+
+  global.renderKamiResume = renderKamiResume;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+  renderKamiResume({ target: "#kami-root", data: window.KAMI_RESUME_DATA });
+</script>
+<script>
+(function () {
+  var bar = document.createElement("div");
+  bar.className = "avatar-bar";
+
+  var label = document.createElement("label");
+  label.textContent = "选择头像";
+  var input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  label.appendChild(input);
+  bar.appendChild(label);
+
+  var remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "移除头像";
+
+  var tip = document.createElement("span");
+  tip.className = "tip";
+
+  function render() {
+    renderKamiResume({ target: "#kami-root", data: window.KAMI_RESUME_DATA });
+    var has = !!window.KAMI_RESUME_DATA.header.avatar;
+    remove.style.display = has ? "" : "none";
+    tip.textContent = has ? "" : "未设置头像（标准页头）";
+  }
+
+  input.addEventListener("change", function () {
+    var f = input.files && input.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      window.KAMI_RESUME_DATA.header.avatar = String(reader.result);
+      render();
+    };
+    reader.readAsDataURL(f);
+  });
+
+  remove.addEventListener("click", function () {
+    delete window.KAMI_RESUME_DATA.header.avatar;
+    input.value = "";
+    render();
+  });
+
+  bar.appendChild(remove);
+  bar.appendChild(tip);
+  document.body.appendChild(bar);
+  render();
+})();
+</script>
+
+<!-- 导出 PDF：浏览器打开本文件 → 打印 → 另存为 PDF（勾选背景图形可保留纸色）。
+     字体：@font-face 按本机已装字体 → 本地路径 → CDN 的顺序解析；
+     离线出稿或 PDF 搜索问题见 scripts/ensure-fonts.sh。 -->
+</body>
+</html>

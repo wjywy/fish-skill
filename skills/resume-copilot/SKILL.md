@@ -17,6 +17,7 @@ Resume Copilot 先建立可追溯的职业事实，再根据目标岗位生成�
 6. **Repository evidence is project evidence, not ownership evidence.** 仓库证明项目存在某能力，不自动证明用户本人实现该能力。
 7. **High-information bullets, not duty statements.** 正式 Bullet 优先表达动作、对象、机制和结果。
 8. **Career Profile is the source of truth.** Markdown、HTML、PDF 只是输出视图。
+9. **No standalone summary.** 简历必须省略独立的个人简介 / summary；页头后直接进入专业技能，相关事实写入技能或经历条目。
 
 
 ## 硬性执行约束（Interview Knowledge，不可跳过）
@@ -171,21 +172,25 @@ Claim → Question → Generated Reference Answer → Knowledge Node → Follow-
 
 `Generated Reference Answer != User Answer`，系统生成内容不代表用户已经掌握，也不自动成为 Career Claim。
 
-默认用户可见输出使用简洁 Markdown，每个参考答案固定两部分：
+默认用户可见输出使用简洁 Markdown。每个参考答案按候选人实际回答的顺序组织：先直接回答，再展开必要的机制、例子和边界；不强制拆成两个可见栏目。内部 `overview` 与 `principleDetail` 仍分别记录开场结论和机制内容，用于完整性检查，不要求在 Markdown 里显示字段名。
+
+Answer-driven 的节点提取和下一题选择只用于内部组织；用户可见答案只回答当前问题，不在段尾添加“下一问”“由此引出”“回到某分支”等串场句。直接以新的 `##` 标题呈现下一题。
 
 ```text
 # 一条简历描述的核心主题
 ## 面试问题
-第一部分：一段话的逻辑与项目场景
-**原理详解**
-第二部分：展开的通用原理
+先用候选人口吻给出结论和项目落点。
+接着用自然段、步骤、短代码或小例子说清关键机制；按需说明失败边界、取舍和验证。
 ## 递归追问
-第一部分：一段话的逻辑与项目场景
-**原理详解**
-第二部分：展开的通用原理
+（同样先答问题，再逐层加深）
 ```
 
-第一部分保持简洁（一段话，给结论、机制主线和项目落点）；第二部分 `**原理详解**` 承担详细度，展开原理、机制、边界与取舍。
+写法以“能直接说出口”为准，不用“我会这样回答”“第一部分”“原理详解”等固定标签。开头简洁，后文允许充分展开；不把整题强压进 30～60 秒，也不把一份复习稿写成概念提纲。行文要求：
+
+- 优先用第一人称和具体动词讲项目事实，例如“我用模块路径定位包内资源”；讲尚未实现的方案时明确用“如果改造，我会……”；不要让口述语气掩盖证据边界。
+- 把问题涉及的知识点讲透：机制题写出前提、关键步骤、状态变化和结果，再用一个可逐步推演的例子说明；按题目需要补失败边界、恢复、取舍和验证。不按固定字数凑篇幅。逐题按 `workflows/interview-knowledge.md` 的 Answer Completeness Gate 自检。
+- 自然段承载回答主线，列表、短代码和图只在帮助理解时使用。简单取舍可以直接说；有多个维度需要比较时再用表格。避免连续的术语、表格和小标题把一句可说出口的回答切碎。
+- **Markdown 文档里的流程图要直接可见**：先写 Mermaid 源码；保存 `.md` 后运行 `scripts/embed-mermaid.mjs <文档.md>`，生成 `assets/*.png` 并在图后插入标准 Markdown 图片引用。保留 Mermaid 源码和 `assets/*.svg` 矢量文件；交付时连同 `assets/` 一起提供。不要只交付绘图工具的跳转链接。具体步骤见 `workflows/interview-knowledge.md`。
 
 Claim、证据路径、项目 Grounding 状态、Node Type、depth、停止条件等仅用于内部推理，除非用户明确要求，否则不得输出。递归知识树可以在内部保持树结构，但最终 Markdown 默认按一级主题下的二级问题扁平展示。
 
@@ -203,14 +208,49 @@ Question → User Answer → Assessment → Follow-up
 
 Renderer 只负责展示。Kami 规则见 `renderers/kami/README.md`。
 
+**成品生成命令**：`scripts/build-resume.mjs` 把 Resume View JSON 直接编译为成品 HTML，
+使用方不需要自己组装拼接：
+
+```bash
+# 默认：生成主题选择入口 templates/index.html + 每主题一份真实数据页面
+node scripts/build-resume.mjs --data resume-view.json
+
+# 已明确主题时：直接产出该主题的成品 HTML
+node scripts/build-resume.mjs --data resume-view.json --theme kami-navy --out 我的简历.html
+```
+
+- **默认模式 `gallery`（约定交付）**：写入 `templates/index.html` —— 即主题选择入口页，
+  卡片指向同目录的 `resume-base.html`、`resume-mono.html`、`resume-navy.html`、`resume-copper.html`、`resume-seal.html`，
+  每个页面都内嵌真实数据，只换配色。用户在页面里点开某一套，再打印导出 PDF；
+  不在对话里反问配色。原样例总览页会自动备份为 `index.sample.html`。
+- `--mode portal`：单页门户（页面右上角切换主题，切换只改 CSS 变量不重渲染，打印时隐藏）。
+- `--theme`：指定主题时按 `--mode single`（默认）产出该主题的单文件自包含 HTML，
+  `@font-face` 原样保留（本机字体 → 本地路径 → CDN 的解析顺序不动）；
+  `--mode linked` 相对引用 `templates/shared/`。
+- **头像在成品页里选，不在对话里问。** 成品页左上角固定有一个头像控件
+  （`选择头像` / `移除头像` / 状态提示）：选一张本地照片，脚本用 `FileReader`
+  读成 data URL 写回 `window.KAMI_RESUME_DATA.header.avatar` 并重渲染，页头立刻切成
+  头像版式（文字块在左 + 头像在右）；点「移除头像」回到标准页头。该控件
+  `@media print` 隐藏，不会进 PDF。若用户已直接给出图片路径 / URL，写进
+  Resume View 的 `header.avatar` 即可，生成时直接就是头像版式。
+- 换主题 / 换数据改参数重跑即可。
+
 默认主题 `kami-default`；用户未指定主题时不得阻塞生成。
 
-**生成前必须先问一句：要不要个人头像。** 头像对应两套页头版式 —— `header.avatar`
-有值时为「头像在左 + 文字块在右」，留空则为标准页头。这是版式差异而非文案差异，
-不能替用户默认。
+**生成阶段不再反问头像或配色。** 用户只要生成简历，就直接按内容流程生成 Resume View，
+默认不填 `header.avatar`；用户打开 `templates/index.html` 主题入口后，可在 5 套主题间
+自行预览和选择。需要头像时，在打开的成品页左上角用头像控件选一张本地照片即可
+（打印时该控件自动隐藏）。若用户已提供头像路径 / URL，再写入 `header.avatar`，
+头像版式是「文字块在左 + 头像在右」。选定主题 HTML 后，用户通过浏览器打印为 PDF。
 
 字段写法与版式强相关（页头教育信息只到年份、项目地址写 `entry.link`、技术栈不渲染等），
 见 `workflows/resume-generation.md` 的「字段口径」一节。
+
+**字体**：模板用仓耳今楷（TsangerJinKai02 W04/W05）。仓库里不带字体文件，默认靠 CDN；
+断网时回退到系统宋体会让 PDF 文字层的汉字落到康熙部首码位，ATS 关键词匹配会失败。
+所以离线出稿、或用户反馈"PDF 搜不到字"时，先让用户跑一次
+`scripts/ensure-fonts.sh`（把字体装到本机，之后 `local()` 生效、断网也不掉字体）。
+不要为了绕开这个问题去改 `kami-family.css`。细节见 `templates/README.md`。
 
 ### Interview expansion cardinality
 

@@ -177,6 +177,9 @@ Root Answer 可能提到：
 
 示例图：
 
+以下是生成前的 Mermaid 源码。保存为 Markdown 后运行
+`node scripts/embed-mermaid.mjs <文档.md>`，交付稿会在围栏后插入 PNG 图片引用。
+
 ```mermaid
 flowchart TD
   A[用户请求] --> B[解析意图]

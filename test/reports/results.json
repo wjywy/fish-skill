@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-29T17:23:20.566Z",
+  "generatedAt": "2026-09-30T05:46:46.317Z",
   "node": "v22.22.2",
   "totals": {
-    "total": 70,
-    "passed": 70,
+    "total": 78,
+    "passed": 78,
     "warned": 0,
     "failed": 0
   },
@@ -11,8 +11,8 @@
     {
       "name": "T1 · Package & structure integrity",
       "summary": {
-        "total": 12,
-        "passed": 12,
+        "total": 14,
+        "passed": 14,
         "warned": 0,
         "failed": 0
       },
@@ -49,7 +49,7 @@
         },
         {
           "id": "T1.6",
-          "title": "all 10 Kami template entry files exist",
+          "title": "all 5 Kami template entry files exist",
           "status": "PASS",
           "detail": ""
         },
@@ -63,13 +63,13 @@
           "id": "T1.8",
           "title": "every theme entry wires css + layout delta + preview data + render js",
           "status": "PASS",
-          "detail": "10 themes wired (css + data + renderer + avatar toggle)"
+          "detail": "5 themes wired (css + data + renderer + avatar toggle)"
         },
         {
           "id": "T1.9",
-          "title": "each of the 9 themes overrides all 10 upstream tokens with valid CSS",
+          "title": "each of the 4 non-base themes overrides all 10 upstream tokens with valid CSS",
           "status": "PASS",
-          "detail": "9 themes × 10 tokens"
+          "detail": "4 themes × 10 tokens"
         },
         {
           "id": "T1.10",
@@ -87,7 +87,19 @@
           "id": "T1.12",
           "title": "avatar preview toggle is wired on every theme and stays preview-only",
           "status": "PASS",
-          "detail": "11 preview pages wired; toggle is sample-only and print-hidden"
+          "detail": "6 preview pages wired; toggle is sample-only and print-hidden"
+        },
+        {
+          "id": "T1.13",
+          "title": "common.css stays scoped to the gallery page",
+          "status": "PASS",
+          "detail": "gallery-only; the dead rules stay deleted"
+        },
+        {
+          "id": "T1.14",
+          "title": "font binaries stay out of the repo, with an installer outside it",
+          "status": "PASS",
+          "detail": "installer present + executable; 0 font binaries in the repo"
         }
       ]
     },
@@ -224,8 +236,8 @@
     {
       "name": "T4 · Kami renderer contract",
       "summary": {
-        "total": 16,
-        "passed": 16,
+        "total": 20,
+        "passed": 20,
         "warned": 0,
         "failed": 0
       },
@@ -234,7 +246,7 @@
           "id": "T4.1",
           "title": "maps header slots onto the Kami header (education on its own line)",
           "status": "PASS",
-          "detail": "header slots → 2 lines left / 2 lines right"
+          "detail": "header slots → name/role row + two paired education/contact rows"
         },
         {
           "id": "T4.2",
@@ -252,7 +264,7 @@
           "id": "T4.4",
           "title": "emits only upstream Kami classes, all covered by the stylesheets",
           "status": "PASS",
-          "detail": "25 classes emitted across both header variants, all upstream + all styled"
+          "detail": "23 classes emitted across both header variants, all upstream + all styled"
         },
         {
           "id": "T4.5",
@@ -282,7 +294,7 @@
           "id": "T4.9",
           "title": "renders **keyword** as theme accent, leaking no literal **",
           "status": "PASS",
-          "detail": "3 .hl + 3 .em-brand"
+          "detail": "9 .hl + 3 .em-brand"
         },
         {
           "id": "T4.10",
@@ -325,14 +337,38 @@
           "title": "entry.link renders as a short-label anchor, meta stays plain text",
           "status": "PASS",
           "detail": "link → <a>github</a>; meta stays text"
+        },
+        {
+          "id": "T4.17",
+          "title": "entry header keeps name / link+kind / time columns",
+          "status": "PASS",
+          "detail": "name left + middle centred + time right, on a fixed 28mm column"
+        },
+        {
+          "id": "T4.18",
+          "title": "paper grain and print colour retention live in the layout delta",
+          "status": "PASS",
+          "detail": "grain inlined; tint kept; dividers darkened per theme"
+        },
+        {
+          "id": "T4.19",
+          "title": "every theme keeps its secondary text at WCAG AA",
+          "status": "PASS",
+          "detail": "5 themes audited; lowest --stone on --parchment passes AA"
+        },
+        {
+          "id": "T4.20",
+          "title": "the layout delta redeclares @font-face with a local() source first",
+          "status": "PASS",
+          "detail": "local() first; relative + CDN fallbacks kept; upstream copy untouched"
         }
       ]
     },
     {
       "name": "T5 · CLI (fish-skill)",
       "summary": {
-        "total": 8,
-        "passed": 8,
+        "total": 10,
+        "passed": 10,
         "warned": 0,
         "failed": 0
       },
@@ -359,7 +395,7 @@
           "id": "T5.4",
           "title": "`install` copies the full skill to --target",
           "status": "PASS",
-          "detail": "62 files copied"
+          "detail": "65 files copied"
         },
         {
           "id": "T5.5",
@@ -384,6 +420,18 @@
           "title": "unknown command exits 1 with usage",
           "status": "PASS",
           "detail": ""
+        },
+        {
+          "id": "T5.9",
+          "title": "ensure-fonts.sh --check is read-only and reports MISS on an empty dir",
+          "status": "PASS",
+          "detail": "--check: read-only, MISS on empty, exit 0"
+        },
+        {
+          "id": "T5.10",
+          "title": "install carries scripts/ over and keeps it executable",
+          "status": "PASS",
+          "detail": "scripts/ copied with mode preserved"
         }
       ]
     },
@@ -412,7 +460,7 @@
           "id": "T6.3",
           "title": "render-options theme enum matches Kami template files",
           "status": "PASS",
-          "detail": "10 themes aligned"
+          "detail": "5 themes aligned"
         },
         {
           "id": "T6.4",

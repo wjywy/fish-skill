@@ -7,7 +7,7 @@ Kami Renderer 负责把 `Resume View` 渲染成 A4 技术简历。它只负责�
 **内容槽位不变，样式对齐。** 这两件事分开：
 
 - `Resume View` 沿用本 skill 自己的内容模型
-  （`header / summary / skills / sections[].entries[]`，见
+  （`header / skills / sections[].entries[]`，见
   `../../schemas/resume-view.schema.json`），不改成 Kami 的
   `metrics / timeline / projects` 结构。
 - 渲染器把上面的槽位**映射**进上游 Kami 的 DOM 类名，从而让
@@ -19,20 +19,19 @@ Kami Renderer 负责把 `Resume View` 渲染成 A4 技术简历。它只负责�
 ```text
 header.name            → .name.serif           （页头第 1 行左格）
 header.targetRole      → .role                 （页头第 1 行右格）
-header.educationInline → .alias                （页头第 2 行左格，只到年份）
-header.contacts[]      → .contact              （页头第 2 行右格），.sep 分隔
-header.avatar          → .avatar + .header-main（可选；头像在左、文字块在右）
-summary                → .summary（可省略）
+header.educationInline → .alias                （内部拆成「学校 · 专业」/「在校时间」两行）
+header.contacts[]      → .contact              （与教育信息逐行配对）
+header.avatar          → .avatar + .header-main（可选；文字块在左、头像在右）
 skills[]               → .skill-row > .skill-label + .skill-body
-sections[].title/range → .section-title (+ .sub)
-entry.time             → .proj-role            （条目标题行左格：在职时间）
-entry.title            → .proj-name.serif      （中格：公司 / 项目名称）
-entry.meta             → .proj-kind            （右格：所在部门）
-entry.link             → .proj-kind            （追加在 meta 之后，渲染成超链接）
+sections[].title/range → .section-title (+ .sub；纯日期范围不重复显示）
+entry.title            → .proj-name.serif      （左格：公司 / 项目名称）
+entry.link             → `.proj-name a`        （紧跟名称的短标签超链接）
+entry.meta             → .proj-kind            （中格：岗位 · 地点，居中）
+entry.time             → .proj-role            （右格：时间；工作经历可按版式隐藏）
 entry.tags[]           → 不渲染（技术栈不上简历）
 entry.summaryBullets[] → .proj-row（label ·）
 entry.bullets[]        → .proj-row（label ·）
-entry.subBlocks[]      → .proj-row（label |，分标题加粗、单起一行）
+entry.subBlocks[]      → .proj-row（label `|`，分标题加粗 + 极淡分组线）
 subBlocks[].bullets[]  → .proj-row（label ·）
 type=education         → .no-break + .edu-row
 ```
@@ -42,35 +41,39 @@ type=education         → .no-break + .edu-row
 
 ### 与上游唯一的版式差异：页头
 
-上游是「`alias` 与姓名同行 + 两栏底部对齐」，本 skill 改成 **2×2 栅格**：
+上游是「`alias` 与姓名同行 + 两栏底部对齐」，本 skill 改成 **2×2 栅格 + 两个内部两行块**：
 
 ```text
 张知行                                          后端开发工程师 / AI 应用方向
-华东理工大学 · 软件工程 · 2021–2025    github.com/zhangzhixing · …@example.com
+华东理工大学 · 软件工程                         github.com/zhangzhixing
+2021–2025                                      zhangzhixing@example.com
 ```
 
-第 1 行姓名 / 目标岗位底部对齐，第 2 行教育信息 / 联系方式按首行基线对齐。
-若 `header.avatar` 有值，文字块左侧再加一列头像，且文字块与头像**等高**：
-第 1 行贴头像顶、第 2 行贴头像底。
+第 1 行是姓名 / 目标岗位；第 2 行内部是「学校 · 专业 / 联系方式 ①」，第 3 行内部是
+「在校时间 / 联系方式 ②」。若 `header.avatar` 有值，文字块在左、头像在右，且文字块与
+头像等高。
 
 这处差异收在 `templates/shared/kami-layout.css` 一个文件里（必须在上游样式之后加载），
 所以 `kami-family.css` 仍是上游的干净拷贝。`T4.14` / `T4.15` 会守住这一点。
+
+### 页头与条目标题的版式规则
+
+- 头像是可选的，但不再是生成前的阻塞问题：未提供时留空 `header.avatar`；交付入口可让用户自行预览主题。若填写，头像在**右侧**，文字块在左。
+- 页头教育信息会拆为两行，按「学校 · 专业 ↔ 联系方式 ①」与「在校时间 ↔ 联系方式 ②」配对。
+- 条目标题按「左公司 / 项目名 · 中岗位 / 地点 · 右时间」排列；中间岗位列居中。
+- 工作经历的 `entry.time` 仍保留在数据中，但工作条目标题右侧的重复时间由 CSS 隐藏；项目 / 开源保留。
+- 工作内容分组保留轻量 `|` 标记；后续分组保留极淡的低对比度分组线，再配合加粗标题 + 留白，避免表格感。
 
 ## 默认主题
 
 用户侧默认主题 ID：`kami-default`，当前映射到 `templates/kami-base.html`。
 
 可选主题：
-- `kami-default`
-- `kami-ivory`
-- `kami-mono`
-- `kami-navy`
-- `kami-slate`
-- `kami-teal`
-- `kami-forest`
-- `kami-burgundy`
-- `kami-sepia`
-- `kami-copper`
+- `kami-default`（→ `templates/kami-base.html`，上游原色）
+- `kami-mono`（极简黑白）
+- `kami-navy`（冷调商务）
+- `kami-copper`（暖调工匠）
+- `kami-seal`（朱砂印）
 
 ## 主题选择
 
@@ -89,7 +92,6 @@ Kami Renderer 直接消费 `../../schemas/resume-view.schema.json`。核心结�
 ```text
 Resume View
 ├── header            { name, targetRole, educationInline, avatar?, contacts[] }
-├── summary           string | null
 ├── skills[]          { label, description }
 ├── sections[]        { type, title, range }
 │   └── entries[]     { time, title, meta, link? }
@@ -102,9 +104,9 @@ Resume View
 
 两条与版式强相关的字段口径：
 
-- `header.avatar`：**决定页头版式**（有值 = 头像版，留空 = 标准版），所以生成前
-  必须先问用户是否需要头像，不能默认。
-- `entry.link`：项目地址，渲染成超链接，显示文字取站点短名
+- `header.avatar`：**决定页头版式**（有值 = 头像版，留空 = 标准版）。生成阶段不反问；
+  用户交付预览时可自行选择主题，若已提供头像则填写该字段，头像显示在右侧。
+- `entry.link`：项目地址，渲染成紧跟项目名的超链接，显示文字取站点短名
   （`github.com/xxx/yyy` → `github`），`href` 是完整 URL。网址写在 `meta` 里
   也能识别（旧数据兼容），但新数据应写进 `link`。
 

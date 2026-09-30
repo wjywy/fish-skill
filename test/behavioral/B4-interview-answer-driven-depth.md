@@ -36,16 +36,15 @@ Target role: Agent 应用开发工程师.
    constraint → transaction isolation).
 5. Retain non-chosen siblings from an answer and return to them after the
    current branch is exhausted.
-6. **Every answer is two parts**: a concise logic + project-scenario paragraph,
-   then a longer `**原理详解**` section.
+6. **Every answer sounds like a candidate**: directly answer, then explain the
+   causal mechanism with a concrete example and clear project boundaries.
 
 ## Anti-patterns (the `反模式` explicitly named by the workflow)
 
 - `主题A: Q1/Q2/Q3/Q4` style topic lists with independent questions.
 - Switching topic while the current answer still has high-value unexpanded nodes.
 - Depth stuck at "是什么 / 为什么要" (≤ 2 layers).
-- An answer that is a single flat paragraph (no two-part split), or whose
-  principle section is shorter than its opening paragraph.
+- An answer that lists conclusions or terms without a causal walkthrough.
 
 ## Rubric
 
@@ -55,9 +54,13 @@ Target role: Agent 应用开发工程师.
 | B4-R2 | Reaches the mechanism layer | 3 |
 | B4-R3 | No independent parallel-sibling pile-up | 3 |
 | B4-R4 | Reference answers detailed enough to revise from | 1 |
-| B4-R5 | Each answer is two parts; principle section is the longer one | 3 |
+| B4-R5 | Each answer is natural to say aloud, with a direct opening and concrete mechanism | 3 |
 
 ## Recorded run
+
+The record below predates the spoken-answer contract. Its `**原理详解**`
+markers and recorded score are historical evidence, not the current output target;
+rerun this fixture to score the revised rubric.
 
 ```text
 # Outbox 可靠事件分发

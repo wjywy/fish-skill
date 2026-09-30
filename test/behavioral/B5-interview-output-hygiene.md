@@ -24,8 +24,8 @@ workflow lists an explicit deny-list of fields that must never reach the user.
 
 - `#` = the core theme (e.g. `# Outbox 可靠事件分发`), never `Claim 1`.
 - `##` = questions; answers immediately follow.
-- Each answer is **two parts**: a concise logic + project-scenario paragraph,
-  then a `**原理详解**` section.
+- Each answer directly addresses the question, then explains the mechanism
+  with a concrete example in natural candidate language.
 - Any project-detail gap is covered by a short aside only.
 
 ## Anti-patterns — the deny-list
@@ -51,9 +51,13 @@ workflow lists an explicit deny-list of fields that must never reach the user.
 | B5-R1 | Zero internal metadata fields exposed | 3 |
 | B5-R2 | Level-1 heading is a theme, not a Claim number | 2 |
 | B5-R3 | Questions and answers are adjacent and revision-ready | 2 |
-| B5-R4 | Every answer uses the two-part structure (`**原理详解**`) | 2 |
+| B5-R4 | Every answer has a direct opening, concrete mechanism, and no internal field labels | 2 |
 
 ## Recorded run (audit of the B4 document)
+
+The audit below predates the spoken-answer contract. Its `**原理详解**`
+markers and recorded score are historical evidence, not the current output target;
+rerun B4/B5 to score the revised rubric.
 
 Structural check:
 

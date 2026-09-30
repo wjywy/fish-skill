@@ -7,29 +7,32 @@
 <meta name="author" content="{{姓名}}">
 <meta name="description" content="{{摘要}}">
 <meta name="keywords" content="{{关键词}}">
-<meta name="generator" content="Kami Family (kami-sepia)">
+<meta name="generator" content="Kami Family (kami-seal)">
 <link rel="stylesheet" href="shared/kami-family.css" />
 <!-- 本 skill 的版式微调，必须在上游样式之后加载 -->
 <link rel="stylesheet" href="shared/kami-layout.css" />
 <style>
-  /* 主题：kami-sepia —— 只覆盖颜色变量，结构完全复用 shared/kami-family.css */
+  /* 主题：kami-seal —— 朱砂印。唯一的高饱和款：印章朱红强调 + 暖米白纸。
+     方向：强调色敢跳（brand 饱和度约 60%，是全家族最冒险的一套），
+     但仍守住纸感与可读性（brand 对纸底 5.7:1，stone 5.5:1，全部 ≥ AA）。 */
   :root {
-    --parchment: #f7f2ea;
-    --ivory: #fdfaf5;
-    --border: #e3d7c7;
-    --border-soft: #ede4d8;
-    --near-black: #34281e;
-    --stone: #786554;
-    --olive: #5e4c3d;
-    --brand: #6b4a32;
-    --brand-tint: #f3e9de;
-    --dark-warm: #44372c;
+    --parchment: #faf6f0;
+    --ivory: #fffdf8;
+    --border: #ecdcd2;
+    --border-soft: #f4e9e0;
+    --near-black: #2b1d18;
+    --stone: #7d5c50;
+    --olive: #8a4a38;
+    --brand: #b0362a;
+    --brand-tint: #f9e9e4;
+    --dark-warm: #4a2f27;
   }
 </style>
 </head>
 <body>
 <main id="kami-root"></main>
-<!-- 预览用样例数据。生成正式简历时把这一行换成真实 Resume View。 -->
+<!-- 预览用样例数据。生成正式简历时不用改本文件：
+     用 scripts/build-resume.mjs 把真实 Resume View JSON 编译为成品 HTML。 -->
 <script src="shared/sample-data.js"></script>
 <script src="shared/kami-render.js"></script>
 <script>

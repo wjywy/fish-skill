@@ -1,17 +1,10 @@
-/* ===== templates/shared/sample-data.js（预览专用样例数据）
-   把 shared/sample-data.json 的内容挂到 window.KAMI_RESUME_DATA，
-   好让 10 个主题页直接双击打开就能看到完整简历（file:// 下 fetch() 会被
-   浏览器拦截，所以这里用经典 <script src> 而不是 fetch）。
-
-   ⚠️ 生成正式简历时，必须把这个 <script> 替换成真实 Resume View，
-      否则页面会渲染样例数据。生成流程见 templates/README.md。 ===== */
 window.KAMI_RESUME_DATA = {
   "id": "resume-view-sample",
   "targetId": "target-backend-ai",
   "header": {
     "name": "张知行",
     "targetRole": "后端开发工程师 / AI 应用方向",
-    "educationInline": "华东理工大学 · 软件工程 · 2021–2025",
+    "educationInline": "华东理工大学 · 软件工程 · 2021.9 – 2025.6",
     "contacts": [
       {
         "label": "GitHub",
@@ -73,7 +66,7 @@ window.KAMI_RESUME_DATA = {
                 },
                 {
                   "id": "bullet-sample-3",
-                  "text": "排查超时链路并把热点查询改为缓存加批量读取，接口 **P99 延迟** 从 800ms 降到 220ms。",
+                  "text": "排查超时链路并把热点查询改为缓存加批量读取，接口 **P99 延迟** 从 **800ms** 降到 **220ms**。",
                   "claimIds": [
                     "claim-sample-3"
                   ],
@@ -88,7 +81,7 @@ window.KAMI_RESUME_DATA = {
               "bullets": [
                 {
                   "id": "bullet-sample-9",
-                  "text": "把散落各处的策略配置收敛到统一配置中心，改一次即可全量生效，回滚从小时级降到分钟级。",
+                  "text": "把散落各处的策略配置收敛到统一配置中心，改一次即可全量生效，回滚从小时级降到 **分钟级**。",
                   "claimIds": [
                     "claim-sample-9"
                   ],
@@ -168,7 +161,7 @@ window.KAMI_RESUME_DATA = {
               "bullets": [
                 {
                   "id": "bullet-work2-4",
-                  "text": "把 T+1 对账从全量跑批改为按商户增量计算，对账完成时间提前到次日凌晨前。",
+                  "text": "把 **T+1** 对账从全量跑批改为按商户增量计算，对账完成时间提前到次日凌晨前。",
                   "claimIds": [
                     "claim-work2-4"
                   ],
@@ -191,7 +184,6 @@ window.KAMI_RESUME_DATA = {
     {
       "type": "project",
       "title": "项目经历",
-      "range": "AI / RAG",
       "entries": [
         {
           "time": "2024.03 - 2024.05",
@@ -221,7 +213,7 @@ window.KAMI_RESUME_DATA = {
                 },
                 {
                   "id": "bullet-sample-6",
-                  "text": "把答案生成与引用展示解耦、分开调优，**引用准确率** 从 78% 提升到 92%。",
+                  "text": "把答案生成与引用展示解耦、分开调优，**引用准确率** 从 **78%** 提升到 **92%**。",
                   "claimIds": [
                     "claim-sample-6"
                   ],
@@ -264,10 +256,9 @@ window.KAMI_RESUME_DATA = {
     {
       "type": "open_source",
       "title": "开源经历",
-      "range": "OpenSumi / OpenTiny",
       "entries": [
         {
-          "time": "开源经历",
+          "time": "2024.03 - 2024.09",
           "title": "OpenSumi",
           "meta": "阿里巴巴开源社区",
           "bullets": [
@@ -290,7 +281,7 @@ window.KAMI_RESUME_DATA = {
           ]
         },
         {
-          "time": "开源经历",
+          "time": "2023.05 - 2023.10",
           "title": "OpenTiny",
           "meta": "华为开源社区",
           "bullets": [

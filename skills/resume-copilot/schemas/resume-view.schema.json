@@ -42,7 +42,7 @@
             "string",
             "null"
           ],
-          "description": "个人头像的图片地址（URL 或相对路径）。填写时页头渲染成「头像在左 + 文字块在右」的版式；留空或省略则用标准页头。生成前应先询问用户是否需要头像。"
+          "description": "个人头像的图片地址（URL 或相对路径）。填写时页头渲染成「文字块在左 + 头像在右」的版式；留空或省略则用标准页头。头像与主题选择都在交付预览阶段完成，不阻塞内容生成。"
         },
         "contacts": {
           "type": "array",
@@ -71,12 +71,6 @@
         }
       },
       "additionalProperties": false
-    },
-    "summary": {
-      "type": [
-        "string",
-        "null"
-      ]
     },
     "skills": {
       "type": "array",
