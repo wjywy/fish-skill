@@ -49,6 +49,43 @@ Strategy 不负责：
 - JD（若用户提供）；
 - 用户约束，例如页数、语言、资历层级、希望突出或弱化的方向。
 
+## 数据模型中的权威字段
+
+Strategy 中存在“决策结果”和“决策解释”两类字段，必须区分：
+
+### Generation 的权威输入
+
+```text
+selectedExperienceIds
+selectedClaimIds
+sectionPlan
+```
+
+Resume Generation **只以这些 selection / plan 字段作为实际取材依据**。
+
+### 审计 / 解释字段
+
+```text
+claimEvaluations
+excludedClaims
+requirementCoverage
+coverageGaps
+riskNotes
+```
+
+它们用于解释“为什么选 / 不选 / 哪里有风险”，不能覆盖 selection 结果。
+
+若审计字段与权威 selection 冲突，Strategy 在交付前必须先修正冲突。例如：
+
+```text
+claimEvaluations: claim-a = SELECT
+selectedClaimIds: 没有 claim-a
+```
+
+属于无效 Strategy，不得交给 Resume Generation。
+
+`claimEvaluations` 可以只记录需要解释的高价值或高风险 Claim，不要求为 Career Profile 每个 Claim 建一条评估记录；但凡出现的记录必须与最终 selection 一致。
+
 ## JD 解析
 
 如果提供 JD，将其拆成结构化 requirements，不做纯关键词匹配。
@@ -175,6 +212,19 @@ Education / Other: 剩余空间
 
 这只是内容预算起点，不是固定版式。若内容过多，应先减少低价值 Claim / Bullet，而不是交给 Renderer 压字号。
 
+## Strategy Consistency Gate
+
+交给 Resume Generation 前检查：
+
+1. 每个 `selectedClaimId` 都存在于 Career Profile 且 `resumeEligible != false`。
+2. 每个 `selectedExperienceId` 都存在。
+3. `sectionPlan[].experienceIds` 不引用未选择 / 不存在的 Experience，除非用户明确要求额外展示。
+4. `claimEvaluations[].decision = SELECT` 的 Claim 必须在 `selectedClaimIds`。
+5. `claimEvaluations[].decision = EXCLUDE` / `excludedClaims[]` 中的 Claim 不得同时进入 `selectedClaimIds`。
+6. `requirementCoverage[].claimIds` 必须真实存在；`covered` 不能由不存在或明显不足的 Claim 支撑。
+
+发现冲突先修 Strategy，不把矛盾留给 Generation 猜。
+
 ## 输出 Resume Strategy
 
 输出至少包含：
@@ -183,10 +233,14 @@ Education / Other: 剩余空间
 - `requirementCoverage`
 - `selectedExperienceIds`
 - `selectedClaimIds`
-- `excludedClaimIds` + reason
 - `sectionPlan`
+
+按需包含：
+
+- `excludedClaims`
+- `claimEvaluations`
 - `emphasis`
 - `coverageGaps`
 - `riskNotes`
 
-Resume Generation 必须以 Strategy 为输入，不得绕过 Strategy 重新遍历全部 Career Profile 随意选材。
+Resume Generation 必须以权威 selection / plan 字段为输入，不得绕过 Strategy 重新遍历全部 Career Profile 随意选材。
