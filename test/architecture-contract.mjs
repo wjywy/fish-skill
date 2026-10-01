@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
-const SKILL = path.join(ROOT, 'skills', 'resume-copilot');
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -64,11 +63,34 @@ check('knowledge expansion policy is the scheduler source of truth', () => {
   assert(expansion.includes('Retain all valuable siblings'), 'sibling retention invariant missing');
 });
 
-check('answer depth policy owns answer completeness', () => {
+check('interview knowledge is deep-study by default', () => {
+  assert(skill.includes('Deep Study per question'), 'SKILL missing deep-study invariant');
+  assert(interviewWorkflow.includes('默认就是完整 Q&A'), 'workflow must default to complete Q&A');
+  assert(depth.includes('每题默认 DEEP_STUDY'), 'depth policy missing deep-study contract');
+  assert(!interviewWorkflow.includes('默认：只输出问题'), 'question-only default reintroduced');
+  assert(!skill.includes('默认面试预设只展示问题'), 'question-only default reintroduced in SKILL');
+});
+
+check('answer depth policy owns answer completeness and presentation planning', () => {
   assert(depth.includes('Answer Completeness Gate'), 'answer completeness gate missing');
   assert(depth.includes('Why Layer'), 'Why Layer missing');
   assert(depth.includes('Knowledge Abstraction'), 'knowledge abstraction missing');
   assert(depth.includes('No Terminology-as-Explanation'), 'terminology-as-explanation guard missing');
+  assert(depth.includes('# 二、Presentation Planning'), 'presentation planning missing');
+  assert(depth.includes('Question Shape Classification'), 'question classification missing');
+});
+
+check('visible interview answers are not forced into a two-part template', () => {
+  assert(skill.includes('不得强制套 `直接回答 / 展开说明`'), 'SKILL must reject fixed visible two-part template');
+  assert(interviewWorkflow.includes('不要固定输出 `直接回答 / 展开说明`'), 'workflow must reject fixed visible two-part template');
+  assert(depth.includes('不固定显示 `直接回答 / 展开说明`'), 'depth policy must reject fixed visible two-part template');
+  assert(!answerExamples.includes('外层统一展示 `**直接回答**` 与 `**展开说明**`'), 'examples reintroduced fixed two-part presentation');
+});
+
+check('execution claims require current execution evidence', () => {
+  assert(evidence.includes('Execution Evidence Rule'), 'execution evidence rule missing');
+  assert(evidence.includes('不能单独'), 'execution evidence rule must distinguish static evidence');
+  assert(depth.includes('EXECUTION'), 'answer depth policy must preserve execution boundary');
 });
 
 check('examples remain non-normative', () => {
@@ -76,10 +98,11 @@ check('examples remain non-normative', () => {
   assert(!answerExamples.includes('Answer Quality Contract（硬约束）'), 'hard policy leaked into examples');
 });
 
-check('generated answer has no redundant evaluation-complete flag', () => {
+check('generated answer storage is presentation-agnostic', () => {
   assert(!('candidateEvaluationComplete' in answerSchema.properties), 'candidateEvaluationComplete reintroduced');
-  assert(!answerSchema.required.includes('candidateEvaluationComplete'), 'redundant evaluation flag required again');
-  assert(answerSchema.required.includes('overview') && answerSchema.required.includes('principleDetail'), 'two-part internal answer contract missing');
+  assert(answerSchema.required.includes('overview') && answerSchema.required.includes('principleDetail'), 'internal completeness slots missing');
+  assert(answerSchema.properties.overview.description?.includes('不直接映射'), 'overview still coupled to visible presentation');
+  assert(answerSchema.properties.principleDetail.description?.includes('Presentation Planning'), 'principleDetail must delegate visible rendering');
 });
 
 check('interview node uses one decision-reason field', () => {
