@@ -1,8 +1,9 @@
 {
   "id": "B4",
-  "title": "Interview Knowledge — DEEP_STUDY answers + answer-driven depth",
+  "title": "Interview Knowledge — bounded DEEP_STUDY + answer-driven depth",
   "sourceOfTruth": [
     "policies/interview-depth-policy.md",
+    "policies/answer-presentation-policy.md",
     "policies/knowledge-expansion-policy.md §六、Answer-first 执行算法与调度器",
     "workflows/interview-knowledge.md",
     "SKILL.md §硬性执行约束"
@@ -14,18 +15,20 @@
   },
   "userInput": "针对“使用 Transactional Outbox 保证长任务事件可靠记录与异步投递”这条简历描述，帮我准备面试问题和参考答案。",
   "mustDo": [
-    "每个已物化 Question 都按 DEEP_STUDY 标准完整回答，再提取下一层节点",
-    "从当前完整 Answer 提取全部有意义 Candidate Nodes，并对每个节点做 Coverage + Value 判定",
+    "每个已物化 Question 先识别 Explanation Backbone，再按 DEEP_STUDY 标准完整回答",
+    "对额外展开内容执行 Necessary-for-Conclusion Test：当前题必需则展开，非必要但高价值则留给 Candidate Node / Follow-up",
+    "从 complete internal Answer 提取全部有意义 Candidate Nodes，并对每个节点做 Coverage + Value 判定，不从渲染后的 Markdown 反推节点",
     "保留所有高价值 UNEXPANDED siblings，默认一次执行一个，当前深分支耗尽后返回其他 sibling",
     "递归深度由目标岗位相关性与信息增益决定，而不是固定层数、题数或文档长度",
-    "机制题解释前提、执行步骤、状态变化和结果为何成立，并在需要时给出可推演例子",
-    "根据 Question Shape 选择最适合的表达结构，不固定展示 `直接回答 / 展开说明`",
+    "Question Dimension 与 Explanation Shape 解耦；用户可见答案由 answer-presentation-policy.md 选择自然结构",
     "区分 CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION，不把通用方案或历史测试记录写成本轮已实现/已运行事实"
   ],
   "mustNotDo": [
     "先列“主题 → 每个主题 4–5 个问题”的平行清单再逐题补答案",
     "把 Interview Knowledge 当作 QUESTION_BANK 而降低单题答案深度",
     "当前问题本应讲清的核心机制留给下一道 Follow-up 补完",
+    "把所有相关且有趣的知识都提前展开，导致高价值 Follow-up 被当前答案吞掉",
+    "把 NECESSARY / INTERESTING 持久化成新的 Node 状态或 Coverage 枚举",
     "在 Expansion Queue 仍有高价值 UNEXPANDED 节点时横向换 Root Theme",
     "一个 Answer 产生多个高价值 sibling 时只保留最高分的一个",
     "对当前 Answer 已 SUFFICIENT / COVERED 的泛化节点机械重复追问",
@@ -33,15 +36,17 @@
     "因达到固定 5 层、8 层、固定题数或文档过长而停止",
     "把未验证的最佳实践写成用户当前项目事实",
     "没有本轮执行证据却写“我运行了 / 当前测试全部通过”",
-    "所有答案机械重复 `直接回答 / 展开说明` 两个可见栏目"
+    "所有答案机械重复 `直接回答 / 展开说明` 两个可见栏目",
+    "所有 Backbone 都强制显示成 A != B 或 A → B → C"
   ],
   "rubric": [
     { "id": "B4-R1", "criterion": "每个当前答案独立达到 DEEP_STUDY 完整度，不依赖下一题补核心机制", "weight": 3 },
-    { "id": "B4-R2", "criterion": "构成由答案驱动的追问链", "weight": 3 },
-    { "id": "B4-R3", "criterion": "在岗位相关范围内深入到机制层", "weight": 3 },
-    { "id": "B4-R4", "criterion": "高价值 sibling 全部保留并在分支耗尽后返回", "weight": 2 },
-    { "id": "B4-R5", "criterion": "已充分覆盖节点不被机械重复追问", "weight": 2 },
-    { "id": "B4-R6", "criterion": "答案结构适配 Question Shape，而不是固定两段式模板", "weight": 3 },
-    { "id": "B4-R7", "criterion": "CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION 边界清楚", "weight": 2 }
+    { "id": "B4-R2", "criterion": "当前答案通过 Necessary-for-Conclusion 上界，不穷尽整个知识邻域", "weight": 3 },
+    { "id": "B4-R3", "criterion": "构成由 complete Answer 驱动的追问链", "weight": 3 },
+    { "id": "B4-R4", "criterion": "在岗位相关范围内深入到机制层", "weight": 3 },
+    { "id": "B4-R5", "criterion": "高价值 sibling 全部保留并在分支耗尽后返回", "weight": 2 },
+    { "id": "B4-R6", "criterion": "已充分覆盖节点不被机械重复追问", "weight": 2 },
+    { "id": "B4-R7", "criterion": "Question Dimension 与 Explanation Shape 解耦，Presentation 不影响 Node Extraction", "weight": 3 },
+    { "id": "B4-R8", "criterion": "CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION 边界清楚", "weight": 2 }
   ]
 }
