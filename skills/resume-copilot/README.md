@@ -38,15 +38,16 @@ Resume Copilot 尽量保证：
 | --- | --- |
 | `SKILL.md` | 路由、全局不变量、跨 Workflow 边界 |
 | `workflows/` | 某项任务按什么顺序执行 |
-| `policies/` | 证据、Metric、写作、知识扩展、答案深度与 Presentation Planning |
+| `policies/` | 证据、Metric、写作、知识扩展、答案深度与可见呈现 |
 | `schemas/` | 内部数据结构 |
 | `examples/` | 行为示例，不承载硬规则 |
 | `renderers/` / `scripts/` / `templates/` | HTML/PDF 视觉与构建实现 |
 
 设计原则是 **Single Source of Truth**：
 
+- 面试答案深度、Explanation Backbone、Deep Study Boundary、递归停止边界 → `policies/interview-depth-policy.md`
+- 面试用户可见 Explanation Shape、Natural Rendering、Citation Locality → `policies/answer-presentation-policy.md`
 - 面试节点提取、Coverage、Expansion Queue / Root Queue、Sibling Gate → `policies/knowledge-expansion-policy.md`
-- 面试答案完整度、DEEP_STUDY、Presentation Planning、递归停止边界 → `policies/interview-depth-policy.md`
 - 证据 / Ownership / Execution Evidence → `policies/evidence-policy.md`
 - Resume Bullet 写作 → `policies/resume-writing-policy.md`
 - 数字可用条件 → `policies/metric-policy.md`
@@ -93,13 +94,18 @@ Question
   ↓
 DEEP_STUDY Generated Reference Answer
   ↓
-Candidate Nodes
-  ↓
-Coverage + Value Evaluation
+Answer Completeness Gate
+  ├───────────────┐
+  ↓               ↓
+Candidate Nodes   Answer Presentation
+  ↓               ↓
+Coverage + Value  Natural Markdown
   ↓
 Follow-up Question
   ↺
 ```
+
+Expansion 和 Presentation 都消费同一个 complete internal Answer；下一问不能从渲染后的 Markdown 反推。
 
 ### 4.1 每一道已生成的问题都按 DEEP_STUDY 回答
 
@@ -107,7 +113,42 @@ Interview Knowledge 没有 QUESTION_BANK 式浅回答模式。一个 Question �
 
 问题数量和文档长度不是优化目标。后面还有多少题，不能成为缩短当前答案的理由。
 
-### 4.2 Answer-driven，而不是预生成题库
+### 4.2 Explanation Backbone First
+
+展开大量实现细节之前，先确定当前问题最小、最有解释力的主轴，例如：
+
+```text
+module-relative resource vs workspace-relative target
+structural validity → referential integrity → semantic evidence
+preparation → commit → recovery
+source → artifact → runtime → delivery
+```
+
+Backbone 是内部解释规划工具，不是固定 Markdown 模板；简单题如果直接自然回答更清楚，可以不显式展示。
+
+### 4.3 Deep Study Boundary
+
+DEEP_STUDY 的目标是：
+
+```text
+complete the current question
+!=
+exhaust the entire knowledge neighborhood
+```
+
+额外知识只有在“不解释就会使当前结论、因果链、walkthrough 或必要 boundary 无法成立 / 被误解”时才完整展开。
+
+非必要但高价值的知识：
+
+```text
+轻量点出
+→ Candidate Node
+→ 后续 Follow-up
+```
+
+`NECESSARY / INTERESTING` 只用于 Answer Construction 的临时决策，不新增 Node 状态或 Schema 字段。
+
+### 4.4 Answer-driven，而不是预生成题库
 
 正确：
 
@@ -129,48 +170,46 @@ Claim
 
 一个 Answer 可以产生多个高价值 sibling；全部保留，但默认一次只执行一个。当前深分支耗尽后再返回其他 sibling。
 
-### 4.3 当前题先讲透
+### 4.5 内部 Answer 与用户可见结构分离
 
 内部 Generated Answer 当前仍使用：
 
 - `overview`：核心结论和必要项目落点；
-- `principleDetail`：机制、Why Layer、具体推演、知识抽象、失败边界与取舍。
+- `principleDetail`：当前问题所必需的机制、Why Layer、具体推演、知识抽象、失败边界与取舍。
 
 它们是内部 completeness slots，不是用户可见栏目。Follow-up 不能用来补上一题本来就没解释清楚的核心机制。
 
-### 4.4 Presentation Planning
+### 4.6 Answer Presentation Policy
 
-最终答案不固定输出：
+Question Dimension 描述“这一问想考察什么”；Explanation Shape 描述“答案怎么讲”。两者不做一一映射。
+
+可见答案由 `policies/answer-presentation-policy.md` 选择主 Shape，例如：
 
 ```text
-直接回答
-展开说明
+PROSE
+CAUSAL_CHAIN
+SEQUENCE
+COMPARISON_MATRIX
+TIMELINE
+STATE_TRANSITION
+COMPONENT_FLOW
+EVIDENCE_CHAIN
+DECISION_FRAME
 ```
 
-而是先直接回应问题，再按题型选择最合适的解释结构：
+最终答案不固定输出 `直接回答 / 展开说明`，也不暴露 Backbone / Explanation Shape / overview / principleDetail 等内部规划字段。
 
-| 题型 | 常见结构 |
-| --- | --- |
-| 定义 | 定义 → 边界 / 反例 → 例子 |
-| 机制 | 因果链 → walkthrough → 边界 |
-| 流程 | 编号步骤 / flow → 状态变化 |
-| 对比 | 核心差异 → 对比表 → 如何选择 |
-| 并发 | 时间线 → race → atomic point |
-| 失败恢复 | failure scenario → 中间状态 → recovery |
-| 架构 | 组件关系 → data/state flow → Why |
-| 验证 | Claim → Observation Point → Evidence Boundary |
-
-内部字段名不出现在最终 Markdown。
-
-### 4.5 深度由岗位决定
+### 4.7 深度由岗位决定
 
 停止不是因为“已经第 5 层 / 第 8 层”，也不是因为“已经生成很多题”，而是因为继续追问已不能增加对 Target Role / Claim 的判断信息。
 
-### 4.6 Execution Evidence
+### 4.8 Execution Evidence 与 Citation Locality
 
 读取测试代码、README、历史报告只能说明“仓库定义 / 历史记录了什么”。只有本轮真实执行命令并拿到结果，才可以写“我刚运行通过 / 当前 78/78 / 实测成功”。
 
-### 4.7 默认可见输出
+当运行环境支持 citation / provenance 时，项目事实和本轮执行结果的引用尽量紧邻对应 Claim；普通面试答案不默认变成独立证据清单。
+
+### 4.9 默认可见输出
 
 Interview Knowledge 默认就是完整 Q&A：
 
@@ -179,11 +218,11 @@ Interview Knowledge 默认就是完整 Q&A：
 
 ## 问题
 
-<自然开头直接回答；随后按题型完整展开>
+<完整 DEEP_STUDY Answer，经 Answer Presentation Policy 自然渲染>
 
 ## 由上一层 Answer 产生的 Follow-up
 
-<该题自己的完整 DEEP_STUDY 答案>
+<该题自己的完整 DEEP_STUDY Answer>
 ```
 
 系统 Generated Answer 不代表用户已掌握，也不自动变成新的 Career Claim。
