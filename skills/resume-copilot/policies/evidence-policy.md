@@ -74,10 +74,10 @@ Metric 也通过 `factIds` 回溯来源，但 Metric 的可用条件读取 `./me
 
 以下材料都**不能单独**支撑“本轮已执行成功”：
 
-- `package.json` 中存在 `npm test`；
+- 包清单中定义了测试脚本；
 - 测试源码里有某个 assertion；
 - README 声称测试通过；
-- 仓库里存在历史 `test-report.md`；
+- 仓库里的历史测试报告记录了成功；
 - 之前某次对话或旧日志记录了成功结果。
 
 没有本轮执行证据时，应改写为：
@@ -91,6 +91,8 @@ Metric 也通过 `factIds` 回溯来源，但 Metric 的可用条件读取 `./me
 同理：读取 Benchmark 代码不等于本轮跑过 Benchmark；读取构建脚本不等于本轮实际构建成功；读取部署配置不等于当前环境已部署。
 
 Execution Evidence 只证明“这一次执行发生了什么”，不会自动升级用户 Ownership，也不会自动证明所有未观察到的系统行为正确。
+
+引用 / provenance 在最终用户可见答案中的摆放由 `./answer-presentation-policy.md` 的 Citation Locality 负责；本 Policy 只决定证据能证明什么，不决定 Markdown 如何呈现。
 
 ## 写入原则
 
