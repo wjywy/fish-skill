@@ -1,12 +1,11 @@
 {
   "id": "B4",
-  "title": "Interview Knowledge — answer-driven depth (no parallel question list)",
+  "title": "Interview Knowledge — complete answers + answer-driven depth",
   "sourceOfTruth": [
-    "SKILL.md §硬性执行约束",
-    "SKILL.md §Interview expansion cardinality",
-    "workflows/interview-knowledge.md §生成前与交付前强制检查",
-    "policies/knowledge-expansion-policy.md §六 Answer-first 执行算法与调度器",
-    "policies/interview-depth-policy.md"
+    "policies/interview-depth-policy.md",
+    "policies/knowledge-expansion-policy.md §六、Answer-first 执行算法与调度器",
+    "workflows/interview-knowledge.md",
+    "SKILL.md §硬性执行约束"
   ],
   "preconditions": {
     "mode": "RESUME_GROUNDED",
@@ -15,23 +14,31 @@
   },
   "userInput": "针对“使用 Transactional Outbox 保证长任务事件可靠记录与异步投递”这条简历描述，帮我准备面试问题和参考答案。",
   "mustDo": [
-    "先物化 1 个 Root Question 并给出参考答案",
-    "从该答案提取节点，再由节点驱动下一问（Answer-driven 深链）",
-    "至少深入到机制层（例如 幂等 / 并发去重 / 唯一约束 / 事务隔离）",
-    "每个参考答案以候选人口吻先回答问题，再用步骤和具体例子展开机制；已实现项目事实与设计建议明确分开",
-    "输出为 `# 主题` + 多个 `## 问题` + 紧邻答案的扁平结构"
+    "当前参考答案先通过 Answer Completeness Gate，再提取下一层节点",
+    "从当前答案提取全部有意义 Candidate Nodes，并对每个节点做 Coverage + Value 判定",
+    "保留所有高价值 UNEXPANDED siblings，默认一次执行一个，当前深分支耗尽后返回其他 sibling",
+    "递归深度由目标岗位相关性与信息增益决定，而不是固定层数",
+    "机制题解释前提、执行步骤、状态变化和结果为何成立，并在需要时给出可推演例子",
+    "区分 CURRENT / PRINCIPLE / IMPROVEMENT，不把通用方案写成项目已实现事实",
+    "用户明确要求附答案时输出为 `# 主题` + 多个 `## 问题`，每题显示 `**直接回答**` 与 `**展开说明**`"
   ],
   "mustNotDo": [
     "先列“主题 → 每个主题 4–5 个问题”的平行清单再逐题补答案",
-    "在 Expansion Queue 非空时横向换题",
-    "深度停在“是什么 / 为什么要”（≤2 层）",
-    "参考答案只有术语清单或结论，没有可推演的机制和例子"
+    "当前问题本应讲清的核心机制留给下一道 Follow-up 补完",
+    "在 Expansion Queue 仍有高价值 UNEXPANDED 节点时横向换 Root Theme",
+    "一个 Answer 产生多个高价值 sibling 时只保留最高分的一个",
+    "对当前 Answer 已 SUFFICIENT / COVERED 的泛化节点机械重复追问",
+    "参考答案只有术语清单或结论，没有可推演的机制",
+    "因达到固定 5 层或 8 层而停止",
+    "把未验证的最佳实践写成用户当前项目事实"
   ],
   "rubric": [
-    { "id": "B4-R1", "criterion": "构成一条由答案驱动的追问链（后一问由前一问答案引出）", "weight": 3 },
-    { "id": "B4-R2", "criterion": "深度至少到机制层", "weight": 3 },
-    { "id": "B4-R3", "criterion": "无互不依赖的平行兄弟问题堆叠", "weight": 3 },
-    { "id": "B4-R4", "criterion": "参考答案详细到可直接复习", "weight": 1 },
-    { "id": "B4-R5", "criterion": "每个答案自然可口述，开场直接回答，后续机制具体且事实边界清楚", "weight": 3 }
+    { "id": "B4-R1", "criterion": "当前答案独立完整，不依赖下一题补核心机制", "weight": 3 },
+    { "id": "B4-R2", "criterion": "构成由答案驱动的追问链", "weight": 3 },
+    { "id": "B4-R3", "criterion": "在岗位相关范围内深入到机制层", "weight": 3 },
+    { "id": "B4-R4", "criterion": "高价值 sibling 全部保留并在分支耗尽后返回", "weight": 2 },
+    { "id": "B4-R5", "criterion": "已充分覆盖节点不被机械重复追问", "weight": 2 },
+    { "id": "B4-R6", "criterion": "答案自然可口述且结构适配问题类型", "weight": 2 },
+    { "id": "B4-R7", "criterion": "CURRENT / PRINCIPLE / IMPROVEMENT 边界清楚", "weight": 2 }
   ]
 }
