@@ -5,9 +5,10 @@
 进入本流程后必须读取：
 
 - `../policies/knowledge-expansion-policy.md`：Candidate Node、Coverage、去重、队列与调度的唯一 Source of Truth。
-- `../policies/interview-depth-policy.md`：当前答案完整度、Presentation Planning 与递归停止边界的唯一 Source of Truth。
+- `../policies/interview-depth-policy.md`：当前答案深度、Deep Study Boundary 与递归停止边界的唯一 Source of Truth。
+- `../policies/answer-presentation-policy.md`：Explanation Shape 与用户可见答案渲染的唯一 Source of Truth。
 - `../examples/interview-expansion-examples.md`：展示 Answer-driven 扩展行为，不是规则来源。
-- `../examples/interview-answer-examples.md`：展示不同题型如何自然组织答案，不是规则来源。
+- `../examples/interview-answer-examples.md`：展示不同答案结构的落地方式，不是规则来源。
 - `../examples/claim-graph.example.json`：展示内部图结构，不是用户项目事实。
 
 Examples 只能帮助理解规则如何落地，不能新增 Policy，也不能把示例事实迁移到当前用户。
@@ -23,13 +24,18 @@ Question
   ↓
 DEEP_STUDY Generated Reference Answer
   ↓
-Candidate Knowledge Nodes
-  ↓
-Value / Coverage Evaluation
+Answer Completeness Gate
+  ├───────────────┐
+  ↓               ↓
+Candidate Nodes   Answer Presentation
+  ↓               ↓
+Value / Coverage  Natural Markdown
   ↓
 Follow-up Question
   ↺
 ```
+
+**Expansion 与 Presentation 消费同一个 complete Generated Answer，但互不作为对方的前置条件。** 下一问由内部 Answer 暴露出的知识驱动，不由渲染后的 Markdown 反向决定。
 
 支持两种 Grounding 入口：
 
@@ -54,15 +60,16 @@ Interview Knowledge 默认交付完整 Q&A。不存在“只输出问题、内�
 
 每个 Generated Reference Answer 完成后，先执行 `interview-depth-policy.md` 的 Answer Completeness Gate。
 
-不通过：补写当前答案。
+不通过：补写或收敛当前答案。
 
-通过：才允许进入 Candidate Node Extraction。
+通过：才允许 Candidate Node Extraction；用户可见渲染也只消费通过 Gate 的完整答案。
 
 硬约束：
 
 - 当前题不能因为“后面还有很多题”而缩短答案；
 - Follow-up 不得承担补完当前答案的职责；
-- 当前 Question 一旦被物化，就必须形成可独立学习、可直接复习的完整解释。
+- 当前 Question 一旦被物化，就必须形成可独立学习、可直接复习的完整解释；
+- 当前题也不能因为“相关知识很多”而穷尽整个知识邻域；额外展开内容必须通过 Necessary-for-Conclusion Test。
 
 ### Gate 3：Before Transition / Output
 
@@ -74,8 +81,9 @@ Interview Knowledge 默认交付完整 Q&A。不存在“只输出问题、内�
 - 每一道已物化问题是否都有 DEEP_STUDY 级答案；
 - 是否仍有被静默丢弃的高价值 `UNEXPANDED` sibling；
 - 是否因固定层数而过早停止；
+- 是否把非必要但高价值的相邻知识提前全部讲完，破坏后续 Answer-driven 深链；
 - 用户可见文档是否泄露内部调度、Grounding 或存储字段；
-- 答案是否按问题类型选择了合适结构，而不是机械套同一个模板。
+- 最终展示是否由 `answer-presentation-policy.md` 选择自然 Explanation Shape，而不是机械套模板。
 
 不通过则修正后再交付。
 
@@ -106,7 +114,9 @@ Interview Knowledge 默认交付完整 Q&A。不存在“只输出问题、内�
 
 Root Question 只启动当前 Claim 的第一条有效深链，不负责预规划完整题库。
 
-可参考的问题维度包括：
+### Question Dimension
+
+Question Dimension 描述“这一问想考察什么”，不是“答案如何排版”。可参考：
 
 - `DEFINITION`
 - `MOTIVATION`
@@ -121,7 +131,7 @@ Root Question 只启动当前 Claim 的第一条有效深链，不负责预规�
 - `METRIC`
 - `OWNERSHIP`
 
-维度只是视角，不是覆盖清单。
+这些 Dimension 只用于选题 / assessment intent。答案如何组织统一交给 `answer-presentation-policy.md` 的 Explanation Shape，禁止建立 `Question Dimension = Markdown Template` 的一一映射。
 
 规则：
 
@@ -138,7 +148,16 @@ Root Question 只启动当前 Claim 的第一条有效深链，不负责预规�
 - `overview`：核心结论与必要项目落点；
 - `principleDetail`：机制、Why Layer、具体推演、知识抽象、失败边界与取舍。
 
-这两个字段只是内部 completeness slots，不是最终 Markdown 模板。答案质量、CURRENT / PRINCIPLE / IMPROVEMENT 边界、Execution Evidence、术语不得代替解释、Concrete Walkthrough 等规则全部读取对应 Policy，本 Workflow 不复制一套写作算法。
+这两个字段只是内部 completeness slots，不是最终 Markdown 模板。
+
+构建答案时调用 `interview-depth-policy.md`：
+
+1. 先识别 Explanation Backbone，或确认当前题简单到无需显式 Backbone；
+2. 建立当前问题成立所必需的因果链 / 例子 / boundary；
+3. 对额外知识执行 Necessary-for-Conclusion Test；
+4. `NECESSARY` 的内容当前展开；
+5. 非必要但高价值的知识最多轻量点出，留给 Candidate Extraction；
+6. `NECESSARY / INTERESTING` 只是当前 drafting 决策，不写入 Node Schema。
 
 ### 项目 Grounding
 
@@ -158,36 +177,16 @@ Root Question 只启动当前 Claim 的第一条有效深链，不负责预规�
 通过之前不得进入下一题。尤其检查：
 
 - 当前问题是否已经自洽；
+- Explanation Backbone 是否真正统领当前解释，而不是事后贴标签；
 - 机制是否按因果链讲清；
 - 是否只用技术名词替代解释；
 - 需要时是否包含 Why Layer、可推演例子与通用抽象；
-- 项目现状、通用原理、假设方案和本轮执行结果是否分清。
+- 项目现状、通用原理、假设方案和本轮执行结果是否分清；
+- 是否把非必要的高价值相邻知识留给 Follow-up，而不是提前穷尽。
 
-如果答案仍需要下一题才能把当前问题解释完整，说明当前 Answer 不合格，应先补写。
+如果答案仍需要下一题才能把当前问题解释完整，说明当前 Answer 不合格，应先补写；如果当前答案已经开始系统展开非必要邻域，则应收敛当前 Answer。
 
-## Step 4：Presentation Planning
-
-Answer Completeness 通过后、用户可见 Markdown 生成前，调用 `interview-depth-policy.md` 的 Presentation Planning。
-
-先判断当前题最适合的解释形态，再组织最终答案。例如：
-
-```text
-DEFINITION       → 定义 + 边界 + 例子
-MECHANISM        → 因果链 + walkthrough
-PROCESS          → 编号步骤 / flow
-COMPARISON       → 对比表 + 结论
-CONCURRENCY      → 时间线 + race + atomic point
-FAILURE/RECOVERY → failure scenario + recovery flow/state
-ARCHITECTURE     → component relation + data/state flow + rationale
-TRADEOFF         → criteria + alternatives + cost
-VALIDATION       → claim + observation point + evidence strength
-```
-
-最终答案必须在开头自然、直接地回应问题，但**不要固定输出 `直接回答 / 展开说明`、`overview / principleDetail`、`coreAnswer / mechanism` 等内部字段名**。
-
-Presentation Planner 只决定“怎么讲清楚”，不得删除 DEEP_STUDY 所需知识内容。
-
-## Step 5：Candidate Node Extraction & Scheduling
+## Step 4：Candidate Node Extraction & Scheduling
 
 调用 `knowledge-expansion-policy.md`，不要在本 Workflow 复制算法。
 
@@ -203,7 +202,23 @@ Presentation Planner 只决定“怎么讲清楚”，不得删除 DEEP_STUDY �
 - Sibling Transition Gate；
 - 去重、环路与 Root Question 补充。
 
-本 Workflow 只消费该 Policy 的结果：得到下一节点就生成下一 Question，并回到 Step 2。
+本 Workflow 只消费该 Policy 的结果：得到下一节点就 Just-in-time 生成下一 Question，并回到 Step 2。
+
+注意：Node Extraction 必须读取 **complete internal Answer**，不得从已经压缩 / 排版后的 Markdown 反推 Candidate Nodes。
+
+## Step 5：Answer Presentation
+
+用户可见输出调用 `answer-presentation-policy.md`。
+
+该 Policy 负责：
+
+- Question Dimension 与 Explanation Shape 解耦；
+- 选择 `PROSE / CAUSAL_CHAIN / SEQUENCE / COMPARISON_MATRIX / TIMELINE / STATE_TRANSITION / COMPONENT_FLOW / EVIDENCE_CHAIN / DECISION_FRAME` 等主 Shape；
+- 自然选择段落、步骤、表格、时间线、状态流、代码等表达工具；
+- 隐藏内部 `overview / principleDetail / Backbone / Node` 等规划字段；
+- Citation Locality：事实性项目 / 执行陈述的引用尽量靠近其支持的 Claim。
+
+Workflow 不复制 Shape 映射表，也不根据 Question Dimension 硬编码 Markdown 模板。
 
 ## Step 6：Recursive Depth Check
 
@@ -244,22 +259,23 @@ Generated Answer 是系统为知识扩展与复习生成的参考内容：
 
 ## <Root Question>
 
-<自然开头直接回答问题；随后按题型组织完整 DEEP_STUDY 内容>
+<完整 DEEP_STUDY Answer，经 Answer Presentation Policy 自然渲染>
 
 ## <由上一层 Answer 产生的 Follow-up Question>
 
-<该问题自己的完整 DEEP_STUDY 答案>
+<该问题自己的完整 DEEP_STUDY Answer>
 ```
 
-输出结构原则：
+输出结构原则只保留跨 Presentation Policy 的全局约束：
 
 - 一级标题：一条 Claim / 简历描述的核心主题，不写 `Claim 1`。
 - 二级标题：面试问题；Root 与 Follow-up 默认同级扁平展示。
 - 默认不输出题号；用户明确要求时再编号。
 - 每个二级问题后立即给完整答案。
-- 答案可按需使用自然段、步骤、表格、时间线、流程图、伪代码或代码片段。
 - 不固定出现“直接回答 / 展开说明”等模板标题。
 - 内部图很复杂，用户输出保持可读、可复习。
+
+具体表格 / 时间线 / flow / 小标题 / 代码使用规则只在 `answer-presentation-policy.md` 维护。
 
 如果答案确实需要 Mermaid 流程图，并且最终交付 Markdown 文件，可使用现有 `../scripts/embed-mermaid.mjs` 生成图片资源；流程图是表达工具，不是每题必需格式。
 
@@ -277,7 +293,7 @@ Generated Answer 是系统为知识扩展与复习生成的参考内容：
 - Expansion Queue / Root Queue；
 - Scheduler State / Transition Gate；
 - `decisionReason` / Stop Reason；
-- `overview / principleDetail` 等内部 Answer 字段；
+- `overview / principleDetail / Explanation Backbone / Explanation Shape` 等内部字段；
 - “建议补充验证”等内部缺口旁白。
 
 项目事实不足时，在答案对应位置直接区分 CURRENT / PRINCIPLE / IMPROVEMENT，不把内部 Grounding 状态暴露成调试报告。
