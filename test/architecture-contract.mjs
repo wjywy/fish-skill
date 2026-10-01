@@ -97,7 +97,8 @@ check('answer presentation policy is the visible-structure source of truth', () 
 check('workflow does not duplicate explanation-shape mappings', () => {
   assert(interviewWorkflow.includes('../policies/answer-presentation-policy.md'), 'workflow must load presentation policy');
   assert(interviewWorkflow.includes('Question Dimension 描述“这一问想考察什么”'), 'workflow must name question-dimension responsibility');
-  assert(interviewWorkflow.includes('Question Dimension 不等于 Markdown Template'), 'workflow must separate question dimension from rendering');
+  assert(interviewWorkflow.includes('Question Dimension 与 Explanation Shape 解耦'), 'workflow must separate question dimension from rendering');
+  assert(interviewWorkflow.includes('禁止建立 `Question Dimension = Markdown Template` 的一一映射'), 'workflow must reject direct template coupling');
   assert(!interviewWorkflow.includes('DEFINITION       → 定义 + 边界 + 例子'), 'old presentation mapping duplicated in workflow');
   assert(!interviewWorkflow.includes('CONCURRENCY      → 时间线 + race + atomic point'), 'old concurrency mapping duplicated in workflow');
 });
