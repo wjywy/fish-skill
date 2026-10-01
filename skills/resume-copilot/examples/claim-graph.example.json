@@ -21,7 +21,6 @@
       "status": "EXPANDED",
       "mergedIntoNodeId": null,
       "decisionReason": "根 Claim 的核心机制。",
-      "stopReason": null,
       "roleRelevance": "CORE",
       "roleRelevanceReason": "Agent / 后端平台岗位需要理解可靠事件分发与一致性机制。",
       "coverageStatus": "SUFFICIENT"
@@ -43,7 +42,6 @@
       "status": "EXPANDED",
       "mergedIntoNodeId": null,
       "decisionReason": "上层答案明确指出至少一次投递会引出重复执行；该问题直接影响可靠链路正确性。",
-      "stopReason": null,
       "roleRelevance": "CORE",
       "roleRelevanceReason": "幂等与重复投递直接影响可靠事件链路正确性。",
       "coverageStatus": "PARTIAL"
@@ -65,7 +63,6 @@
       "status": "UNEXPANDED",
       "mergedIntoNodeId": null,
       "decisionReason": "仅知道 eventId 不足以解释并发正确性；继续追问可区分是否理解 check-then-act 竞态与原子约束。",
-      "stopReason": null,
       "roleRelevance": "RELATED",
       "roleRelevanceReason": "并发去重仍属于 Agent / 后端平台岗位的可靠性能力。",
       "coverageStatus": "MENTIONED"
@@ -86,8 +83,7 @@
       "candidateSource": "EXPLICIT",
       "status": "DROPPED",
       "mergedIntoNodeId": null,
-      "decisionReason": "JSON 仅为表示格式，对当前 Claim、岗位判断和信息增益都很低。",
-      "stopReason": "低信息增益。",
+      "decisionReason": "JSON 仅为表示格式，对当前 Claim、岗位判断和信息增益都很低，因此丢弃。",
       "roleRelevance": "CONTEXTUAL",
       "roleRelevanceReason": "不影响可靠事件分发 Claim 的核心理解。",
       "coverageStatus": "MENTIONED"
@@ -109,7 +105,6 @@
       "status": "UNEXPANDED",
       "mergedIntoNodeId": null,
       "decisionReason": "与幂等 sibling 一样来自同一个 Outbox Answer；虽然本轮未被选中，但必须继续保留在 Expansion Queue。",
-      "stopReason": null,
       "roleRelevance": "CORE",
       "roleRelevanceReason": "多 Worker 并发领取直接影响可靠投递链路的正确性。",
       "coverageStatus": "MENTIONED"
@@ -162,7 +157,7 @@
         "node-worker-locking"
       ],
       "groundingStatus": "PARTIAL",
-      "overview": "Task 状态更新与待投递事件必须原子化落库，否则会出现双写不一致：先提交业务状态再写消息会丢事件，先写消息再提交业务状态会让下游消费到不存在的任务。Transactional Outbox 把业务状态更新与 Outbox 事件记录放进同一个本地事务，提交即代表二者同时持久化，再由 Worker 异步投递；项目中可以确认使用 PostgreSQL 事务 Outbox 持久化任务事件。",
+      "overview": "Task 状态更新与待投递事件必须原子化落库，否则会出现双写不一致。Transactional Outbox 把业务状态更新与 Outbox 事件记录放进同一个本地事务，提交即代表二者同时持久化，再由 Worker 异步投递。",
       "principleDetail": "Transactional Outbox 要解决的是数据库写入与消息投递两个独立系统无法共享事务的问题。业务状态与 Outbox 行在同一数据库事务中提交，从而消除两次独立写入之间的崩溃窗口；事务提交后 Worker 再异步扫描并投递。由于投递与标记完成本身不能原子完成，整体通常是至少一次语义，因此会继续引出幂等、并发领取和失败恢复等问题。",
       "projectAside": "消费侧具体幂等实现尚未由当前项目事实确认。"
     },
