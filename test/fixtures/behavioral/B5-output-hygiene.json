@@ -1,10 +1,11 @@
 {
   "id": "B5",
-  "title": "Interview Knowledge — adaptive DEEP_STUDY output hygiene",
+  "title": "Interview Knowledge — presentation-policy output hygiene",
   "sourceOfTruth": [
     "workflows/interview-knowledge.md §用户可见 Markdown 输出",
     "workflows/interview-knowledge.md §默认禁止输出的内部信息",
     "policies/interview-depth-policy.md",
+    "policies/answer-presentation-policy.md",
     "SKILL.md §硬性执行约束"
   ],
   "preconditions": {
@@ -15,13 +16,17 @@
   "mustDo": [
     "一级标题提炼核心主题，不写内部 Claim 编号",
     "二级标题为面试问题；每个问题后立即给完整 DEEP_STUDY 答案",
-    "答案先自然回应问题，再按 Question Shape 使用自然段、步骤、表格、时间线、代码或图",
+    "Question Dimension 只描述考察方向；最终 Markdown 由 Explanation Shape 自然组织，不建立固定一一映射",
+    "Explanation Backbone 可以保持隐式，不强制渲染为 A != B 或 A → B → C",
     "项目当前实现、通用原理、假设改造与本轮执行结果在相关答案中自然区分，不暴露 Grounding/debug 标签",
+    "当运行环境支持 citation/provenance 时，引用靠近其支持的事实性 Claim，不默认堆成独立证据清单",
     "最终文档只保留可复习内容，不写 Knowledge Graph 调度过程"
   ],
   "mustNotDo": [
     "默认只输出问题而省略参考答案",
     "所有答案机械显示 `直接回答 / 展开说明` 或 `overview / principleDetail`",
+    "把 Explanation Backbone / Explanation Shape / NECESSARY / INTERESTING 等内部规划字段输出给用户",
+    "把 Question Dimension 直接当 Markdown 模板",
     "输出 claimId / 内部 Claim 编号 / 仅用于 provenance 的证据路径",
     "输出 VERIFIED / PARTIAL / INSUFFICIENT 等 Grounding 状态标签",
     "输出 graph depth / Node Type / roleRelevance / 内部 risk 等元数据字段",
@@ -31,11 +36,12 @@
     "把项目事实不足单独写成调试旁白，而不是在相关技术句中自然说明边界"
   ],
   "rubric": [
-    { "id": "B5-R1", "criterion": "未暴露内部执行元数据", "weight": 3 },
+    { "id": "B5-R1", "criterion": "未暴露内部执行或规划元数据", "weight": 3 },
     { "id": "B5-R2", "criterion": "一级标题为人类可读主题而非内部 Claim 编号", "weight": 2 },
     { "id": "B5-R3", "criterion": "每个问题与完整 DEEP_STUDY 答案紧邻、可直接复习", "weight": 3 },
-    { "id": "B5-R4", "criterion": "答案结构适配问题类型，不固定两段式模板", "weight": 3 },
+    { "id": "B5-R4", "criterion": "Explanation Shape 适配实际知识关系，不与 Question Dimension 或固定两段式绑定", "weight": 3 },
     { "id": "B5-R5", "criterion": "CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION 边界自然表达，不使用 debug 标签", "weight": 2 },
-    { "id": "B5-R6", "criterion": "无 Queue / Scheduler 过渡旁白", "weight": 2 }
+    { "id": "B5-R6", "criterion": "可用 citation/provenance 时与对应事实 Claim 局部绑定", "weight": 2 },
+    { "id": "B5-R7", "criterion": "无 Queue / Scheduler 过渡旁白", "weight": 2 }
   ]
 }
