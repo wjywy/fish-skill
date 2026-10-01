@@ -4,6 +4,15 @@ node_modules/
 # 本地生成的简历、面试文档和宣传图片
 resume-output/
 image-cards/
+/output/
+
+# 在仓库根目录运行构建脚本时生成的页面
+/index.html
+/resume-*.html
+
+# 在本仓库运行 CLI 时安装出的 Skill 副本
+/.agents/skills/
+/.claude/skills/
 
 # 测试输出、打包产物和本地下载的字体
 test/reports/results.json
