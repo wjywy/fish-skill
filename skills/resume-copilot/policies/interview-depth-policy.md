@@ -2,13 +2,14 @@
 
 ## 目的
 
-Interview Depth 同时约束三个不同问题：
+Interview Depth 只约束两个问题：
 
-1. **Answer Depth**：当前这道题本身要解释到什么程度才算完整。
-2. **Presentation Planning**：完整答案用什么结构呈现最容易理解。
-3. **Recursive Depth**：当前知识分支还应不应该继续追问。
+1. **Answer Depth**：当前这道题本身要解释到什么程度才算完整，以及什么时候应该停止继续展开当前答案。
+2. **Recursive Depth**：当前知识分支还应不应该继续追问。
 
-这三件事必须分开判断。`knowledge-expansion-policy.md` 负责“从答案产生哪些节点、如何评估与调度”；本文件负责“当前答案是否讲透”“怎么自然呈现”以及“递归何时停止”。
+用户可见答案如何组织与呈现统一由 `./answer-presentation-policy.md` 负责；Candidate Node 的产生、Coverage、价值判定与调度统一由 `./knowledge-expansion-policy.md` 负责。
+
+核心原则：**当前答案既要有下界，也要有上界。** DEEP_STUDY 要求把当前问题讲透，但不要求穷尽当前问题周围的整个知识邻域。
 
 ---
 
@@ -26,7 +27,7 @@ Interview Knowledge 不提供 QUESTION_BANK 式浅回答模式。每一个被物
 - 关键机制为什么成立；
 - 为什么采用这一设计（如果存在真实设计动机）；
 - 能否用一个具体例子或过程推演；
-- 哪些边界会改变结论；
+- 哪些边界会改变当前结论；
 - 项目当前实际做到哪里；
 - 哪些内容只是通用原理或假设改造。
 
@@ -39,16 +40,39 @@ Interview Knowledge 不提供 QUESTION_BANK 式浅回答模式。每一个被物
 - `overview`：核心结论与必要项目落点；
 - `principleDetail`：完整机制、Why Layer、walkthrough、边界、取舍与必要抽象。
 
-这两个字段用于内部 completeness，不是最终 Markdown 的固定分栏。
+这两个字段用于内部 completeness，不是最终 Markdown 的固定分栏。最终展示调用 `./answer-presentation-policy.md`。
 
-用户可见答案：
+## 3. Explanation Backbone First
 
-- 开头必须自然、直接回答当前问题；
-- 不固定显示 `直接回答 / 展开说明`；
-- 不显示 `overview / principleDetail`；
-- 不因为内部只有两个字段，就把所有内容压成两个大段。
+在展开大量实现细节之前，先判断：
 
-## 3. Mechanism Chain
+> 当前问题最小、最有解释力的主轴是什么？
+
+Backbone 可以是：
+
+- **Contrast / responsibility boundary**：`module-relative resource vs workspace-relative target`；
+- **Causal chain**：哪一步使目标性质成立；
+- **Layer model**：`structural validity → referential integrity → semantic evidence`；
+- **State transition**：准备、提交、恢复；
+- **Observation hierarchy**：source → artifact → runtime → delivery；
+- **Decision frame**：目标、候选方案、判断标准、代价。
+
+Backbone 的作用是组织理解，不是新的可见模板。简单事实 / 定义题如果直接自然回答更清楚，可以不显式输出 Backbone。
+
+### Backbone 与 Knowledge Abstraction 的关系
+
+Backbone 先回答“这一题主要围绕什么关系解释”；Knowledge Abstraction 再判断“这个关系是否值得抽象成可迁移的通用模型”。两者不重复：
+
+```text
+Question
+→ identify explanatory backbone
+→ explain current question
+→ optionally abstract reusable principle
+```
+
+不要先堆大量实现细节，最后才补一个与正文脱节的“通用总结”。
+
+## 4. Mechanism Chain
 
 机制 / 实现 / 架构类问题，答案至少应覆盖真正影响结论的因果链：
 
@@ -58,7 +82,7 @@ Interview Knowledge 不提供 QUESTION_BANK 式浅回答模式。每一个被物
 → 执行步骤
 → 状态或数据变化
 → 哪一步使结果成立
-→ 会改变结论的失败边界 / 取舍
+→ 会改变当前结论的必要失败边界 / 取舍
 ```
 
 不要求把这些词机械写成小标题，但不能只罗列组件名。
@@ -71,7 +95,7 @@ PostgreSQL + Redis + SSE + Outbox
 
 不是完整解释。必须说明谁持久化状态、谁记录可靠事件、谁做跨实例广播、谁只是连接层，以及连接断开后为什么任务仍能继续。
 
-## 4. No Terminology-as-Explanation
+## 5. No Terminology-as-Explanation
 
 不得用一个技术名词替代机制解释。
 
@@ -91,7 +115,7 @@ PostgreSQL + Redis + SSE + Outbox
 - 哪一步带来了目标性质；
 - 在什么条件下会失效或需要额外保护。
 
-## 5. Why Layer
+## 6. Why Layer
 
 对于架构、数据模型、并发、一致性、Agent、检索、测试设计等非纯事实问题，仅说明“代码怎么做”通常不够。
 
@@ -104,7 +128,7 @@ PostgreSQL + Redis + SSE + Outbox
 
 纯定义、命令说明或简单事实题不强行补 Why Layer。
 
-## 6. Knowledge Abstraction
+## 7. Knowledge Abstraction
 
 当项目实现体现了可迁移的通用技术概念时，在 Project Grounding 后抽象一层知识模型。
 
@@ -118,14 +142,14 @@ Schema + ID Check + Evidence Rule
 → structural validity vs referential integrity vs semantic validity
 
 temp + rename + lock
-→ preparation / atomic visibility / critical section
+→ preparation / visibility switch / critical section
 ```
 
 抽象层用于帮助迁移理解，**不得反向写成项目已实现事实**。
 
 不要为了形式统一而每题强行追加“通用原则”；只有抽象确实能提升迁移理解时才做。
 
-## 7. Concrete Walkthrough
+## 8. Concrete Walkthrough
 
 当问题涉及流程、竞态、状态机、解析、安全边界、测试判断或恢复时，至少提供一个能逐步推演的例子，例如：
 
@@ -137,7 +161,70 @@ temp + rename + lock
 
 例子的目的不是增加字数，而是让“为什么成立”可验证。
 
-## 8. CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION
+## 9. Deep Study Boundary：Necessary-for-Conclusion Test
+
+DEEP_STUDY 的目标是 **complete the current question, not the entire neighborhood**。
+
+生成答案时，对准备继续展开的每个知识点执行 Necessary-for-Conclusion Test。只有满足至少一项时，才应在当前答案中完整展开：
+
+1. 不解释它，当前核心结论无法成立；
+2. 不解释它，读者无法理解当前关键因果链；
+3. 不解释它，当前 walkthrough / example 无法被正确推演；
+4. 不解释它，会让读者对当前结论产生实质性错误理解；
+5. 它是会直接改变当前结论正确性的必要 boundary / trade-off。
+
+如果都不满足，则该知识点不属于当前答案的必要深度。
+
+### Necessary vs Interesting 是瞬时决策，不是 Node 状态
+
+在 Answer Construction 期间使用：
+
+```text
+Candidate Detail
+↓
+Necessary for current conclusion?
+├─ yes → EXPAND NOW
+└─ no
+    ↓
+High future value?
+├─ yes → MENTION LIGHTLY / leave evidence for Candidate Extraction
+└─ no → OMIT
+```
+
+`NECESSARY / INTERESTING` **不得**写入 Knowledge Node Schema，也不得成为 Coverage / status 的第三套权威状态。
+
+Node Extraction 后仍统一使用 `knowledge-expansion-policy.md` 的：
+
+```text
+MENTIONED / PARTIAL / SUFFICIENT
+UNEXPANDED / EXPANDED / COVERED / MERGED / DROPPED
+```
+
+### 示例
+
+问题：
+
+> 唯一临时目录为什么不能解决两个安装进程的并发竞态？
+
+当前答案必须讲清：
+
+```text
+unique temp dir isolates preparation
+!=
+commit arbitration on the shared target
+```
+
+并用 A / B 时间线解释为什么正式路径仍会竞争。锁 / 原子条件提交可以作为解决方向。
+
+如果进一步想到 lease 过期后的 stale holder 与 fencing token：
+
+- 它很有价值；
+- 但不是解释“临时目录为什么挡不住提交竞态”的必要条件；
+- 当前题可以点出“租约锁还会引出 stale holder 问题”；
+- 不在这里完整讲完 fencing token；
+- 交给后续 Candidate Node / Follow-up。
+
+## 10. CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION
 
 答案始终区分：
 
@@ -146,83 +233,32 @@ temp + rename + lock
 - `IMPROVEMENT`：尚未实现的改造方案，使用“如果改造，我会……”等假设语气；
 - `EXECUTION`：本轮真实 Tool / Command Execution 得到的结果，例如“刚运行 `npm test` 为 78/78”。
 
-只有存在本轮实际执行证据时才能写 EXECUTION 类断言。静态读取测试代码、README、package.json 或历史 test report，只能证明“仓库定义 / 历史记录了什么”，不能写成“我刚运行通过”。
+只有存在本轮实际执行证据时才能写 EXECUTION 类断言。静态读取测试代码、README、package manifest 或历史测试报告，只能证明“仓库定义 / 历史记录了什么”，不能写成“我刚运行通过”。
 
 不要求把这些标签原样展示，但语义不能混淆。
 
-## 9. Answer Completeness Gate
+## 11. Answer Completeness Gate
 
 每个 Generated Answer 在 Node Extraction 前逐项检查：
 
 1. 是否直接回答了当前问题，而不是只给背景或术语？
-2. 是否把影响结论的关键因果链讲清？
-3. 如果机制抽象，是否给了可推演例子？
-4. 如果存在设计动机，是否解释 Why Layer？
-5. 如果存在可复用工程概念，是否做了必要抽象？
-6. 会改变正确性的失败边界 / trade-off 是否已说明？
-7. CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION 是否分清？
-8. 是否删除了“面试时我会怎么说”“这体现我的能力”等答题策略旁白？
-9. 如果只看这一题，是否已经足以独立学习，而不是必须读下一题才能补全核心机制？
+2. 是否先识别了一个足以组织当前解释的 Backbone，或确认当前题简单到无需显式 Backbone？
+3. 是否把影响结论的关键因果链讲清？
+4. 如果机制抽象，是否给了可推演例子？
+5. 如果存在设计动机，是否解释 Why Layer？
+6. 如果存在可复用工程概念，是否做了必要抽象？
+7. 会改变当前结论正确性的失败边界 / trade-off 是否已说明？
+8. CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION 是否分清？
+9. 是否删除了“面试时我会怎么说”“这体现我的能力”等答题策略旁白？
+10. 如果只看这一题，是否已经足以独立学习，而不是必须读下一题才能补全核心机制？
+11. 是否对额外展开内容执行了 Necessary-for-Conclusion Test，避免把“相关且有趣”误当成“当前题必须讲完”？
+12. 是否为后续 Answer-driven Follow-up 保留了非必要但高价值的相邻知识，而不是提前穷尽？
 
-任一关键项不满足就补写当前答案。不要通过增加 Follow-up 来绕过这个 Gate。
-
----
-
-# 二、Presentation Planning
-
-## 核心原则
-
-**内部知识结构与用户可见结构分离。**
-
-完成 DEEP_STUDY Answer 后，先判断当前问题属于什么解释类型，再选择最合适的信息结构。Presentation Planner 只能改变“怎么讲”，不能删掉已经通过 Completeness Gate 的知识内容。
-
-## 1. Question Shape Classification
-
-不要求把分类标签展示给用户。常见形态：
-
-- `DEFINITION`：是什么、概念边界是什么；
-- `MECHANISM`：为什么能工作、哪一步使结果成立；
-- `PROCESS`：完整执行流程是什么；
-- `COMPARISON`：多个方案 / 层级有什么区别；
-- `CONCURRENCY`：并发交错、竞态、原子点在哪里；
-- `FAILURE_RECOVERY`：哪里会失败、怎么恢复；
-- `ARCHITECTURE`：组件职责、数据流、状态流、设计动机；
-- `TRADEOFF`：为什么选 A 不选 B、成本是什么；
-- `VALIDATION`：一个结论究竟被什么观察点 / 证据证明。
-
-一个问题可以同时包含多个形态，选主形态组织，必要时组合。
-
-## 2. Explanation Shape
-
-推荐映射：
-
-| Question Shape | 优先表达结构 |
-| --- | --- |
-| Definition | 直接定义 → 边界 / 反例 → 一个具体例子 |
-| Mechanism | 核心结论 → 因果链 → walkthrough → 边界 |
-| Process | 核心目标 → 编号步骤 / flow → 关键状态变化 |
-| Comparison | 先点核心区别 → 对比表 → 如何选择 |
-| Concurrency | 先指出 race → 时间线 → 原子点 / 锁 / 约束 → 边界 |
-| Failure / Recovery | failure scenario → 中间状态 → recovery rule |
-| Architecture | 总体关系图 / 文字模型 → 组件职责 → data/state flow → Why |
-| Tradeoff | 决策目标 → alternatives → cost / benefit → 适用条件 |
-| Validation | Claim → observation point → assertion/evidence → 证明边界 |
-
-## 3. Visible Answer Rules
-
-最终答案：
-
-- 第一段或第一句必须直接回应问题；
-- 后续结构按题型选择，不固定“两段式”；
-- 可以自然使用小标题，但小标题必须来自知识结构，例如“竞态是怎么发生的”“为什么唯一约束能收敛并发”，而不是内部字段名；
-- 表格、流程图、时序、代码只在它们能降低认知成本时使用；
-- 不为“看起来结构化”机械堆小标题；
-- 不把整题压成一个高密度长段；
-- 不输出 `直接回答 / 展开说明 / overview / principleDetail / coreAnswer / mechanism` 等内部模板字段。
+任一关键项不满足就补写或收敛当前答案。不要通过增加 Follow-up 来补当前题，也不要通过无限扩写当前题来消灭 Follow-up。
 
 ---
 
-# 三、Recursive Depth
+# 二、Recursive Depth
 
 ## 核心原则
 
