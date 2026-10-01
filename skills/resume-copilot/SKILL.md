@@ -27,7 +27,7 @@ Resume Copilot 将原始职业材料与当前代码仓库转成可追溯的职�
 | --- | --- | --- |
 | `SKILL.md` | 路由、全局不变量、跨 Workflow 边界 | 具体执行算法、Renderer 细节 |
 | `workflows/` | 某项任务按什么顺序执行、何时交接 | 重复定义 Policy 的判定规则 |
-| `policies/` | 证据、写作、知识扩展、深度等决策规则 | 任务编排、示例事实 |
+| `policies/` | 证据、写作、知识扩展、深度、展示等决策规则 | 任务编排、示例事实 |
 | `schemas/` | 内部数据结构与机器可校验契约 | 写作风格与推理流程 |
 | `examples/` | 展示规则如何落地 | 新增硬规则；示例永远不能覆盖 Policy |
 | `renderers/` / `scripts/` / `templates/` | HTML/PDF 的视觉与构建实现 | 决定简历写什么 |
@@ -134,17 +134,24 @@ Experience Mining 判断某段经历是否可进入 Strategy / Generation。典�
 
 ## 硬性执行约束（Interview Knowledge，不可跳过）
 
-Interview Knowledge 的执行算法以 `workflows/interview-knowledge.md` 为入口，以 `policies/knowledge-expansion-policy.md` 和 `policies/interview-depth-policy.md` 为判定 Source of Truth。这里仅保留全局不变量：
+Interview Knowledge 的执行算法以 `workflows/interview-knowledge.md` 为入口，并分别读取：
+
+- `policies/interview-depth-policy.md`：当前题讲什么、讲多深、讲到哪里停，以及递归边界；
+- `policies/answer-presentation-policy.md`：完整答案怎么组织成用户可见结构；
+- `policies/knowledge-expansion-policy.md`：下一问从哪些 Candidate Nodes 产生、如何评估和调度。
+
+这里仅保留全局不变量：
 
 1. **Answer-driven, not outline-driven.** 不先生成完整题纲再补答案；先生成当前 Question 的完整 Generated Reference Answer，再从答案提取下一层节点。
 2. **Deep Study per question.** 每一个被物化的 Question 都必须按 DEEP_STUDY 标准完整回答；问题数量、文档长度或尚未执行的候选节点都不能成为降低当前答案深度的理由。
-3. **Current answer first.** 当前答案必须先达到独立可学习的完整程度；Follow-up 不负责补完上一题本应说明的核心机制。
-4. **Depth before breadth.** 当前分支仍有高价值 `UNEXPANDED` 节点时，不横跳到新的 Root Theme。
-5. **No silent sibling loss.** 一个 Answer 可以产生多个高价值 sibling；未被本轮选择的节点必须保留。
-6. **Role-bounded depth.** 停止依据是岗位相关性与信息增益，不是固定层数或固定题型。
-7. **Adaptive presentation.** 内部知识结构与用户可见结构分离；最终答案必须先直接回应问题，但不得强制套 `直接回答 / 展开说明` 等固定分栏。
-8. **Output hygiene.** 内部 Knowledge Graph、Grounding、队列和调度信息默认不暴露给用户。
-9. **Execution claims need execution evidence.** 只有本轮实际执行工具/命令并获得结果，才可以写“我运行了 / 当前通过 / 实测成功”；静态测试代码、README 或历史报告不能冒充本轮运行结果。
+3. **Complete the question, not the whole neighborhood.** 当前答案必须独立完整，但非必要的高价值相邻知识应保留给后续 Follow-up，不因“越详细越好”而提前穷尽。
+4. **Backbone before detail.** 展开大量细节前先找到当前问题最小、最有解释力的主轴；Backbone 是内部规划，不是新的固定可见模板。
+5. **Depth before breadth.** 当前分支仍有高价值 `UNEXPANDED` 节点时，不横跳到新的 Root Theme。
+6. **No silent sibling loss.** 一个 Answer 可以产生多个高价值 sibling；未被本轮选择的节点必须保留。
+7. **Role-bounded depth.** 停止依据是岗位相关性与信息增益，不是固定层数或固定题型。
+8. **Adaptive presentation.** 内部知识结构与用户可见结构分离；Question Dimension 不等于 Markdown Template，最终呈现由 Answer Presentation Policy 选择 Explanation Shape。
+9. **Output hygiene.** 内部 Knowledge Graph、Grounding、Backbone、Explanation Shape、队列和调度信息默认不暴露给用户。
+10. **Execution claims need execution evidence.** 只有本轮实际执行工具/命令并获得结果，才可以写“我运行了 / 当前通过 / 实测成功”；静态测试代码、README 或历史报告不能冒充本轮运行结果。
 
 预检查时，如果工作区存在历史面试文档或用户反馈则读取并对齐；不存在时继续执行，不把环境专属文件当硬依赖。
 
@@ -171,7 +178,12 @@ Interview Knowledge 的执行算法以 `workflows/interview-knowledge.md` 为入
 内部链路：
 
 ```text
-Claim → Question → Deep Generated Reference Answer → Knowledge Node → Follow-up Q&A
+Claim
+→ Question
+→ Deep Generated Reference Answer
+→ Answer Completeness Gate
+→ Candidate Node Expansion + Answer Presentation
+→ Follow-up Q&A
 ```
 
 Interview Knowledge **默认就是完整问答模式**，不存在为了覆盖题量而降低答案深度的 QUESTION_BANK 模式。每个 Question 一旦被物化，就必须生成并展示完整参考答案；下一 Question 只能在当前答案通过 Completeness Gate 后，由当前 Answer 的高价值未覆盖节点驱动产生。
@@ -181,11 +193,17 @@ Interview Knowledge **默认就是完整问答模式**，不存在为了覆盖�
 - `overview`：当前问题的核心结论与必要项目落点。
 - `principleDetail`：机制、Why Layer、可推演例子、边界、取舍与必要抽象。
 
-最终展示前必须经过 Presentation Planning：根据问题属于定义、机制、流程、对比、并发、失败恢复、架构、取舍或验证等类型，选择自然段、步骤、表格、时间线、流程图或代码等最适合的表达结构。**不要输出 `overview` / `principleDetail` 字段名，也不要固定输出 `直接回答 / 展开说明` 标题。**
+当前答案先由 Depth Policy 完成 Explanation Backbone、Necessary-for-Conclusion Test 与 Answer Completeness；之后 Expansion 和 Presentation 从同一个 complete Answer 分叉：
+
+```text
+complete internal Answer
+├─ Knowledge Expansion → Candidate Nodes / next Question
+└─ Answer Presentation → Explanation Shape / natural Markdown
+```
+
+**Node Extraction 不从渲染后的 Markdown 反推；Presentation 也不得通过删内容或补无关知识改变 Answer Depth。**
 
 `Generated Reference Answer != User Answer`；系统生成内容不代表用户已经掌握，也不自动成为 Career Claim。
-
-答案质量与递归深度统一由 `policies/interview-depth-policy.md` 约束；问题扩展和队列调度由 `policies/knowledge-expansion-policy.md` 约束；可见示例见 `examples/interview-answer-examples.md` 与 `examples/interview-expansion-examples.md`。
 
 ### Mock Interview
 
@@ -198,8 +216,9 @@ Interview Knowledge **默认就是完整问答模式**，不存在为了覆盖�
 - Repository 证据边界：`policies/repository-evidence-policy.md`
 - Metric：`policies/metric-policy.md`
 - Resume Bullet 写作：`policies/resume-writing-policy.md`
+- 面试答案深度、Explanation Backbone、Deep Study Boundary 与递归边界：`policies/interview-depth-policy.md`
+- 面试答案 Explanation Shape 与用户可见呈现：`policies/answer-presentation-policy.md`
 - 面试节点扩展与调度：`policies/knowledge-expansion-policy.md`
-- 面试答案深度、Presentation Planning 与递归边界：`policies/interview-depth-policy.md`
 - Mock Interview 回答评估：`policies/answer-assessment-policy.md`
 
 ## Examples
