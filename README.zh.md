@@ -1,12 +1,16 @@
 # fish-skill
 
-`fish-skill` 是一个面向 Coding Agent 的可复用 Skill 集合。仓库采用多 Skill 目录结构，每个 Skill 都是一个独立目录，并以 `SKILL.md` 作为入口。
+`fish-skill` 是一个面向 Coding Agent 的可复用 Skill 集合。仓库采用多 Skill Catalog 结构：
+
+```text
+skills/<skill-name>/SKILL.md
+```
 
 当前包含：
 
 | Skill | 说明 |
 | --- | --- |
-| `resume-copilot` | 从项目关键词、历史简历、工作材料或当前代码仓库中提取事实，生成技术简历，并派生面试知识树。 |
+| `resume-copilot` | 从项目关键词、历史简历、工作材料或当前代码仓库中提取事实，生成可追溯技术简历，并派生面试知识树。 |
 
 ## 目录结构
 
@@ -25,193 +29,169 @@ fish-skill/
         ├── schemas/
         ├── examples/
         ├── renderers/
+        ├── scripts/
         └── templates/
 ```
 
-以后新增 Skill 时，继续放在：
-
-```text
-skills/<skill-name>/SKILL.md
-```
-
-不需要改变根目录结构。
-
 ## 安装方式
 
-### 方式一：通过 npm 包安装并复制指定 Skill
-
-发布到 npm 后，可以直接：
+### 方式一：fish-skill CLI
 
 ```bash
 npx fish-skill list
 npx fish-skill install resume-copilot
 ```
 
-默认会安装到当前项目：
+默认安装到：
 
 ```text
 .agents/skills/resume-copilot/
 ```
 
-也可以指定 Agent 的 Skill 目录：
+指定其他 Skill 根目录：
 
 ```bash
 npx fish-skill install resume-copilot --target .claude/skills
-npx fish-skill install resume-copilot --target .codex/skills
 ```
 
-如果目标目录已经存在，需要明确覆盖：
+已有同名目录时默认拒绝覆盖；用户明确接受替换时：
 
 ```bash
 npx fish-skill install resume-copilot --force
 ```
 
-> npm 上的最终包名如果不是 `fish-skill`，将上面的命令替换为实际发布包名即可。
+### 方式二：支持多 Skill Catalog 的 skills CLI
 
-### 方式二：使用 skills CLI 从 GitHub 仓库安装
+仓库保持 `skills/<name>/SKILL.md` 结构，可由支持该目录发现方式的 Skill 工具按需安装单个 Skill，而不是把整个 monorepo 当成一个 Skill 目录。
 
-仓库保持 `skills/<name>/SKILL.md` 结构后，也兼容 `skills` CLI 的仓库发现方式。`skills` CLI 会扫描仓库的 `skills/` 目录寻找 Skill。可使用：
+例如：
 
 ```bash
 npx skills add <owner>/fish-skill --skill resume-copilot
 ```
 
-安装全部 Skill：
-
-```bash
-npx skills add <owner>/fish-skill --all
-```
-
-这与 `baoyu-skills` 的多 Skill 仓库使用方式一致：仓库作为 Skill Catalog，用户按需安装单个 Skill，而不是把所有 Skill 一次性塞进 Agent 上下文。
+> 不要直接把整个 `fish-skill` 仓库 clone 成 `.agents/skills/resume-copilot`；`resume-copilot/SKILL.md` 实际位于仓库的 `skills/resume-copilot/` 子目录，整仓 clone 会多嵌套一层。
 
 ## Resume Copilot
 
-### 根据一段项目关键词生成简历
+### 核心事实链
 
 ```text
-项目：低代码平台
-负责：页面编辑器、事件驱动器
-关键词：Schema、页面编辑、实时预览
-
-结合 resume-copilot 帮我生成简历内容。
+Raw Career Input / Repository
+            ↓
+           Fact
+            ↓
+        Experience
+            ↓
+          Claim
+        ↙       ↘
+Strategy      Interview Knowledge
+   ↓
+Resume View
+   ↓
+Renderer
 ```
 
-### 结合当前代码仓库生成简历
-
-```text
-结合当前项目和 resume-copilot，帮我生成 3 条 Agent 应用开发工程师方向的简历内容。
-```
-
-Skill 会先读取仓库事实，但遵守：
+核心边界：
 
 ```text
 Repository Fact != User Ownership != Resume Claim
 ```
 
-即代码证明项目里存在某项能力，不等于自动认定该能力由用户设计或实现。
+仓库能证明“项目里存在某能力”，不自动证明该能力由用户本人设计或实现。
 
-### 生成完整简历
+### 架构职责
 
-内容确定后，Resume Copilot 可以使用 Kami Renderer 输出 HTML / PDF。默认主题为 `kami-default`，也可以选择 Navy、Teal、Forest、Burgundy、Sepia、Copper 等主题。
+`resume-copilot` 将规则分层维护：
 
-### 面试准备
+- `SKILL.md`：路由与全局不变量；
+- `workflows/`：执行顺序；
+- `policies/`：证据、Metric、写作、面试扩展和深度判定；
+- `schemas/`：内部数据契约；
+- `examples/`：行为示例，不新增硬规则；
+- `renderers/ / scripts/ / templates/`：视觉与构建实现。
 
-默认使用 Interview Knowledge 模式：
+详见 `skills/resume-copilot/README.md`。
 
-```text
-Resume Claim
-  ↓
-问题
-  ↓
-参考答案
-  ↓
-提取答案中的高价值知识节点
-  ↓
-继续递归生成追问与答案
-```
+### Target Role
 
-递归追问以目标岗位 / JD 的能力边界为停止标准，而不是以“是否已经远离根关键词”或固定追问层数为标准。只要新的知识节点仍能用于判断该岗位要求的能力，就继续深入；完全脱离岗位要求后才停止。
+生成正式 Resume Bullet / Resume View 前必须明确目标岗位或方向。目标未知时仍可以扫描仓库、抽取 Fact 和整理信息缺口，但不根据 React、Go、LangGraph 等技术词自动猜岗位方向。
 
-只有用户明确要求模拟面试时，才进入 Mock Interview，让用户自己回答并评估回答质量。
-
-## 开发新的 Skill
-
-创建目录：
-
-```bash
-mkdir -p skills/my-skill
-```
-
-并至少提供：
+### Resume Strategy / Generation / Renderer
 
 ```text
-skills/my-skill/
-└── SKILL.md
+Resume Strategy   → 决定写什么
+Resume Generation → 把已选事实写成 Resume View
+Renderer          → 决定长什么样、如何生成 HTML/PDF
 ```
 
-`SKILL.md` 应包含 YAML frontmatter：
+简历默认不生成 standalone personal summary；页头后直接进入 Skills / Experience / Projects 等内容。
 
-```md
----
-name: my-skill
-description: 描述这个 Skill 做什么，以及什么时候应该使用。
----
+Renderer 的默认 public theme ID 为：
+
+```text
+kami-default
 ```
 
-检查仓库中可发现的 Skill：
+具体 theme 枚举、模板文件映射、头像、字体与打印实现以：
 
-```bash
-npm run check
-# 或
-npx fish-skill check
+```text
+skills/resume-copilot/schemas/render-options.schema.json
+skills/resume-copilot/renderers/kami/README.md
 ```
 
-## 发布到 npm
+为准。根 README 不复制主题列表，避免视觉实现调整后文档漂移。
 
-发布前先检查打包内容：
+## Interview Knowledge
 
-```bash
-npm pack --dry-run
+默认链路：
+
+```text
+Claim
+  ↓
+Question
+  ↓
+Generated Reference Answer
+  ↓
+Candidate Nodes
+  ↓
+Coverage + Value
+  ↓
+Follow-up Question
+  ↺
 ```
 
-登录 npm：
+### 当前答案先讲透
 
-```bash
-npm login
+系统参考答案内部使用：
+
+- `overview`：直接、可口述的核心回答；
+- `principleDetail`：完整机制、Why Layer、具体推演、知识抽象与必要边界。
+
+当前答案必须先完整，再从答案提取下一层节点；不能把当前问题本应解释清楚的核心机制推给下一道 Follow-up。
+
+### Answer-driven 深链
+
+不先生成完整题库。
+
+```text
+Question₀
+→ Answer₀
+→ Node₁
+→ Question₁
+→ Answer₁
+→ Node₂
 ```
 
-发布：
+一个 Answer 可以产生多个高价值 sibling。全部保留，但默认一次只执行一个；当前深分支耗尽后再返回其他 sibling。
 
-```bash
-npm publish
-```
+### 深度边界
 
-之后用户即可通过：
+递归停止由目标岗位相关性与信息增益决定，不按固定 5 层、8 层停止。项目 Grounding 不足只影响项目场景化，不阻止可靠的通用技术解释。
 
-```bash
-npx fish-skill install resume-copilot
-```
+### 默认 Markdown
 
-安装指定 Skill。
-
-## 为什么同时支持 npm 与 GitHub
-
-GitHub / `npx skills add` 更适合公开 Skill Catalog 和发现；npm 包更适合版本管理、企业私有 Registry、锁定版本以及把 Skill 分发纳入现有 Node.js 工具链。
-
-例如可以锁定 npm 版本：
-
-```bash
-npx fish-skill@0.1.0 install resume-copilot
-```
-
-## License
-
-MIT
-
-
-## Interview Knowledge 默认 Markdown 格式
-
-面试问题预设默认只输出问题，按简历主题组织并逐层深入。参考答案仍在内部生成，用于从答案中继续提取高价值追问；只有用户明确要求“附答案 / 完整问答”时才展示答案。
+默认面试预设只展示问题：
 
 ```markdown
 # 简历要点核心主题
@@ -221,15 +201,73 @@ MIT
 ## 继续追问的问题
 ```
 
-明确要求附答案时，每道题下才显示 `**直接回答**` 与 `**展开说明**`。内部仍用 `overview` 与 `principleDetail` 检查答案与机制是否齐全；默认问题清单不输出这两个字段。
+用户明确要求附答案时才显示：
 
-内部使用的 Claim、Evidence、项目 Grounding 状态、Node Type、depth、停止条件等信息默认不会出现在最终文档中。
+```markdown
+**直接回答**
 
+**展开说明**
+```
 
-### Interview Knowledge 答案原则
+`展开说明` 可以根据题目使用步骤、表格、时间线、流程图或伪代码，不要求写成一个大段。
 
-明确要求附答案时，参考答案优先保证技术内容准确完整，再结合已验证的项目背景做场景化说明。
+面试节点调度规则以：
 
-- 开场直接回答“是什么 / 为什么 / 在本项目里怎么落地”，项目场景只能来自已验证事实。
-- 机制展开要完整、准确；使用自然段、步骤和具体例子，使答案既能口述又能复习。
-- 项目证据不足时仍解释通用原理，并清楚说明哪些只是改进设想，不输出内部证据状态。
+```text
+skills/resume-copilot/policies/knowledge-expansion-policy.md
+```
+
+为唯一 Source of Truth；答案完整度与递归边界以：
+
+```text
+skills/resume-copilot/policies/interview-depth-policy.md
+```
+
+为准。
+
+只有用户明确要求“模拟面试我 / 我自己回答”时才进入 Mock Interview。系统 Reference Answer 不代表用户已经掌握，也不自动成为 Career Claim。
+
+## 开发检查
+
+检查 Skill 可发现性：
+
+```bash
+npm run check
+```
+
+运行 deterministic tests + Resume Copilot architecture contract：
+
+```bash
+npm test
+```
+
+只检查本次新增的架构护栏：
+
+```bash
+npm run test:architecture
+```
+
+architecture contract 会防止常见回归，例如：
+
+- Interview Scheduler 被复制回 `SKILL.md` / Workflow；
+- Example 重新承载硬规则；
+- Generated Answer 重复持久化派生完成状态；
+- `stopReason / decisionReason` 双字段复活；
+- Resume Strategy 重新出现 standalone Summary；
+- Resume Generation 重新维护 Renderer 的模板默认值或字体实现。
+
+## 发布到 npm
+
+发布前：
+
+```bash
+npm test
+npm pack --dry-run
+npm publish
+```
+
+包内 `bin/fish-skill.mjs` 会从 `skills/` 发现包含 `SKILL.md` 的目录，并将指定 Skill 完整复制到目标 Agent Skill 根目录。
+
+## License
+
+MIT
