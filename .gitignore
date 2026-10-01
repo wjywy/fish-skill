@@ -1,7 +1,21 @@
 node_modules/
 .preview/
 
+# 本地生成的简历、面试文档和宣传图片
+resume-output/
+image-cards/
+
+# 测试输出、打包产物和本地下载的字体
+test/reports/results.json
+coverage/
+*.tgz
+assets/fonts/
+
+# 操作系统文件与本地配置
+.DS_Store
+.env
+.env.*
+!.env.example
+
 # WorkBuddy 工作区数据（会话记忆 / 项目记忆）：仅本地保留，不进仓库。
-# 注意：.gitignore 只对「未跟踪」文件生效；若某个文件已被 git 跟踪，
-# 必须先 `git rm -r --cached .workbuddy-ai` 取消跟踪，否则仍会被推送。
 .workbuddy-ai/
