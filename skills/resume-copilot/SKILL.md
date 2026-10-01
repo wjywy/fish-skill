@@ -5,57 +5,98 @@ description: "Builds defensible resumes from verified career facts through exper
 
 # Resume Copilot
 
-Resume Copilot 先建立可追溯的职业事实，再根据目标岗位生成简历内容，并从简历 Claim 派生面试知识树。
+Resume Copilot 将原始职业材料与当前代码仓库转成可追溯的职业事实，再按目标岗位生成简历，并从已验证 Claim 派生面试知识树。
 
-## 核心原则
+## 全局原则
 
-1. **Target direction before final wording.** 在生成正式 Resume Bullet / Resume View 前，必须明确目标岗位或方向；若用户未提供，先主动询问。不得仅根据技术栈擅自推断前端、后端、Agent、产品、全栈或其他方向。
-2. **Draft early, verify continuously.** 目标方向已知后，已有足够信息就先给可讨论 Draft，再补关键缺口。
-3. **Source → Fact → Claim → Wording.** 原始材料先转成事实；正式简历表述必须来自已验证 Claim。
-4. **Never silently upgrade ownership.** 不把协作 / 参与 / 了解静默升级成负责 / 主导 / 设计。
-5. **Metrics need provenance.** 数字必须有来源或确认状态，不自动编造。
-6. **Repository evidence is project evidence, not ownership evidence.** 仓库证明项目存在某能力，不自动证明用户本人实现该能力。
-7. **High-information bullets, not duty statements.** 正式 Bullet 优先表达动作、对象、机制和结果。
-8. **Career Profile is the source of truth.** Markdown、HTML、PDF 只是输出视图。
-9. **No standalone summary.** 简历必须省略独立的个人简介 / summary；页头后直接进入专业技能，相关事实写入技能或经历条目。
+1. **Target direction before final wording.** 生成正式 Resume Bullet / Resume View 前必须明确 Target Role / Target Direction；资料解析、仓库检查和 Fact 抽取不受此 Gate 阻塞。
+2. **Source → Fact → Claim → Wording.** 原始材料先形成 Fact；正式简历表述只能来自已验证 Claim / Metric。
+3. **Repository evidence is project evidence, not ownership evidence.** 仓库能证明项目能力，不能自动证明用户本人实现该能力。
+4. **Never silently upgrade ownership.** 不把参与 / 协作 / 了解静默升级成负责 / 主导 / 设计。
+5. **Metrics need provenance.** 数字必须有来源、口径和确认状态，不自动估算。
+6. **Draft early, verify continuously.** 方向明确且已有足够事实时可以先给 provisional draft，但 Draft 不是事实源。
+7. **Career Profile is the source of truth.** Markdown、HTML、PDF 都是输出视图，不反向成为职业事实。
+8. **High-information bullets, not duty statements.** 正式 Bullet 优先表达动作、对象、机制、约束与结果。
+9. **No standalone summary.** 简历省略独立个人简介 / summary；页头后直接进入专业技能、经历等内容。
 
+## 架构与 Source of Truth
 
-## 硬性执行约束（Interview Knowledge，不可跳过）
+不同层只负责一种职责，避免同一规则在多个文件重复维护。
 
-以下约束是硬性的。**「输出形态是一份文档」或「用户要求批量题目」都不构成豁免。**
+| 层 | 职责 | 不负责 |
+| --- | --- | --- |
+| `SKILL.md` | 路由、全局不变量、跨 Workflow 边界 | 具体执行算法、Renderer 细节 |
+| `workflows/` | 某项任务按什么顺序执行、何时交接 | 重复定义 Policy 的判定规则 |
+| `policies/` | 证据、写作、知识扩展、深度等决策规则 | 任务编排、示例事实 |
+| `schemas/` | 内部数据结构与机器可校验契约 | 写作风格与推理流程 |
+| `examples/` | 展示规则如何落地 | 新增硬规则；示例永远不能覆盖 Policy |
+| `renderers/` / `scripts/` / `templates/` | HTML/PDF 的视觉与构建实现 | 决定简历写什么 |
 
-1. **Pre-flight：动笔前先读两处**
-   - 先读工作区记忆（`.workbuddy-ai/memory/` 的当日日志与 `MEMORY.md`），确认用户对同类文档的历史反馈与既有约定。
-   - 先盘点目标输出目录下的已有版本，对齐既有结构，不另起炉灶。
-2. **禁止预生成完整题纲**
-   - 不得先列「主题 → 每个主题 4–5 个问题」的清单，再逐题补答案。
-   - 必须先物化一个 Root Question、写出参考答案，再从该答案提取节点，决定下一问。
-3. **当前分支优先（Depth before Breadth）**
-   - 只要当前分支仍有高价值未展开节点，就必须继续深入，**不得横向换题**。
-   - 一条链要挖到**机制层**，不是停在一两层。参照深链示例：
-     `Outbox → 双写一致性 → 本地事务 → Worker 重复执行 → 幂等 → 并发去重 → 唯一约束 → 事务隔离`
-4. **批量输出例外必须显式受限**
-   - 只有输出形态确需批量时才可一次物化多个问题；即便如此，每一条仍必须**由上一层答案驱动、逐层加深**。
-   - **禁止**把批量输出做成「平行兄弟问题清单」。
-5. **Output Gate：交付前逐主题自检（不通过就重写）**
-   - 这是「一条答案驱动的深链」，还是「一组互不依赖的平行问题」？
-   - 深度是否至少到机制层（解释「为什么成立 / 底层怎么做」），而不是停在「是什么 / 为什么要」？
-   - 是否在分支真正耗尽前就横向换了题？
-   - 只要出现「平行问题堆叠」或「深度 ≤ 2 层」→ **该主题不达标，必须重写**。
+发生歧义时：用户明确要求优先；全局原则不可被下层静默覆盖；执行顺序看当前 Workflow；判定语义看对应 Policy；Schema 只约束结构；Example 仅用于示范。
 
+## 能力与路由
+
+- 原始输入接入：`workflows/input-intake.md`
+- 当前仓库分析：`workflows/repository-inspection.md`
+- 快速候选成稿：`workflows/resume-bootstrap.md`
+- 经历验证与补全：`workflows/experience-mining.md`
+- Resume Strategy：`workflows/resume-strategy.md`
+- 正式简历生成：`workflows/resume-generation.md`
+- 默认面试知识树：`workflows/interview-knowledge.md`
+- 用户主动模拟面试：`workflows/mock-interview.md`
+
+### Workflow 边界
+
+```text
+Raw Input
+  ↓
+Input Intake
+  ↓
+Fact / Repository Fact
+  ↓
+Bootstrap（可选：快速给可讨论 Draft）
+  ↓
+Experience Mining（验证 Ownership / Action / Result）
+  ↓
+Career Profile
+  ↓
+Resume Strategy（决定写什么）
+  ↓
+Resume Generation（决定怎么写成 Resume View）
+  ↓
+Renderer（决定长什么样）
+```
+
+- **Bootstrap 与 Mining 不互相替代。** Bootstrap 优先让用户早看到候选表达；Mining 负责把材料提升为可写入 Career Profile 的已验证事实。
+- **Strategy 与 Generation 不互相替代。** Strategy 选 Claim 和内容预算；Generation 只能表达已选内容。
+- **Generation 与 Renderer 不互相替代。** Generation 产出 Resume View；主题、头像交互、字体、打印与 HTML 构建细节由 Renderer / scripts 维护。
+
+## 按需加载规则
+
+不要启动时一次性读取全部文件。
+
+```text
+SKILL.md
+  ↓
+选择一个 Workflow
+  ↓
+读取该 Workflow 的 Required References
+  ↓
+执行
+```
+
+若工作区存在项目记忆、历史输出或约定文件，应在相关任务开始时优先复用；**不存在时不得阻塞流程，也不得假设固定存在 `.workbuddy-ai/memory/` 等某个平台专属目录。**
 
 ## Target Direction Gate
 
-Resume Copilot 可以在目标方向未知时读取资料、分析仓库、抽取 Fact 和整理 Experience，但**不得生成正式 Resume Bullet / Resume View**。
+当用户目标是生成、改写或定向优化简历时：
 
-在进入 `BOOTSTRAP` 的正式文案输出、`STRATEGY` 或 `DRAFTING` 前：
+1. 已知 Target Role / Target Direction → 继续。
+2. 未知 → 在生成正式 Resume Bullet / Resume View 前询问一次。
+3. 不得仅根据 React、Go、LangGraph、Redis 等技术词猜目标方向。
+4. JD 可选；只有岗位方向也可以进入 Bootstrap / Strategy。
 
-1. 检查是否已有明确 `Target Role / Target Direction`。
-2. 若已有，例如“前端开发工程师”“后端开发工程师”“Agent 应用开发工程师”“产品经理”，直接继续。
-3. 若没有，主动询问一次，例如：
-   > 这份简历主要投什么方向？例如前端、后端、Agent、产品、全栈，或者具体岗位名称。
-4. 不得根据 React、Go、LangGraph、Redis 等技术词自行推断岗位方向。
-5. 用户可只提供方向，不要求必须提供完整 JD；若有 JD，再交给 Resume Strategy 做定向匹配。
+目标方向未知时仍可做资料解析、Repository Inspection、Fact 抽取和缺口整理。
 
 ## 核心模型
 
@@ -77,28 +118,73 @@ Resume Strategy  Interview Knowledge
 MD / HTML / PDF
 ```
 
-用户通常负责说明哪些关键词属于同一段项目 / 经历；Skill 负责组内事实抽取、补全、验证、简历化和面试展开。
+## Resume Ready
 
-## 能力与路由
+Experience Mining 判断某段经历是否可进入 Strategy / Generation。典型条件：
 
-- 输入接入：`workflows/input-intake.md`
-- 当前仓库分析：`workflows/repository-inspection.md`
-- 快速候选成稿：`workflows/resume-bootstrap.md`
-- 经历深挖：`workflows/experience-mining.md`
-- Resume Strategy：`workflows/resume-strategy.md`
-- 正式简历生成：`workflows/resume-generation.md`
-- 默认面试知识树：`workflows/interview-knowledge.md`
-- 用户主动模拟面试：`workflows/mock-interview.md`
+- Target Role 已知（当目标是生成简历时）；
+- Context / Problem 明确；
+- Ownership 明确；
+- 至少一个具体 Action；
+- 至少一个具体 Mechanism；
+- 至少一个可验证 Claim；
+- Result 已知，或明确暂无可靠量化结果。
 
-## 按需加载规则
+不要为了准备所有潜在面试追问而延长 Resume Mining；技术递归属于 Interview Knowledge。
 
-不要在启动 Skill 时一次性读取全部文件。进入某个 Workflow 后，必须读取该 Workflow 的 **Required References**；示例文件只有在对应阶段被列为 Required Reference 时才需要加载。
+## 硬性执行约束（Interview Knowledge，不可跳过）
+
+Interview Knowledge 的执行算法以 `workflows/interview-knowledge.md` 为入口，以 `policies/knowledge-expansion-policy.md` 和 `policies/interview-depth-policy.md` 为判定 Source of Truth。这里仅保留全局不变量：
+
+1. **Answer-driven, not outline-driven.** 不先生成完整题纲再补答案；先生成当前 Question 的 Generated Reference Answer，再从答案提取下一层节点。
+2. **Current answer first.** 当前答案必须先达到独立可学习的完整程度；Follow-up 不负责补完上一题本应说明的核心机制。
+3. **Depth before breadth.** 当前分支仍有高价值 `UNEXPANDED` 节点时，不横跳到新的 Root Theme。
+4. **No silent sibling loss.** 一个 Answer 可以产生多个高价值 sibling；未被本轮选择的节点必须保留。
+5. **Role-bounded depth.** 停止依据是岗位相关性与信息增益，不是固定层数或固定题型。
+6. **Output hygiene.** 内部 Knowledge Graph、Grounding、队列和调度信息默认不暴露给用户。
+
+预检查时，如果工作区存在历史面试文档或用户反馈则读取并对齐；不存在时继续执行，不把环境专属文件当硬依赖。
+
+### Interview expansion cardinality
 
 ```text
-SKILL.md → 选择 Workflow → 读取 Required References → 执行
+1 Generated Answer
+  ↓
+0..N valuable Candidate Nodes
+  ↓
+保留所有高价值 UNEXPANDED siblings
+  ↓
+默认一次执行 1 个
+  ↓
+当前深分支耗尽后返回其余 sibling
 ```
 
-这保证 examples / policies 真正进入执行链，同时避免无关上下文占用。
+具体节点提取、覆盖判定、Expansion Queue / Root Queue 与 Sibling Transition Gate 只在 `policies/knowledge-expansion-policy.md` 定义，其他文件不得复制一套不同算法。
+
+## Interview 输出模式
+
+### Interview Knowledge（默认）
+
+内部链路：
+
+```text
+Claim → Question → Generated Reference Answer → Knowledge Node → Follow-up Q&A
+```
+
+内部 `Generated Answer` 使用 `overview` 与 `principleDetail`：
+
+- `overview`：简短、可口述的直接回答与必要项目落点。
+- `principleDetail`：完整机制、Why Layer、可推演例子、边界与必要抽象。
+
+`Generated Reference Answer != User Answer`；系统生成内容不代表用户已经掌握，也不自动成为 Career Claim。
+
+默认面试预设只展示问题。只有用户明确要求“附答案 / 生成参考答案 / 完整问答”时才显示答案；答案外层使用 `**直接回答**` 与 `**展开说明**`，内部结构按知识类型自适应，不要求两个大段。
+
+答案质量与递归深度统一由 `policies/interview-depth-policy.md` 约束；问题扩展和队列调度由 `policies/knowledge-expansion-policy.md` 约束；可见示例见 `examples/interview-answer-examples.md` 与 `examples/interview-expansion-examples.md`。
+
+### Mock Interview
+
+只有用户要求模拟面试、逐题作答或评估回答时，进入 `workflows/mock-interview.md`。Mock Interview 评估的是用户答案，不把系统 Generated Answer 当作用户掌握证明。
 
 ## 核心 Policy
 
@@ -107,11 +193,21 @@ SKILL.md → 选择 Workflow → 读取 Required References → 执行
 - Repository 证据边界：`policies/repository-evidence-policy.md`
 - Metric：`policies/metric-policy.md`
 - Resume Bullet 写作：`policies/resume-writing-policy.md`
-- 知识递归：`policies/knowledge-expansion-policy.md`
-- 面试扩展示例：`examples/interview-expansion-examples.md`
-- 面试答案示例（仅明确要求附答案时读取）：`examples/interview-answer-examples.md`
-- 面试递归深度：`policies/interview-depth-policy.md`
+- 面试节点扩展与调度：`policies/knowledge-expansion-policy.md`
+- 面试答案深度与递归边界：`policies/interview-depth-policy.md`
 - Mock Interview 回答评估：`policies/answer-assessment-policy.md`
+
+## Examples
+
+- Repository 模式：`examples/repository-project-mode.example.md`
+- Resume Bullet：`examples/resume-bullet-patterns.md`
+- Resume Strategy：`examples/resume-strategy.example.json`
+- Career Profile：`examples/career-profile.example.json`
+- Claim Graph：`examples/claim-graph.example.json`
+- 面试扩展：`examples/interview-expansion-examples.md`
+- 面试答案（显式要求附答案时读取）：`examples/interview-answer-examples.md`
+
+Examples 只示范，不承载硬规则，不得作为用户项目事实来源。
 
 ## 核心 Schema
 
@@ -131,132 +227,8 @@ SKILL.md → 选择 Workflow → 读取 Required References → 执行
 - Mock Interview Answer：`schemas/mock-interview-answer.schema.json`
 - Interview Assessment：`schemas/interview-assessment.schema.json`
 
-## 工作状态
+## Rendering Handoff
 
-状态不是强制线性：
-- `INTAKE`
-- `BOOTSTRAP`
-- `MINING`
-- `VERIFYING`
-- `STRATEGY`
-- `DRAFTING`
-- `REVIEWING`
-- `RENDERING`
-- `INTERVIEW_PREP`
+Resume Generation 只产出符合 Resume View Schema 的内容模型；视觉与构建细节读取 `renderers/kami/README.md` 与相关 scripts/templates。
 
-允许回退，例如 `REVIEWING → MINING → VERIFYING → DRAFTING`。
-
-## Experience Ready
-
-某段经历满足以下条件后默认停止主动深挖：
-- 当目标是生成简历时，Target Role / Target Direction 已明确；
-- Context / Problem 明确；
-- Ownership 明确；
-- 至少一个 Action；
-- 至少一个具体 Mechanism / 实现方式；
-- 至少一个 Claim；
-- Result 已明确，或确认暂无可靠量化结果。
-
-达到 Resume Ready 后进入 Strategy / Generation。不要为了准备所有潜在面试追问继续深挖；技术递归属于 Interview Knowledge。
-
-## Interview 模式
-
-### Interview Knowledge（默认）
-
-```text
-Claim → Question → Generated Reference Answer → Knowledge Node → Follow-up Q&A
-```
-
-系统生成参考答案，并从答案中的关键技术、机制、决策、失败恢复、一致性、并发、性能和取舍继续递归展开。
-
-递归边界由 **Target Role / JD Requirements** 决定，而不是由“距离根 Claim / 根关键词有多远”决定。`CORE / RELATED` 节点通常继续；`CONTEXTUAL` 节点根据 Claim Dependency 与 Information Gain 决定；只有进入 `OUT_OF_SCOPE`，或继续深入已不能增加岗位判断信息时才停止。项目 Grounding 不足本身不是停止条件。
-
-`Generated Reference Answer != User Answer`，系统生成内容不代表用户已经掌握，也不自动成为 Career Claim。
-
-面试问题预设默认只交付问题：Markdown 按一级主题列出二级问题，不输出参考答案、答题提示、项目边界旁白或内部推导。生成问题时仍在内部写 Generated Reference Answer，从答案中提取高价值节点，逐层决定下一问；“只输出问题”不改变 Answer-driven 生成逻辑。
-
-只有用户明确要求“附答案 / 生成参考答案 / 完整问答”时，才显示每题答案。答案固定为 `**直接回答**` 与 `**展开说明**` 两部分，分别对应内部 `overview` 和 `principleDetail`；后者讲机制、例子和必要边界，不重复前者。只要求模拟面试时仍走 Mock Interview。
-
-明确要求附答案时，先读 `examples/interview-answer-examples.md`，参考其中的口述语气与具体推演方式；示例不提供可迁移到其他用户的项目事实，也不规定每题的篇幅或内部段落数。
-
-Answer-driven 的节点提取和下一题选择只用于内部组织；问题清单直接以新的 `##` 标题呈现下一题，不写“下一问”“由此引出”“回到某分支”等串场句。显式要求答案时，用户可见答案也只回答当前问题。
-
-```text
-# 一条简历描述的核心主题
-## 面试问题
-## 递归追问
-（只显示问题标题，不附答案）
-```
-
-若用户明确要求附答案，采用“候选人先答核心、再顺着追问讲透”的讲法。`直接回答` 不写成履历自评或答题策略；`展开说明` 只解释当前问题，不写“面试官追问时我会……”“我不会夸大……”等关于如何回答的评论。30～60 秒只是直接回答的参考，不是每题的时长或字数要求。答案写法要求：
-
-- 优先用第一人称和具体动词讲项目事实，例如“我用模块路径定位包内资源”；讲尚未实现的方案时明确用“如果改造，我会……”；不要让口述语气掩盖证据边界。
-- 把问题涉及的知识点讲透：机制题写出前提、关键步骤、状态变化和结果，再用一个可逐步推演的例子说明；按题目需要补失败边界、恢复、取舍和验证。不按固定字数凑篇幅。逐题按 `workflows/interview-knowledge.md` 的 Answer Completeness Gate 自检。
-- 用自然的口述节奏推进解释；遇到复杂执行链、状态变化或并发时序，可用步骤、短代码或图帮助读者推演。是否分段、画图或收束总结，由这道题的理解难度决定。避免连续术语和小标题把回答切碎，也避免把整题压成两段高密度文字。
-- 失败恢复、并发竞争等机制若各自足以成为有价值的追问，应分别成题并答透；不要为了减少题目数量把它们挤进一个概览答案。仍按 Answer-driven 规则决定实际问题，不机械套固定题单。
-- 项目现状与假设改造需要区分时，直接说明“当前实现是……”和“如果改造，我会……”。不要以“我会怎样向面试官解释”“这些表述能体现什么能力”等元话语代替答案；不生成泛泛评价候选人或简历匹配度的问题，除非用户单独要求。
-- **Markdown 文档里的流程图要直接可见**：先写 Mermaid 源码；保存 `.md` 后运行 `scripts/embed-mermaid.mjs <文档.md>`，生成 `assets/*.png` 并在图后插入标准 Markdown 图片引用。保留 Mermaid 源码和 `assets/*.svg` 矢量文件；交付时连同 `assets/` 一起提供。不要只交付绘图工具的跳转链接。具体步骤见 `workflows/interview-knowledge.md`。
-
-Claim、证据路径、项目 Grounding 状态、Node Type、depth、停止条件等仅用于内部推理，除非用户明确要求，否则不得输出。递归知识树可以在内部保持树结构，但最终 Markdown 默认按一级主题下的二级问题扁平展示。
-
-### Mock Interview（可选）
-
-只有用户明确要求“你来面试我 / 我自己回答 / 不要先给答案”时启用：
-
-```text
-Question → User Answer → Assessment → Follow-up
-```
-
-只有该模式评估 `WEAK / PARTIAL / DEFENSIBLE / NOT_OWNED / INCORRECT`。
-
-## Renderer
-
-Renderer 只负责展示。Kami 规则见 `renderers/kami/README.md`。
-
-**成品生成命令**：`scripts/build-resume.mjs` 把 Resume View JSON 直接编译为成品 HTML，
-使用方不需要自己组装拼接：
-
-```bash
-# 默认：生成主题选择入口 templates/index.html + 每主题一份真实数据页面
-node scripts/build-resume.mjs --data resume-view.json
-
-# 已明确主题时：直接产出该主题的成品 HTML
-node scripts/build-resume.mjs --data resume-view.json --theme kami-navy --out 我的简历.html
-```
-
-- **默认模式 `gallery`（约定交付）**：写入 `templates/index.html` —— 即主题选择入口页，
-  卡片指向同目录的 `resume-base.html`、`resume-mono.html`、`resume-navy.html`、`resume-copper.html`、`resume-seal.html`，
-  每个页面都内嵌真实数据，只换配色。用户在页面里点开某一套，再打印导出 PDF；
-  不在对话里反问配色。原样例总览页会自动备份为 `index.sample.html`。
-- `--mode portal`：单页门户（页面右上角切换主题，切换只改 CSS 变量不重渲染，打印时隐藏）。
-- `--theme`：指定主题时按 `--mode single`（默认）产出该主题的单文件自包含 HTML，
-  `@font-face` 原样保留（本机字体 → 本地路径 → CDN 的解析顺序不动）；
-  `--mode linked` 相对引用 `templates/shared/`。
-- **头像在成品页里选，不在对话里问。** 成品页左上角固定有一个头像控件
-  （`选择头像` / `移除头像` / 状态提示）：选一张本地照片，脚本用 `FileReader`
-  读成 data URL 写回 `window.KAMI_RESUME_DATA.header.avatar` 并重渲染，页头立刻切成
-  头像版式（文字块在左 + 头像在右）；点「移除头像」回到标准页头。该控件
-  `@media print` 隐藏，不会进 PDF。若用户已直接给出图片路径 / URL，写进
-  Resume View 的 `header.avatar` 即可，生成时直接就是头像版式。
-- 换主题 / 换数据改参数重跑即可。
-
-默认主题 `kami-default`；用户未指定主题时不得阻塞生成。
-
-**生成阶段不再反问头像或配色。** 用户只要生成简历，就直接按内容流程生成 Resume View，
-默认不填 `header.avatar`；用户打开 `templates/index.html` 主题入口后，可在 5 套主题间
-自行预览和选择。需要头像时，在打开的成品页左上角用头像控件选一张本地照片即可
-（打印时该控件自动隐藏）。若用户已提供头像路径 / URL，再写入 `header.avatar`，
-头像版式是「文字块在左 + 头像在右」。选定主题 HTML 后，用户通过浏览器打印为 PDF。
-
-字段写法与版式强相关（页头教育信息只到年份、项目地址写 `entry.link`、技术栈不渲染等），
-见 `workflows/resume-generation.md` 的「字段口径」一节。
-
-**字体**：模板用仓耳今楷（TsangerJinKai02 W04/W05）。仓库里不带字体文件，默认靠 CDN；
-断网时回退到系统宋体会让 PDF 文字层的汉字落到康熙部首码位，ATS 关键词匹配会失败。
-所以离线出稿、或用户反馈"PDF 搜不到字"时，先让用户跑一次
-`scripts/ensure-fonts.sh`（把字体装到本机，之后 `local()` 生效、断网也不掉字体）。
-不要为了绕开这个问题去改 `kami-family.css`。细节见 `templates/README.md`。
-
-### Interview expansion cardinality
-
-在 Interview Knowledge 中，一个 Generated Answer 可以产生多个高价值 Follow-up Nodes。必须提取并保留所有有价值的 sibling；默认一次只执行其中一个，当前分支耗尽后再返回其余 sibling。不要把“one-at-a-time execution”误解为“one-answer-one-question”。
+默认 Renderer 为 `kami`，默认主题 ID 为 `kami-default`。具体映射（当前指向 `templates/kami-base.html`）、主题数量、头像控件、字体与 PDF 打印要求只在 Renderer / template 文档维护，避免在多个 Workflow 重复定义。
