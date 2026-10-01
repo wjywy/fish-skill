@@ -10,7 +10,7 @@ skills/<skill-name>/SKILL.md
 
 | Skill | 说明 |
 | --- | --- |
-| `resume-copilot` | 从项目关键词、历史简历、工作材料或当前代码仓库中提取事实，生成可追溯技术简历，并派生面试知识树。 |
+| `resume-copilot` | 从项目关键词、历史简历、工作材料或当前代码仓库中提取事实，生成可追溯技术简历，并派生 Answer-driven 的深度面试知识链。 |
 
 ## 目录结构
 
@@ -106,7 +106,7 @@ Repository Fact != User Ownership != Resume Claim
 
 - `SKILL.md`：路由与全局不变量；
 - `workflows/`：执行顺序；
-- `policies/`：证据、Metric、写作、面试扩展和深度判定；
+- `policies/`：证据、Metric、写作、面试扩展、答案深度与 Presentation Planning；
 - `schemas/`：内部数据契约；
 - `examples/`：行为示例，不新增硬规则；
 - `renderers/ / scripts/ / templates/`：视觉与构建实现。
@@ -127,20 +127,7 @@ Renderer          → 决定长什么样、如何生成 HTML/PDF
 
 简历默认不生成 standalone personal summary；页头后直接进入 Skills / Experience / Projects 等内容。
 
-Renderer 的默认 public theme ID 为：
-
-```text
-kami-default
-```
-
-具体 theme 枚举、模板文件映射、头像、字体与打印实现以：
-
-```text
-skills/resume-copilot/schemas/render-options.schema.json
-skills/resume-copilot/renderers/kami/README.md
-```
-
-为准。根 README 不复制主题列表，避免视觉实现调整后文档漂移。
+Renderer 的默认 public theme ID 为 `kami-default`。具体 theme 枚举、模板文件映射、头像、字体与打印实现以 `skills/resume-copilot/schemas/render-options.schema.json` 与 `skills/resume-copilot/renderers/kami/README.md` 为准。
 
 ## Interview Knowledge
 
@@ -151,7 +138,7 @@ Claim
   ↓
 Question
   ↓
-Generated Reference Answer
+DEEP_STUDY Generated Reference Answer
   ↓
 Candidate Nodes
   ↓
@@ -161,69 +148,64 @@ Follow-up Question
   ↺
 ```
 
-### 当前答案先讲透
+### 每个问题都先完整回答
 
-系统参考答案内部使用：
+Interview Knowledge 不提供 QUESTION_BANK 式浅回答模式。每一个被物化的 Question 都必须先形成完整、可独立学习的答案，再从 Answer 提取下一层节点。
 
-- `overview`：直接、可口述的核心回答；
-- `principleDetail`：完整机制、Why Layer、具体推演、知识抽象与必要边界。
-
-当前答案必须先完整，再从答案提取下一层节点；不能把当前问题本应解释清楚的核心机制推给下一道 Follow-up。
+问题数量和文档长度不是优化目标；不能为了后面还有更多题而压缩当前答案。
 
 ### Answer-driven 深链
 
-不先生成完整题库。
+不先生成完整题库：
 
 ```text
 Question₀
-→ Answer₀
-→ Node₁
+→ Complete Answer₀
+→ Candidate Nodes
 → Question₁
-→ Answer₁
-→ Node₂
+→ Complete Answer₁
 ```
 
 一个 Answer 可以产生多个高价值 sibling。全部保留，但默认一次只执行一个；当前深分支耗尽后再返回其他 sibling。
 
+### Presentation Planning
+
+内部仍可以使用 `overview / principleDetail` 保证答案知识完整，但它们不是用户可见栏目。
+
+最终答案不固定展示：
+
+```text
+直接回答
+展开说明
+```
+
+而是先直接回答问题，再按题型选择最适合的自然段、步骤、表格、时间线、流程图或代码结构。
+
 ### 深度边界
 
-递归停止由目标岗位相关性与信息增益决定，不按固定 5 层、8 层停止。项目 Grounding 不足只影响项目场景化，不阻止可靠的通用技术解释。
+递归停止由目标岗位相关性与信息增益决定，不按固定 5 层、8 层停止，也不因为已经生成很多问题而停止。项目 Grounding 不足只影响项目场景化，不阻止可靠的通用技术解释。
+
+### Execution Evidence
+
+只有当前任务中真实执行命令并取得结果，才可以写“我刚运行通过 / 当前 78/78 / 实测成功”。读取测试代码、README、package.json 或历史测试报告不能冒充本轮执行结果。
 
 ### 默认 Markdown
 
-默认面试预设只展示问题：
+Interview Knowledge 默认就是完整 Q&A：
 
 ```markdown
-# 简历要点核心主题
+# 核心主题
 
 ## 面试问题
 
-## 继续追问的问题
+<自然开头直接回答；随后按题型完整展开>
+
+## 根据上一层 Answer 产生的 Follow-up
+
+<该题自己的完整 DEEP_STUDY 答案>
 ```
 
-用户明确要求附答案时才显示：
-
-```markdown
-**直接回答**
-
-**展开说明**
-```
-
-`展开说明` 可以根据题目使用步骤、表格、时间线、流程图或伪代码，不要求写成一个大段。
-
-面试节点调度规则以：
-
-```text
-skills/resume-copilot/policies/knowledge-expansion-policy.md
-```
-
-为唯一 Source of Truth；答案完整度与递归边界以：
-
-```text
-skills/resume-copilot/policies/interview-depth-policy.md
-```
-
-为准。
+面试节点调度规则以 `skills/resume-copilot/policies/knowledge-expansion-policy.md` 为唯一 Source of Truth；答案完整度、Presentation Planning 与递归边界以 `skills/resume-copilot/policies/interview-depth-policy.md` 为准。
 
 只有用户明确要求“模拟面试我 / 我自己回答”时才进入 Mock Interview。系统 Reference Answer 不代表用户已经掌握，也不自动成为 Career Claim。
 
@@ -241,20 +223,13 @@ npm run check
 npm test
 ```
 
-只检查本次新增的架构护栏：
+只检查架构护栏：
 
 ```bash
 npm run test:architecture
 ```
 
-architecture contract 会防止常见回归，例如：
-
-- Interview Scheduler 被复制回 `SKILL.md` / Workflow；
-- Example 重新承载硬规则；
-- Generated Answer 重复持久化派生完成状态；
-- `stopReason / decisionReason` 双字段复活；
-- Resume Strategy 重新出现 standalone Summary；
-- Resume Generation 重新维护 Renderer 的模板默认值或字体实现。
+architecture contract 用来防止常见回归，例如：Scheduler 被复制回入口层、Example 重新承载硬规则、Interview 重新退化成 question-only / 固定两段式输出、Resume Strategy 重新出现 standalone Summary 等。
 
 ## 发布到 npm
 
@@ -265,8 +240,6 @@ npm test
 npm pack --dry-run
 npm publish
 ```
-
-包内 `bin/fish-skill.mjs` 会从 `skills/` 发现包含 `SKILL.md` 的目录，并将指定 Skill 完整复制到目标 Agent Skill 根目录。
 
 ## License
 
