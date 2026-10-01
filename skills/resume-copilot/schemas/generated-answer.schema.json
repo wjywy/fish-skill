@@ -51,19 +51,19 @@
     "overview": {
       "type": "string",
       "minLength": 1,
-      "description": "内部开场内容：用候选人口吻直接回答问题，说明结论、关键做法和已验证的项目落点。最终 Markdown 不需要显示字段名或固定分栏。"
+      "description": "内部开场内容：用候选人口吻简短、直接地回答问题，说明结论、关键做法和已验证的项目落点；它不限制整题的展开深度。默认问题预设不输出；明确要求附答案时对应“直接回答”。"
     },
     "principleDetail": {
       "type": "string",
       "minLength": 1,
-      "description": "内部机制内容：沿开场自然展开，按前提、步骤、状态变化和结果解释因果链，给出可推演的例子；按题目需要补失败边界、取舍和验证。最终 Markdown 以连贯的候选人回答呈现，不强制显示“原理详解”标签；列表、短代码、表格和流程图按理解需要使用。"
+      "description": "内部机制内容：依问题类型完整展开关键因果关系，使用有助于理解的步骤、例子或时间线；按题目需要补失败恢复、并发、取舍和验证。默认问题预设不输出；明确要求附答案时对应“展开说明”，不重复开场或输出答题策略。"
     },
     "projectAside": {
       "type": [
         "string",
         "null"
       ],
-      "description": "仅当项目具体实现/动机/效果无法核实时给用户的简短旁白；不得替代 overview 或 principleDetail。"
+      "description": "内部记录未核实的项目具体实现、动机或效果；用户可见答案仅在相关技术句子中区分现状与假设方案，不单独输出旁白。"
     },
     "candidateEvaluationComplete": {
       "type": "boolean",
@@ -73,5 +73,5 @@
   },
   "$id": "generated-answer.schema.json",
   "additionalProperties": false,
-  "description": "内部用 overview 和 principleDetail 保证直接回答与机制展开都完整；用户可见 Markdown 将它们写成一段连贯、具体、可口述的回答，不强制分栏。项目事实与未实现的设计建议必须区分；Markdown 流程图用图片直接展示并保留 Mermaid 源码。"
+  "description": "内部用 overview 和 principleDetail 支撑答案驱动的追问；默认用户可见 Markdown 只输出问题。明确要求附答案时才显示“直接回答”和“展开说明”两部分。项目事实与未实现的设计建议必须区分；不输出旁白、答题策略或候选人自评。Markdown 流程图用图片直接展示并保留 Mermaid 源码。"
 }

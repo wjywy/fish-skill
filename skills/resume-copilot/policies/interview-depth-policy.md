@@ -95,4 +95,4 @@ Outbox
 
 ## Project Grounding 与深度无关
 
-`VERIFIED / PARTIAL / INSUFFICIENT` 描述的是项目场景化程度，不直接决定是否继续追问。一个节点即使 `projectGrounding=INSUFFICIENT`，只要通用技术答案可靠且对岗位仍有信息增益，就可以继续展开，并用旁白标明项目实现尚未核实。
+`VERIFIED / PARTIAL / INSUFFICIENT` 描述的是项目场景化程度，不直接决定是否继续追问。一个节点即使 `projectGrounding=INSUFFICIENT`，只要通用技术答案可靠且对岗位仍有信息增益，就可以继续展开；涉及项目细节时直接区分当前实现与假设方案，不输出单独旁白。

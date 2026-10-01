@@ -1,6 +1,6 @@
 # Interview Knowledge Expansion Examples
 
-本文件用于帮助 Coding Agent 理解“什么值得继续追问”，不是用户可见输出模板。
+本文件用于帮助 Coding Agent 判断“什么值得继续追问”，不是参考答案的写作模板。示例不是用户项目的事实来源，不得照搬其中的项目、技术栈或实现。
 
 ## 示例 1：低代码平台
 
@@ -159,52 +159,7 @@ Root Answer 可能提到：
 
 ---
 
-## 示例 5：详细答案与流程图
-
-问题：
-
-```text
-多轮澄清的 Agent 如何在用户补充信息后继续原任务？
-```
-
-推荐答案结构：
-
-1. 先说明核心思想：保存未完成任务状态，而不是把澄清当成新请求。
-2. 描述需要保存的数据：task id、当前意图、缺失字段、上下文。
-3. 描述下一轮如何识别与旧任务的关系。
-4. 用流程图展示状态流转。
-5. 再结合项目中的 A2A `input_required` 场景。
-
-示例图：
-
-以下是生成前的 Mermaid 源码。保存为 Markdown 后运行
-`node scripts/embed-mermaid.mjs <文档.md>`，交付稿会在围栏后插入 PNG 图片引用。
-
-```mermaid
-flowchart TD
-  A[用户请求] --> B[解析意图]
-  B --> C{必要参数完整?}
-  C -- 否 --> D[保存活动任务与缺失字段]
-  D --> E[返回 input_required]
-  E --> F[用户补充]
-  F --> G[关联活动 task/context]
-  G --> B
-  C -- 是 --> H[执行 Workflow]
-  H --> I[completed]
-```
-
-不推荐只回答：
-
-```text
-通过保存上下文，在用户补充后继续任务。
-```
-
-因为它没有说明“保存什么、怎么关联、什么时候继续”。
-
-
----
-
-## 示例 6：Answer-first 与待展开队列
+## 示例 5：Answer-first 与待展开队列
 
 Resume Claim：
 
