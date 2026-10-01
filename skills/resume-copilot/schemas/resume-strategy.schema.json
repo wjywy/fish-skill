@@ -12,266 +12,109 @@
     "requirementCoverage"
   ],
   "properties": {
-    "id": {
-      "type": "string"
-    },
-    "targetId": {
-      "type": "string"
-    },
-    "objective": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
+    "id": { "type": "string" },
+    "targetId": { "type": "string" },
+    "objective": { "type": ["string", "null"] },
     "requirements": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "id",
-          "category",
-          "statement",
-          "importance"
-        ],
+        "required": ["id", "category", "statement", "importance"],
         "properties": {
-          "id": {
-            "type": "string"
-          },
+          "id": { "type": "string" },
           "category": {
             "type": "string",
-            "enum": [
-              "responsibility",
-              "skill",
-              "domain",
-              "architecture",
-              "collaboration",
-              "leadership",
-              "outcome",
-              "other"
-            ]
+            "enum": ["responsibility", "skill", "domain", "architecture", "collaboration", "leadership", "outcome", "other"]
           },
-          "statement": {
-            "type": "string",
-            "minLength": 1
-          },
-          "importance": {
-            "type": "string",
-            "enum": [
-              "MUST",
-              "IMPORTANT",
-              "NICE_TO_HAVE"
-            ]
-          },
-          "keywords": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true
-          },
-          "evidenceNeeded": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "sourceText": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
+          "statement": { "type": "string", "minLength": 1 },
+          "importance": { "type": "string", "enum": ["MUST", "IMPORTANT", "NICE_TO_HAVE"] },
+          "keywords": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "evidenceNeeded": { "type": ["string", "null"] },
+          "sourceText": { "type": ["string", "null"] }
         },
         "additionalProperties": false
       }
     },
     "requirementCoverage": {
       "type": "array",
+      "description": "Requirement 覆盖解释层。用于说明 Target/JD 被哪些 Claim 支撑；不得覆盖 selectedClaimIds 的最终 selection。",
       "items": {
         "type": "object",
-        "required": [
-          "requirementId",
-          "status",
-          "claimIds"
-        ],
+        "required": ["requirementId", "status", "claimIds"],
         "properties": {
-          "requirementId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "covered",
-              "weakly_covered",
-              "gap"
-            ]
-          },
-          "claimIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true
-          },
-          "notes": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
+          "requirementId": { "type": "string" },
+          "status": { "type": "string", "enum": ["covered", "weakly_covered", "gap"] },
+          "claimIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "notes": { "type": ["string", "null"] }
         },
         "additionalProperties": false
       }
     },
     "selectedExperienceIds": {
       "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Resume Generation 的权威 Experience selection。"
     },
     "selectedClaimIds": {
       "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Resume Generation 的权威 Claim selection。claimEvaluations / excludedClaims 只解释决策，不能与本字段冲突。"
     },
     "excludedClaims": {
       "type": "array",
+      "description": "可选审计字段：记录为什么排除某些 Claim。不得同时出现在 selectedClaimIds。",
       "items": {
         "type": "object",
-        "required": [
-          "claimId",
-          "reason"
-        ],
+        "required": ["claimId", "reason"],
         "properties": {
-          "claimId": {
-            "type": "string"
-          },
+          "claimId": { "type": "string" },
           "reason": {
             "type": "string",
-            "enum": [
-              "low_relevance",
-              "weak_evidence",
-              "ownership_too_weak",
-              "high_risk",
-              "redundant",
-              "space_budget",
-              "not_resume_eligible",
-              "other"
-            ]
+            "enum": ["low_relevance", "weak_evidence", "ownership_too_weak", "high_risk", "redundant", "space_budget", "not_resume_eligible", "other"]
           },
-          "notes": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
+          "notes": { "type": ["string", "null"] }
         },
         "additionalProperties": false
       }
     },
     "sectionPlan": {
       "type": "array",
+      "description": "Resume Generation 的权威 section placement / content budget plan。",
       "items": {
         "type": "object",
-        "required": [
-          "section",
-          "priority"
-        ],
+        "required": ["section", "priority"],
         "properties": {
-          "section": {
-            "type": "string"
-          },
-          "priority": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "budget": {
-            "type": [
-              "string",
-              "number",
-              "null"
-            ]
-          },
-          "experienceIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true
-          }
+          "section": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 1 },
+          "budget": { "type": ["string", "number", "null"] },
+          "experienceIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
         },
         "additionalProperties": false
       }
     },
-    "emphasis": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true
-    },
-    "coverageGaps": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "riskNotes": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
+    "emphasis": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "coverageGaps": { "type": "array", "items": { "type": "string" } },
+    "riskNotes": { "type": "array", "items": { "type": "string" } },
     "claimEvaluations": {
       "type": "array",
+      "description": "可选审计字段：解释 Claim 的选择理由，可以是部分记录；凡出现的 SELECT / EXCLUDE 必须与 selectedClaimIds 一致。",
       "items": {
         "type": "object",
-        "required": [
-          "claimId",
-          "decision",
-          "reason"
-        ],
+        "required": ["claimId", "decision", "reason"],
         "properties": {
-          "claimId": {
-            "type": "string"
-          },
-          "decision": {
-            "enum": [
-              "SELECT",
-              "DEFER",
-              "EXCLUDE"
-            ]
-          },
-          "matchedRequirementIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true
-          },
-          "strengths": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "weaknesses": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "reason": {
-            "type": "string"
-          }
+          "claimId": { "type": "string" },
+          "decision": { "enum": ["SELECT", "DEFER", "EXCLUDE"] },
+          "matchedRequirementIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "strengths": { "type": "array", "items": { "type": "string" } },
+          "weaknesses": { "type": "array", "items": { "type": "string" } },
+          "reason": { "type": "string" }
         },
         "additionalProperties": false
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "description": "selectedExperienceIds / selectedClaimIds / sectionPlan 是 Generation 的 canonical strategy result；其他 coverage/evaluation/risk 字段用于解释和审计，不得与 canonical selection 冲突。"
 }
