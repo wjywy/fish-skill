@@ -2,29 +2,37 @@
   "id": "B5",
   "title": "Interview Knowledge — user-visible output hygiene",
   "sourceOfTruth": [
-    "SKILL.md §Interview 模式",
-    "workflows/interview-knowledge.md §用户可见 Markdown 输出 / §默认禁止输出的内部信息"
+    "workflows/interview-knowledge.md §用户可见 Markdown 输出",
+    "workflows/interview-knowledge.md §默认禁止输出的内部信息",
+    "policies/interview-depth-policy.md",
+    "SKILL.md §硬性执行约束"
   ],
-  "preconditions": { "mode": "RESUME_GROUNDED", "targetRole": "Agent 应用开发工程师" },
+  "preconditions": {
+    "mode": "RESUME_GROUNDED",
+    "targetRole": "Agent 应用开发工程师"
+  },
   "userInput": "把刚才那条 Outbox 简历描述的面试准备整理成一份可以直接复习的 Markdown 文档。",
   "mustDo": [
-    "一级标题提炼核心主题（如 `# Outbox 可靠事件分发`），不写 `Claim 1`",
-    "二级标题为面试问题，正文为紧邻的参考答案",
-    "每个参考答案直接回答问题，再自然展开机制和具体例子，不强制显示内部字段或固定分栏",
-    "项目细节不足时只追加简短旁白"
+    "一级标题提炼核心主题，不写内部 Claim 编号",
+    "二级标题为面试问题；用户要求附答案时，答案紧邻问题并显示 `**直接回答**` 与 `**展开说明**`",
+    "展开说明按题型使用自然段、步骤、表格、时间线、代码或图，不要求一个固定大段",
+    "项目当前实现、通用原理与假设改造在相关答案中自然区分，不暴露 Grounding/debug 标签",
+    "最终文档只保留可复习内容，不写 Knowledge Graph 调度过程"
   ],
   "mustNotDo": [
-    "输出 claimId / Claim / 证据路径 / 文件路径",
-    "输出 VERIFIED / PARTIAL / INSUFFICIENT",
-    "输出 depth / Node Type / roleRelevance / 风险等级",
-    "输出 Knowledge Node / Parent / Child / Stop Reason / 文档状态",
-    "输出“建议补充验证”等内部缺口列表",
-    "把参考答案写成没有机制、例子或项目边界的术语摘要"
+    "输出 claimId / 内部 Claim 编号 / 仅用于 provenance 的证据路径",
+    "输出 VERIFIED / PARTIAL / INSUFFICIENT 等 Grounding 状态标签",
+    "输出 graph depth / Node Type / roleRelevance / 内部 risk 等元数据字段",
+    "输出 Knowledge Node / Parent / Child / Shared Node 图结构标签",
+    "输出 Expansion Queue / Root Queue / Sibling Transition Gate / decisionReason 等调度信息",
+    "输出“建议补充验证”等内部 debug 缺口列表",
+    "把项目事实不足单独写成调试旁白，而不是在相关技术句中自然说明边界"
   ],
   "rubric": [
-    { "id": "B5-R1", "criterion": "未暴露任何内部元数据字段", "weight": 3 },
-    { "id": "B5-R2", "criterion": "一级标题为主题而非 Claim 编号", "weight": 2 },
-    { "id": "B5-R3", "criterion": "问题与答案紧邻、可直接复习", "weight": 2 },
-    { "id": "B5-R4", "criterion": "每个答案开场直接、机制具体、口述自然，不暴露内部字段标签", "weight": 2 }
+    { "id": "B5-R1", "criterion": "未暴露内部执行元数据", "weight": 3 },
+    { "id": "B5-R2", "criterion": "一级标题为人类可读主题而非内部 Claim 编号", "weight": 2 },
+    { "id": "B5-R3", "criterion": "问题与用户要求的答案紧邻、可直接复习", "weight": 2 },
+    { "id": "B5-R4", "criterion": "CURRENT / PRINCIPLE / IMPROVEMENT 边界自然表达，不使用 debug 标签", "weight": 2 },
+    { "id": "B5-R5", "criterion": "无 Queue / Scheduler 过渡旁白", "weight": 2 }
   ]
 }
