@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "interview-knowledge-node.schema.json",
   "title": "InterviewKnowledgeNode",
   "type": "object",
   "required": [
@@ -102,14 +103,7 @@
         "MERGED",
         "DROPPED"
       ],
-      "description": "UNEXPANDED=值得继续问且尚未展开；EXPANDED=已通过后续问题展开；COVERED=当前答案已经充分解释，继续追问信息增益不足；MERGED=与已有节点重复；DROPPED=低价值/越界/环路。 同一个 sourceAnswerId 可以对应多个同时处于 UNEXPANDED 的 sibling nodes；选择其中一个继续展开不得隐式删除其他 sibling。"
-    },
-    "stopReason": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "兼容字段；新数据优先使用 decisionReason。仅在 DROPPED 且需要记录停止原因时使用。"
+      "description": "UNEXPANDED=高价值且尚未展开；EXPANDED=已通过后续问题展开；COVERED=当前或其他答案已充分解释；MERGED=与已有节点重复；DROPPED=低价值、越界或环路。"
     },
     "roleRelevance": {
       "enum": [
@@ -118,14 +112,13 @@
         "CONTEXTUAL",
         "OUT_OF_SCOPE"
       ],
-      "description": "该节点相对 Target Role / JD Requirements 的岗位相关性。递归是否继续主要由该字段决定，而不是与根关键词的距离。"
+      "description": "节点相对 Target Role / JD 的相关性。它参与价值与递归边界判断，但不是自动白名单。"
     },
     "roleRelevanceReason": {
       "type": [
         "string",
         "null"
-      ],
-      "description": "说明该节点为何仍与目标岗位相关，或为何已脱离岗位要求。"
+      ]
     },
     "sourceAnswerId": {
       "type": [
@@ -141,8 +134,7 @@
         "IMPLICIT",
         "CONTRAST",
         "BOUNDARY"
-      ],
-      "description": "节点来源。ROOT 仅用于根节点。"
+      ]
     },
     "mergedIntoNodeId": {
       "type": [
@@ -156,7 +148,7 @@
         "string",
         "null"
       ],
-      "description": "记录为何展开、合并或丢弃，用于内部可追溯性。"
+      "description": "统一记录为何展开、覆盖、合并或丢弃。停止原因也写在这里，不再维护单独 stopReason。"
     },
     "coverageStatus": {
       "enum": [
@@ -164,9 +156,8 @@
         "PARTIAL",
         "SUFFICIENT"
       ],
-      "description": "该知识点在 sourceAnswerId 对应答案中的覆盖程度。SUFFICIENT 不代表永远不能再问；若继续追问仍有显著岗位信息增益，可创建更具体的新节点。"
+      "description": "该知识点在 sourceAnswerId 对应答案中的覆盖程度。SUFFICIENT 时通常标记 COVERED；如果后来出现更具体的新信息需求，应创建新的具体节点。"
     }
   },
-  "$id": "interview-knowledge-node.schema.json",
   "additionalProperties": false
 }
