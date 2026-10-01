@@ -29,9 +29,10 @@
   "scripts": {
     "list": "node ./bin/fish-skill.mjs list",
     "check": "node ./bin/fish-skill.mjs check",
-    "test": "node ./test/run-tests.mjs",
+    "test": "node ./test/run-tests.mjs && node ./test/architecture-contract.mjs",
+    "test:architecture": "node ./test/architecture-contract.mjs",
     "test:diagram": "node ./test/mermaid-image.test.mjs",
-    "test:report": "node ./test/run-tests.mjs --json",
+    "test:report": "node ./test/run-tests.mjs --json && node ./test/architecture-contract.mjs",
     "prepack": "node ./bin/fish-skill.mjs check"
   }
 }
