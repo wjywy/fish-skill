@@ -2,7 +2,9 @@
 
 ## 目的
 
-把“用户参与程度”和“事实可靠程度”拆成两个维度，避免原先 A/B/C/D 同时承担 ownership 与证据强度。
+把“用户参与程度”和“事实可靠程度”拆成独立维度，并定义 Fact → Claim 的证据边界。
+
+Metric 的数值、口径和可写入条件统一由 `./metric-policy.md` 定义；本文件不重复维护 Metric 规则。
 
 ## Ownership
 
@@ -25,6 +27,8 @@
 | `C` | 用户理解原理或熟悉方案，但并非自己的直接项目事实 |
 | `D` | 缺少足够支撑、存在明显猜测或无法解释 |
 
+Evidence Level 描述“这条 Claim 的事实支撑有多强”，不等于 Ownership。
+
 ## Confidence
 
 - `confirmed`：用户明确确认。
@@ -36,32 +40,31 @@
 
 - `LOW`：用户有直接经历，常规追问可解释。
 - `MEDIUM`：存在协作边界、关键细节未确认，或技术本身会引出较深追问。
-- `HIGH`：表述强于实际 ownership、仅理解未实践、或关键实现细节缺失。
+- `HIGH`：表述强于实际 Ownership、仅理解未实践、或关键实现细节缺失。
 
-Interview Risk 不是“禁止写入”的开关，而是决策信息。
+Interview Risk 不是“禁止写入”的开关，而是 Strategy / Review 的决策信息。
 
 ## Fact → Claim 追溯规则
 
-每个正式 Claim 必须至少引用一个 `factId`。Claim 不直接重复维护 source；来源、仓库路径、用户确认状态等统一从 Fact 追溯。
+每个正式 Claim 必须至少引用一个 `factId`。
 
-每个 Metric 也必须引用支撑它的 `factIds`，避免指标脱离来源单独存在。
+Claim 不重复维护原始 source；来源类型、仓库位置、用户确认等统一沿：
+
+```text
+Claim.factIds
+→ Fact
+→ sourceType / evidenceLocations / confidence / subject
+```
+
+如果 Claim 包含人物贡献表述，还必须有足够的 USER / Ownership 事实支撑；单纯 PROJECT Fact 不能自动升级成个人 Resume Claim。
+
+Metric 也通过 `factIds` 回溯来源，但 Metric 的可用条件读取 `./metric-policy.md`。
 
 ## 写入原则
 
 1. `Evidence D` 默认不进入最终简历。
-2. `Evidence C` 可以进入技能、了解项或用户明确选择的强化表述，但必须提示追问风险。
+2. `Evidence C` 可以进入技能、了解项或用户明确选择的强化表述，但不能伪装成直接项目实践。
 3. 不静默升级 Ownership。
-4. 如果用户坚持使用更强措辞，可以保留用户决策，但应记录 `interviewRisk=HIGH` 或相应风险说明。
-5. 可以同时给出保守版和强化版，但两者都必须追溯到相同事实，不得新增不存在的经历。
-
-## Metric Policy
-
-每个数字至少记录：
-- `value / before / after` 中可用的信息
-- `unit`
-- `confidence`
-- 至少一个支撑它的 `factId`
-
-Metric 不重复维护 `source`。来源类型、文件位置、Repository 证据和用户确认状态统一通过 `factIds → Fact` 回溯。
-
-不允许为了“量化”自动估算业务指标。
+4. 用户坚持更强措辞时可以保留用户决策，但应同步提高 `interviewRisk` 或记录风险。
+5. 可以给保守版和强化版，但二者都必须追溯到相同事实，不得新增不存在的经历。
+6. 证据强度、Ownership 和 Metric 可信度分别判断，不用一个字段代替另一个字段。
