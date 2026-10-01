@@ -4,16 +4,16 @@
 
 ## Objective
 
-Verify the delivered Markdown is **revision-ready but free of internal execution metadata**.
+Verify the delivered Markdown is **revision-ready, DEEP_STUDY, naturally structured, and free of internal execution metadata**.
 
-The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Coverage, queues and scheduler state. The user-facing document should only contain the useful interview material.
+The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Coverage, queues, `overview / principleDetail` and scheduler state. The user-facing document should only contain useful interview material.
 
 ## Source of truth
 
 - `workflows/interview-knowledge.md §用户可见 Markdown 输出`
 - `workflows/interview-knowledge.md §默认禁止输出的内部信息`
-- `policies/interview-depth-policy.md` for answer quality and CURRENT / PRINCIPLE / IMPROVEMENT boundaries
-- `SKILL.md` only for the global output-hygiene invariant
+- `policies/interview-depth-policy.md` for DEEP_STUDY, Presentation Planning and CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION boundaries
+- `SKILL.md` only for global invariants
 
 ## Input
 
@@ -25,9 +25,10 @@ The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Cov
 
 - `#` = core theme, never an internal Claim number.
 - `##` = interview question.
-- If answers were requested, each question is followed by `**直接回答**` and `**展开说明**`.
-- `展开说明` may use steps, tables, timelines, code or diagrams when they improve understanding.
-- Project facts, general principles and hypothetical improvements are distinguished **inside the relevant answer**, not exposed as debug labels.
+- Every generated question is immediately followed by its complete DEEP_STUDY answer.
+- The answer begins by directly addressing the question, then uses the most suitable structure for that question: prose, steps, comparison table, timeline, state flow, code or diagram.
+- Fixed visible headings such as `直接回答 / 展开说明` are not required and should not be mechanically repeated.
+- Project facts, general principles, hypothetical improvements and current execution results are distinguished inside the relevant answer, not exposed as debug labels.
 - No scheduler commentary such as “next node”, “return to sibling”, “Expansion Queue” appears in the document.
 
 ## Anti-patterns — internal metadata must not leak
@@ -45,10 +46,9 @@ The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Cov
 | Expansion Queue / Root Queue | scheduler state |
 | Sibling Transition Gate | scheduler state |
 | `decisionReason` | internal decision trace |
+| `overview / principleDetail` | internal answer storage fields |
 | generation-mode or document-status notes | internal state |
 | “建议补充验证” style debug gap list | internal to-do |
-
-A technical answer may naturally mention words such as “risk”, “depth” or “claim” in ordinary English/Chinese meaning. The test is about leaking **internal field labels / control metadata**, not banning normal technical vocabulary by substring alone.
 
 ## Rubric
 
@@ -56,9 +56,10 @@ A technical answer may naturally mention words such as “risk”, “depth” o
 | --- | --- | ---: |
 | B5-R1 | Zero internal execution metadata exposed | 3 |
 | B5-R2 | Level-1 heading is a human-readable theme, not a Claim number | 2 |
-| B5-R3 | Questions and requested answers are adjacent and revision-ready | 2 |
-| B5-R4 | Project/current vs principle/improvement boundaries are expressed naturally, without debug labels | 2 |
-| B5-R5 | No queue/scheduler transition commentary leaks into prose | 2 |
+| B5-R3 | Every question and its DEEP_STUDY answer are adjacent and revision-ready | 3 |
+| B5-R4 | Presentation matches question shape rather than a fixed two-part template | 3 |
+| B5-R5 | Project/current vs principle/improvement/execution boundaries are expressed naturally | 2 |
+| B5-R6 | No queue/scheduler transition commentary leaks into prose | 2 |
 
 ## Minimal passing shape
 
@@ -67,18 +68,24 @@ A technical answer may naturally mention words such as “risk”, “depth” o
 
 ## 为什么业务状态和 Outbox Event 要在同一个事务里提交？
 
-**直接回答**
+如果状态更新和事件记录分两次提交，中间任何一次崩溃都会形成双写不一致……
 
-<直接回答问题，必要时落到已验证项目事实>
+1. 没有 Outbox 时……
+2. 引入同事务 Outbox 后……
+3. 事务提交后 Worker 如何继续……
 
-**展开说明**
-
-<机制、Why、例子、边界；按题目选择结构>
+<必要的失败例子 / 边界>
 
 ## Outbox Worker 重复投递时，消费侧如何保证幂等？
 
-**直接回答**
-...
+幂等的核心不是“多查一次”，而是把竞争收敛到一个原子写入点……
+
+```text
+T1 A 检查
+T2 B 检查
+T3 A 写入
+T4 B 冲突
+```
 ```
 
 The visible document should **not** contain prose such as:
@@ -87,14 +94,12 @@ The visible document should **not** contain prose such as:
 该节点 roleRelevance=CORE，因此从 Expansion Queue 取出。
 当前 sibling 处理完成后返回 Root Queue。
 projectGrounding=PARTIAL。
+overview: ...
+principleDetail: ...
 ```
 
-Instead, if the project does not prove a specific implementation, write it naturally:
-
-```text
-当前仓库可以确认存在 Outbox / Worker 链路；具体消费侧是否采用唯一索引去重无法由现有证据确认。通用实现上可以……
-```
+If the project does not prove a specific implementation, write it naturally in the answer instead of exposing metadata.
 
 ## What this case proves
 
-The skill can keep a rich internal knowledge graph while delivering a clean document that a candidate can actually study from, without exposing scheduler plumbing or turning evidence boundaries into debug output.
+The skill can keep a rich internal knowledge graph and structured answer storage while delivering a clean deep-study document whose visible structure follows the actual knowledge shape.
