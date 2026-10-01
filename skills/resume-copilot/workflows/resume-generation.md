@@ -5,15 +5,24 @@
 进入本流程后必须读取：
 
 - `../policies/resume-writing-policy.md`
+- `../policies/evidence-policy.md`
+- `../policies/metric-policy.md`
 - `../examples/resume-bullet-patterns.md`
 - `../schemas/resume-view.schema.json`
-- `../renderers/kami/README.md`（两页槽位与文本强调约定）
+- `../renderers/kami/README.md`（仅用于字段到 Renderer 的接口约定）
 
 ## 目标
 
 将 `Career Profile + Resume Strategy` 转换成目标岗位对应的 `Resume View`。
 
-Resume Generation 回答“已经决定要写这些事实后，应该怎么组织和表达”。
+Resume Generation 只回答：**Strategy 已经决定写哪些事实后，如何把这些事实组织成可追溯的简历内容。**
+
+它不负责：
+
+- 重新选择被 Strategy 排除的 Claim；
+- 创造项目事实；
+- 主题设计、头像控件、字体加载、打印参数等 Renderer 实现；
+- 通过压字号或改页面参数解决内容过多。
 
 ## 输入
 
@@ -22,104 +31,49 @@ Resume Generation 回答“已经决定要写这些事实后，应该怎么组�
 - Target Role / Target Direction（必须明确）
 - 写作语言 / 长度 / 格式约束
 
-若 Target Role / Target Direction 缺失，停止正式文案生成并先询问用户。不得根据已有技术词自行推断。
+若 Target Role 缺失，停止正式文案生成并先确认方向。不得根据技术词自行推断。
 
-如果存在 Strategy，不得绕过 Strategy 重新从全部 Claims 任意挑选内容。
+如果已经存在 Resume Strategy，不得绕过 Strategy 重新从全部 Claims 任意挑选内容。
 
-## 生成前必须确认
+## 主流程
 
-- **头像不再作为对话阻塞问题。** 生成简历时不必先反问用户是否需要头像。
-  默认 Resume View 留空 `header.avatar`（标准页头）。**每个成品主题页的左上角都有
-  头像控件**：`选择头像` 挑一张本地照片 → 页头立刻切成头像版式（文字块在左、
-  头像在**右侧**）；`移除头像` 回到标准页头。控件 `@media print` 隐藏，不会进 PDF。
-  若用户明确提供头像路径 / URL，才写入 `header.avatar`。
-- **主题也不需要单独发问。** 生成后直接用生成脚本产出成品 HTML 并交付；
-  用户想换主题时改 `--theme` 重跑即可。`templates/index.html` 仍是主题预览入口
-  （4 套主题 + base），供用户自主浏览。`renderOptions.theme` 可用于用户已明确
-  指定主题的场景，未指定时默认 `kami-base`。
+```text
+Resume Strategy
+  ↓
+Selected Experience / Claim / Metric
+  ↓
+Content Composition
+  ↓
+Traceability Check
+  ↓
+Resume View
+  ↓
+Renderer Handoff
+```
 
-生成完成时，交付顺序是：
+### Step 1：按 Strategy 取材
 
-1. Resume View / 数据文件（含可选 `header.avatar`）。
-2. 运行生成脚本产出 **主题选择入口 `templates/index.html`**（无需用户或使用方自己组装拼接）：
+读取：
 
-   ```bash
-   node ../scripts/build-resume.mjs --data resume-view.json
-   ```
+- `selectedExperienceIds`
+- `selectedClaimIds`
+- `sectionPlan`
+- `emphasis`
+- `coverageGaps / riskNotes`（只用于决策，不直接写进简历）
 
-   产出的是入口页 + 同目录下 5 个主题页（base / mono / navy / copper / seal），
-   **每个主题页都内嵌真实简历数据，只换配色**；用户在入口页点开想看的那套，
-   再打印导出 PDF。原样例总览页会被自动备份为 `index.sample.html`。
-   （用户已明确指定主题时，加 `--theme kami-navy` 直接出该主题的成品 HTML。）
-3. 用户打开 `templates/index.html` → 点开某套主题 → 需要头像就在该页左上角用头像控件
-   选一张本地照片（或点「移除头像」保持标准页头）→ 浏览器「打印 → 另存为 PDF」导出
-   （勾选背景图形保留纸色；头像控件不会出现在 PDF 里）。
+数字必须同时满足 `metric-policy.md`；Claim 被选中不代表关联 Metric 自动可写。
 
-不要为了选择头像或配色而打断内容生成流程；这两个选择都属于交付阶段的视觉决策。
+### Step 2：组合 Bullet
 
-## 顺序
+每条正式 Bullet 必须：
 
-1. 按 Strategy 读取 `selectedExperienceIds` 和 `selectedClaimIds`。
-2. 根据 `sectionPlan` 分配内容位置和 bullet 数量。
-3. 将相关 Claims 组合为 bullet；每条 bullet 必须生成稳定 `id`，并记录直接支撑它的 `claimIds` 与实际使用的 `metricIds`。
-4. 优先采用 `Context/Action/Decision/Result` 中对目标岗位最有区分度的信息。
-5. 使用符合 Ownership 的动词。
-6. Metric 只能引用 `metricIds` 对应、且符合 Metric Policy 的指标。
-7. 去除重复 Claim 和重复技术词。
-8. 检查每条 bullet 是否可追溯回 Claim。
-9. 输出符合 `../schemas/resume-view.schema.json` 的 Resume View：
-   - `header`：姓名、目标岗位、教育简述（`educationInline`）、联系方式，
-     以及可选的 `avatar`（用户要头像时才填）
-   - `skills`：能力方向 + 描述
-   - `sections`：工作 / 项目 / 实习 / 开源 / 教育等；entry 内可含 `summaryBullets / bullets / subBlocks / tags`
-   - `summaryBullets / bullets / subBlocks[].bullets` 使用结构化 Resume Bullet：`{ id, text, claimIds, metricIds }`；Renderer 只展示 `text`，追溯信息保留在 Resume View。
-10. 需要主题强调色的技术词与指标，用 `**关键词**` 标记（渲染为 `<span class="hl">`）；每条内容至少一处，但不要整句高亮。
-11. 如需 HTML / PDF，由 Renderer 解析 `renderOptions`；未指定主题则使用 `kami-default`。
-12. 最后交给 Renderer。
+- 有稳定 `id`；
+- 记录直接支撑它的 `claimIds`；
+- 仅在实际使用指标时记录对应 `metricIds`；
+- 使用符合 Ownership 的动词；
+- 遵守 `resume-writing-policy.md`。
 
-## 字段口径
-
-版式对字段写法有硬性要求，生成时必须遵守：
-
-- `header.educationInline`：教育信息**精确到月份**，`-` 两侧带空格 ——
-  `华东理工大学 · 软件工程 · 2021.9 – 2025.6`。Renderer 会把最后一个年份段拆到第二行：
-  第 1 行「大学 · 专业」配第 1 个联系方式，第 2 行「在校时间」配第 2 个联系方式。
-- `entry.time`：工作 / 项目 / 开源条目的时间**保留月份**（如 `2024.06 - 2024.09`），
-  显示在标题行右侧。
-- `entry.title` + `entry.meta`：条目标题行依次为「左：公司 / 项目名；中：岗位 · 地点 /
-  访问链接（居中）；右：时间」。中间列全部条目共享同一条居中基线（时间列固定宽度）。
-- `entry.meta`：工作条目写任职岗位与地点（`后端开发实习生 / 上海`）；开源条目写社区名。
-- `entry.link`：项目地址，填**完整 URL**。Renderer 在中格显示「站点/末段」短文本
-  （`github.com/xxx/yyy` → `github/yyy`），与 meta 并存时用「·」分隔；不要把网址塞进 `meta`。
-- `entry.tags`：技术栈标签**不渲染**（简历上不出现技术栈清单），可留在数据里备查。
-- `subBlocks[].title`：分组标题渲染为加粗的 `｜标题`（竖线与文字齐平）；
-  工作经历与项目经历的描述区域**不画任何分组线/下划线**，层次只靠字重、
-  主题色和组间留白表达。
-- Resume View 与最终简历都**必须省略独立个人简介 / summary**；页头后直接进入专业技能，不生成同义的引言段落。
-- 描述中的**数据类文字**（指标、百分比、耗时等）用 `**…**` 标记高亮。
-
-## 渲染与分页
-
-Resume Generation 只决定**内容槽位**（上面的 `sections / entries / bullets`），
-不管版式怎么排——那是 Rendering 的职责。Renderer 会把这套槽位映射到上游 Kami 的
-DOM 类名（`.project / .proj-row / .skill-row / .edu-row`…），套用 Kami 的样式表，
-使成品样式与 Kami 一致。映射表见 `../renderers/kami/README.md`。
-
-分页不做固定切分：内容在 A4 页面盒内自然流动，单个经历条目由 CSS 保证不被拆断。
-页数由内容量决定，不强制 2 页。内容过多时**回到 Resume Strategy 重新取舍**，
-不要靠改版式参数或压缩字号硬塞。
-
-**字体**：模板的正文字体是仓耳今楷（`TsangerJinKai02`），仓库里不带字体文件，
-默认从 CDN 取。若用户要**离线出稿**、或打印出的 PDF 里**搜不到简历上的字**
-（回退到系统宋体会让汉字落到康熙部首码位，ATS 关键词匹配失败），
-让用户执行一次 `../scripts/ensure-fonts.sh` 把字体装到本机即可。
-不要为了绕开它去改 `kami-family.css`。
-
-## Bullet 生成原则
-
-生成正式 bullet 时必须读取 `policies/resume-writing-policy.md`。
-
-默认目标结构：
+默认信息结构：
 
 ```text
 Action / Ownership
@@ -129,16 +83,126 @@ Action / Ownership
 + Result / Metric
 ```
 
-不要求机械包含所有字段，但正式 bullet 至少应有“动作 + 对象 + 具体技术机制”，并优先补充问题背景与结果。
+不要求机械包含全部字段，但至少要有“动作 + 对象 + 具体技术机制”。
 
-禁止把“负责 XX 相关能力建设”“参与 XX 项目开发”这类低信息密度句子作为最终 bullet。
+优先形成因果链，而不是关键词列表。
 
-写作风格参考 `examples/resume-bullet-patterns.md`，只能学习信息组织方式，不得迁移用户未验证的事实。
+### Step 3：去重与压缩
+
+检查：
+
+- 多条 Bullet 是否重复证明同一个能力；
+- 同一技术词是否无意义重复；
+- 项目介绍是否混进个人贡献；
+- 是否存在空泛职责句；
+- 是否为了塞更多内容而牺牲事实完整性。
+
+内容过多时返回 Resume Strategy 减少低价值 Claim / Bullet，不通过 Renderer 压缩字号解决。
+
+### Step 4：追溯检查
+
+每条 Bullet 逐段检查：
+
+```text
+Bullet
+→ claimIds
+→ Claim
+→ factIds
+→ Fact / Evidence
+```
+
+包含数字时额外检查：
+
+```text
+Bullet.metricIds
+→ Metric
+→ factIds
+→ Fact
+```
+
+一句话里无法追溯的技术动作、Ownership 或指标必须删除、降级或回到 Mining 验证。
+
+## Resume View 输出
+
+输出必须符合 `../schemas/resume-view.schema.json`。
+
+### Header
+
+`header` 只承载页头事实，例如：
+
+- 姓名
+- Target Role
+- `educationInline`
+- 联系方式
+- 可选 `avatar`
+
+**不生成 standalone summary。** 页头后直接进入 Skills / Sections。
+
+用户没有提供头像时，`header.avatar` 留空即可；头像的交互选择属于 Renderer。
+
+### Skills
+
+Skills 应围绕目标岗位组织能力方向，不把项目 Bullet 原样复制成技能描述，也不新增 Career Profile 中不存在的项目事实。
+
+### Sections / Entries
+
+`sections` 承载工作、项目、实习、开源、教育等。
+
+Entry 可包含：
+
+- `summaryBullets`
+- `bullets`
+- `subBlocks`
+- `tags`
+
+`summaryBullets / bullets / subBlocks[].bullets` 使用结构化 Resume Bullet：
+
+```text
+{ id, text, claimIds, metricIds }
+```
+
+Renderer 只展示 `text`，追溯信息保留在 Resume View。
+
+## 字段口径
+
+这些属于 **Resume View 与 Renderer 的接口契约**；如 Renderer README 后续修改，以 `../renderers/kami/README.md` 为准，本 Workflow 不复制视觉实现。
+
+- `header.educationInline`：教育信息保留到月份，例如 `华东理工大学 · 软件工程 · 2021.9 – 2025.6`。
+- `entry.time`：工作 / 项目 / 开源条目保留月份。
+- `entry.meta`：职位、地点、社区等补充信息；不要把完整 URL 塞进 meta。
+- `entry.link`：项目地址使用完整 URL。
+- `entry.tags`：允许作为数据保留；是否渲染由 Renderer 决定。
+- `subBlocks[].title`：表达条目内部的小分组。
+- 数据类文字、重要技术词可用 `**…**` 标记强调，但不要整句高亮。
+- Resume View 和最终简历都省略独立个人简介 / summary。
+
+## Renderer Handoff
+
+Resume Generation 完成 Resume View 后结束内容职责，并交给 Renderer。
+
+```text
+Resume View
+→ renderOptions
+→ Renderer / build script
+→ HTML / PDF
+```
+
+Renderer 细节统一读取：
+
+- `../renderers/kami/README.md`
+- `../schemas/render-options.schema.json`
+- 相关 `scripts/` / `templates/`
+
+默认 Renderer 为 `kami`，默认主题 ID 为 `kami-default`；当前模板文件映射、主题数量、头像交互、字体加载和打印方式均只在 Renderer / templates 文档维护。
+
+Generation 不重复维护这些实现细节，避免出现 `kami-base` / `kami-default`、主题数量或字体策略多处漂移。
 
 ## 三层职责
 
-- **Resume Strategy：写什么。**
-- **Resume Generation：怎么写。**
-- **Rendering：长什么样。**
+```text
+Resume Strategy  → 写什么
+Resume Generation → 怎么写成 Resume View
+Renderer           → 长什么样、怎么构建
+```
 
-三者不得混合。
+三层不得相互越权。
