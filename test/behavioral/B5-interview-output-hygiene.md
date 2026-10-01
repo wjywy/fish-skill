@@ -4,15 +4,16 @@
 
 ## Objective
 
-Verify the delivered Markdown is **revision-ready, DEEP_STUDY, naturally structured, and free of internal execution metadata**.
+Verify the delivered Markdown is **revision-ready, DEEP_STUDY, naturally structured, locally grounded, and free of internal execution metadata**.
 
-The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Coverage, queues, `overview / principleDetail` and scheduler state. The user-facing document should only contain useful interview material.
+The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Coverage, queues, `overview / principleDetail`, Explanation Backbone, Explanation Shape and scheduler state. The user-facing document should only contain useful interview material.
 
 ## Source of truth
 
 - `workflows/interview-knowledge.md §用户可见 Markdown 输出`
 - `workflows/interview-knowledge.md §默认禁止输出的内部信息`
-- `policies/interview-depth-policy.md` for DEEP_STUDY, Presentation Planning and CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION boundaries
+- `policies/interview-depth-policy.md` for DEEP_STUDY, Backbone, Deep Study Boundary and CURRENT / PRINCIPLE / IMPROVEMENT / EXECUTION boundaries
+- `policies/answer-presentation-policy.md` for Explanation Shape, Natural Rendering and Citation Locality
 - `SKILL.md` only for global invariants
 
 ## Input
@@ -26,9 +27,12 @@ The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Cov
 - `#` = core theme, never an internal Claim number.
 - `##` = interview question.
 - Every generated question is immediately followed by its complete DEEP_STUDY answer.
-- The answer begins by directly addressing the question, then uses the most suitable structure for that question: prose, steps, comparison table, timeline, state flow, code or diagram.
+- The answer begins by directly addressing the question, then uses the most suitable Explanation Shape: prose, causal chain, sequence, comparison matrix, timeline, state transition, component flow, evidence chain or decision frame.
+- Question Dimension does not mechanically decide the visible Markdown structure.
+- Explanation Backbone may remain implicit; it is not forced into a visible `A != B` / `A → B → C` pattern.
 - Fixed visible headings such as `直接回答 / 展开说明` are not required and should not be mechanically repeated.
 - Project facts, general principles, hypothetical improvements and current execution results are distinguished inside the relevant answer, not exposed as debug labels.
+- When the environment provides citations/provenance, factual project/execution claims keep that evidence adjacent instead of defaulting to a detached evidence appendix.
 - No scheduler commentary such as “next node”, “return to sibling”, “Expansion Queue” appears in the document.
 
 ## Anti-patterns — internal metadata must not leak
@@ -47,6 +51,8 @@ The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Cov
 | Sibling Transition Gate | scheduler state |
 | `decisionReason` | internal decision trace |
 | `overview / principleDetail` | internal answer storage fields |
+| Explanation Backbone / Explanation Shape labels | internal planning fields |
+| `NECESSARY / INTERESTING` | transient drafting decision |
 | generation-mode or document-status notes | internal state |
 | “建议补充验证” style debug gap list | internal to-do |
 
@@ -54,12 +60,13 @@ The internal system may use Claim IDs, Evidence, Grounding, Knowledge Nodes, Cov
 
 | ID | Criterion | Weight |
 | --- | --- | ---: |
-| B5-R1 | Zero internal execution metadata exposed | 3 |
+| B5-R1 | Zero internal execution/planning metadata exposed | 3 |
 | B5-R2 | Level-1 heading is a human-readable theme, not a Claim number | 2 |
 | B5-R3 | Every question and its DEEP_STUDY answer are adjacent and revision-ready | 3 |
-| B5-R4 | Presentation matches question shape rather than a fixed two-part template | 3 |
+| B5-R4 | Presentation uses a suitable Explanation Shape without fixed-template coupling | 3 |
 | B5-R5 | Project/current vs principle/improvement/execution boundaries are expressed naturally | 2 |
-| B5-R6 | No queue/scheduler transition commentary leaks into prose | 2 |
+| B5-R6 | Factual evidence/citations are local to the claims they support when available | 2 |
+| B5-R7 | No queue/scheduler transition commentary leaks into prose | 2 |
 
 ## Minimal passing shape
 
@@ -96,10 +103,12 @@ The visible document should **not** contain prose such as:
 projectGrounding=PARTIAL。
 overview: ...
 principleDetail: ...
+Explanation Shape: TIMELINE
+NECESSARY: unique constraint
 ```
 
 If the project does not prove a specific implementation, write it naturally in the answer instead of exposing metadata.
 
 ## What this case proves
 
-The skill can keep a rich internal knowledge graph and structured answer storage while delivering a clean deep-study document whose visible structure follows the actual knowledge shape.
+The skill can keep a rich internal knowledge graph and planning model while delivering a clean deep-study document whose visible structure follows the actual knowledge relationship, not internal taxonomies or fixed answer templates.
