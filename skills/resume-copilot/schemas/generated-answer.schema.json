@@ -34,7 +34,7 @@
     "principleDetail": {
       "type": "string",
       "minLength": 1,
-      "description": "内部 completeness slot：保存完整机制、Why Layer、walkthrough、必要抽象、失败边界与取舍。最终展示由 Presentation Planning 重组，不直接映射为固定栏目。"
+      "description": "内部 completeness slot：保存当前问题所必需的机制、Why Layer、walkthrough、必要抽象、失败边界与取舍。最终展示由 Answer Presentation Policy 重组，不直接映射为固定栏目。"
     },
     "projectAside": {
       "type": ["string", "null"],
@@ -42,5 +42,5 @@
     }
   },
   "additionalProperties": false,
-  "description": "Generated Reference Answer 的内部知识存储契约。overview / principleDetail 用于 completeness，不定义用户可见 Markdown 结构；所有已物化 Question 默认生成 DEEP_STUDY 级答案。"
+  "description": "Generated Reference Answer 的内部知识存储契约。overview / principleDetail 用于 completeness，不定义用户可见 Markdown 结构；Explanation Backbone、Necessary/Interesting 与 Explanation Shape 均为运行时规划，不新增持久化字段。"
 }
