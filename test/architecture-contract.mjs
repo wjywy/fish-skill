@@ -38,6 +38,7 @@ const generation = read('skills/resume-copilot/workflows/resume-generation.md');
 const evidence = read('skills/resume-copilot/policies/evidence-policy.md');
 const expansion = read('skills/resume-copilot/policies/knowledge-expansion-policy.md');
 const depth = read('skills/resume-copilot/policies/interview-depth-policy.md');
+const presentation = read('skills/resume-copilot/policies/answer-presentation-policy.md');
 const answerExamples = read('skills/resume-copilot/examples/interview-answer-examples.md');
 const answerSchema = json('skills/resume-copilot/schemas/generated-answer.schema.json');
 const nodeSchema = json('skills/resume-copilot/schemas/interview-knowledge-node.schema.json');
@@ -71,19 +72,45 @@ check('interview knowledge is deep-study by default', () => {
   assert(!skill.includes('默认面试预设只展示问题'), 'question-only default reintroduced in SKILL');
 });
 
-check('answer depth policy owns answer completeness and presentation planning', () => {
+check('answer depth policy owns depth but not presentation', () => {
   assert(depth.includes('Answer Completeness Gate'), 'answer completeness gate missing');
+  assert(depth.includes('Explanation Backbone First'), 'explanation backbone missing');
+  assert(depth.includes('Necessary-for-Conclusion Test'), 'deep-study upper-bound test missing');
+  assert(depth.includes('Necessary vs Interesting 是瞬时决策'), 'draft-time necessary/interesting boundary missing');
   assert(depth.includes('Why Layer'), 'Why Layer missing');
   assert(depth.includes('Knowledge Abstraction'), 'knowledge abstraction missing');
   assert(depth.includes('No Terminology-as-Explanation'), 'terminology-as-explanation guard missing');
-  assert(depth.includes('# 二、Presentation Planning'), 'presentation planning missing');
-  assert(depth.includes('Question Shape Classification'), 'question classification missing');
+  assert(!depth.includes('# 二、Presentation Planning'), 'presentation planning leaked back into depth policy');
+  assert(depth.includes('./answer-presentation-policy.md'), 'depth policy must delegate visible rendering');
+});
+
+check('answer presentation policy is the visible-structure source of truth', () => {
+  assert(presentation.includes('唯一 Source of Truth'), 'presentation policy must declare ownership');
+  assert(presentation.includes('Question Dimension != Explanation Shape'), 'question dimension and explanation shape must be separated');
+  for (const shape of ['PROSE', 'CAUSAL_CHAIN', 'SEQUENCE', 'COMPARISON_MATRIX', 'TIMELINE', 'STATE_TRANSITION', 'COMPONENT_FLOW', 'EVIDENCE_CHAIN', 'DECISION_FRAME']) {
+    assert(presentation.includes(`\`${shape}\``), `presentation shape missing ${shape}`);
+  }
+  assert(presentation.includes('Citation Locality'), 'citation locality rule missing');
+  assert(presentation.includes('Backbone 可以显式展示，也可以只作为内部规划'), 'backbone must not become a forced visible template');
+});
+
+check('workflow does not duplicate explanation-shape mappings', () => {
+  assert(interviewWorkflow.includes('../policies/answer-presentation-policy.md'), 'workflow must load presentation policy');
+  assert(interviewWorkflow.includes('Question Dimension 描述“这一问想考察什么”'), 'workflow must name question-dimension responsibility');
+  assert(interviewWorkflow.includes('Question Dimension 不等于 Markdown Template'), 'workflow must separate question dimension from rendering');
+  assert(!interviewWorkflow.includes('DEFINITION       → 定义 + 边界 + 例子'), 'old presentation mapping duplicated in workflow');
+  assert(!interviewWorkflow.includes('CONCURRENCY      → 时间线 + race + atomic point'), 'old concurrency mapping duplicated in workflow');
+});
+
+check('presentation and expansion branch from the same complete answer', () => {
+  assert(interviewWorkflow.includes('Expansion 与 Presentation 消费同一个 complete Generated Answer'), 'workflow must explicitly decouple expansion and presentation');
+  assert(interviewWorkflow.includes('不得从已经压缩 / 排版后的 Markdown 反推 Candidate Nodes'), 'node extraction must not depend on rendered markdown');
 });
 
 check('visible interview answers are not forced into a two-part template', () => {
-  assert(skill.includes('不得强制套 `直接回答 / 展开说明`'), 'SKILL must reject fixed visible two-part template');
-  assert(interviewWorkflow.includes('不要固定输出 `直接回答 / 展开说明`'), 'workflow must reject fixed visible two-part template');
-  assert(depth.includes('不固定显示 `直接回答 / 展开说明`'), 'depth policy must reject fixed visible two-part template');
+  assert(skill.includes('Question Dimension 不等于 Markdown Template'), 'SKILL must reject question-dimension template coupling');
+  assert(interviewWorkflow.includes('不固定出现“直接回答 / 展开说明”等模板标题'), 'workflow must reject fixed visible two-part template');
+  assert(presentation.includes('不固定“两段式”'), 'presentation policy must reject fixed visible two-part template');
   assert(!answerExamples.includes('外层统一展示 `**直接回答**` 与 `**展开说明**`'), 'examples reintroduced fixed two-part presentation');
 });
 
@@ -102,7 +129,7 @@ check('generated answer storage is presentation-agnostic', () => {
   assert(!('candidateEvaluationComplete' in answerSchema.properties), 'candidateEvaluationComplete reintroduced');
   assert(answerSchema.required.includes('overview') && answerSchema.required.includes('principleDetail'), 'internal completeness slots missing');
   assert(answerSchema.properties.overview.description?.includes('不直接映射'), 'overview still coupled to visible presentation');
-  assert(answerSchema.properties.principleDetail.description?.includes('Presentation Planning'), 'principleDetail must delegate visible rendering');
+  assert(answerSchema.properties.principleDetail.description?.includes('Presentation'), 'principleDetail must delegate visible rendering');
 });
 
 check('interview node uses one decision-reason field', () => {
@@ -111,6 +138,12 @@ check('interview node uses one decision-reason field', () => {
   for (const status of ['UNEXPANDED', 'EXPANDED', 'COVERED', 'MERGED', 'DROPPED']) {
     assert(nodeSchema.properties.status.enum.includes(status), `node status missing ${status}`);
   }
+});
+
+check('necessary vs interesting did not become a node-state taxonomy', () => {
+  const serialized = JSON.stringify(nodeSchema);
+  assert(!serialized.includes('NECESSARY'), 'draft-time NECESSARY leaked into node schema');
+  assert(!serialized.includes('INTERESTING'), 'draft-time INTERESTING leaked into node schema');
 });
 
 check('evidence policy does not duplicate Metric policy', () => {
