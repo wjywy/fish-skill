@@ -12,61 +12,35 @@
     "extractedNodeIds"
   ],
   "properties": {
-    "id": {
-      "type": "string"
-    },
-    "questionId": {
-      "type": "string"
-    },
-    "answerType": {
-      "const": "GENERATED_REFERENCE"
-    },
-    "sourceClaimIds": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "sourceMetricIds": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
+    "id": { "type": "string" },
+    "questionId": { "type": "string" },
+    "answerType": { "const": "GENERATED_REFERENCE" },
+    "sourceClaimIds": { "type": "array", "items": { "type": "string" } },
+    "sourceMetricIds": { "type": "array", "items": { "type": "string" } },
     "extractedNodeIds": {
       "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "该 Answer 已提取出的 Knowledge Node IDs。每个节点是否完成价值判定由 Node.status / coverageStatus 表达；不再额外持久化 candidateEvaluationComplete 布尔值，避免双重状态漂移。"
+      "items": { "type": "string" },
+      "description": "该 Answer 已提取出的 Knowledge Node IDs。每个节点是否完成价值判定由 Node.status / coverageStatus 表达。"
     },
     "groundingStatus": {
-      "enum": [
-        "VERIFIED",
-        "PARTIAL",
-        "INSUFFICIENT",
-        "NOT_APPLICABLE"
-      ],
+      "enum": ["VERIFIED", "PARTIAL", "INSUFFICIENT", "NOT_APPLICABLE"],
       "description": "仅表示答案的项目场景化程度，不表示通用技术答案的正确性或完整性。"
     },
     "overview": {
       "type": "string",
       "minLength": 1,
-      "description": "内部开场内容：用候选人口吻简短、直接地回答问题，说明结论、关键做法和已验证的项目落点；它不限制整题的展开深度。默认问题预设不输出；明确要求附答案时对应“直接回答”。"
+      "description": "内部 completeness slot：保存当前问题的核心结论、关键做法与必要项目落点。该字段不直接映射为用户可见标题。"
     },
     "principleDetail": {
       "type": "string",
       "minLength": 1,
-      "description": "内部机制内容：依问题类型完整展开关键因果关系、Why Layer、具体推演、必要抽象与边界。默认问题预设不输出；明确要求附答案时对应“展开说明”。"
+      "description": "内部 completeness slot：保存完整机制、Why Layer、walkthrough、必要抽象、失败边界与取舍。最终展示由 Presentation Planning 重组，不直接映射为固定栏目。"
     },
     "projectAside": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "内部记录未核实的项目具体实现、动机或效果；用户可见答案仅在相关技术句子中区分现状与假设方案，不单独输出旁白。"
+      "type": ["string", "null"],
+      "description": "内部记录未核实的项目具体实现、动机或效果；用户可见答案仅在相关技术句子中自然区分 CURRENT / PRINCIPLE / IMPROVEMENT，不单独输出旁白。"
     }
   },
   "additionalProperties": false,
-  "description": "Generated Reference Answer 的内容契约。Node Evaluation 是否完成由 extractedNodeIds 指向的 Knowledge Node 状态派生，不重复保存布尔完成标记。"
+  "description": "Generated Reference Answer 的内部知识存储契约。overview / principleDetail 用于 completeness，不定义用户可见 Markdown 结构；所有已物化 Question 默认生成 DEEP_STUDY 级答案。"
 }
