@@ -1,220 +1,108 @@
 # Interview Knowledge Expansion Examples
 
-本文件用于帮助 Coding Agent 判断“什么值得继续追问”，不是参考答案的写作模板。示例不是用户项目的事实来源，不得照搬其中的项目、技术栈或实现。
+本文件只示范 `policies/knowledge-expansion-policy.md` 的 **Node Extraction / Coverage / Value / Scheduling** 行为，不是参考答案写作模板，也不新增规则。
 
-## 示例 1：低代码平台
+下面出现的 `Answer 摘要` 为了说明节点来源会被刻意缩短。**真实 Generated Reference Answer 仍必须先通过 `policies/interview-depth-policy.md` 的 Answer Completeness Gate。**
 
-### Resume Claim
+示例不是用户项目事实来源，不得迁移其中技术栈、实现或结论。
+
+---
+
+## 示例 1：低代码平台——技术词不等于高价值节点
+
+Resume Claim：
 
 ```text
 设计并实现低代码事件驱动机制，将组件事件、触发条件与动作配置统一抽象至 Schema，通过事件解析与运行时执行链路支撑组件间交互。
 ```
 
-### Root Answer 中的候选节点
+Answer 中可能出现：
 
 ```text
 Schema
+JSON
 事件解析
 运行时执行
-JSON
 组件
 ```
 
-### 判定
+### Schema → 高价值
 
-#### Schema → EXPAND
+原因：它直接决定事件与动作如何建模，既依赖 Claim，又能区分“会配 JSON”和“理解低代码运行时”。
 
-- Role Relevance：高
-- Claim Dependency：高
-- Discriminative Power：高
-- Information Gain：高
-
-问题：
+可生成：
 
 ```text
-Schema 在事件驱动系统里具体描述哪些信息？为什么要把事件和动作配置抽象进 Schema？
+Schema 在事件驱动系统里具体描述哪些信息？配置又是如何被运行时解释成真正动作的？
 ```
 
-#### JSON → DROP
+### JSON → 通常 DROPPED
 
-如果 JSON 只是存储 Schema 的格式，则“JSON 是什么”无法显著帮助判断低代码平台能力。
+如果 JSON 只是 Schema 的序列化格式，“JSON 是什么”不会增加对低代码平台能力的判断。
 
-#### 运行时执行 → EXPAND
+### 运行时执行 → 高价值
 
-问题：
+如果当前 Answer 只提到“运行时解析配置”但没有讲执行链，则 Coverage = `PARTIAL`，可以继续追：
 
 ```text
-配置在运行时是如何被解析并转化为真正的组件交互行为的？
+一个组件事件触发后，从 Schema 解析到目标动作执行，中间经历哪些步骤？
 ```
-
-这个问题可以区分“只会配置 Schema”和“理解运行时机制”。
 
 ---
 
-## 示例 2：Agent Workflow
-
-### Resume Claim
-
-```text
-基于 LangGraph 构建 Supervisor + Specialist 的多 Agent Workflow。
-```
-
-Root Answer：
-
-```text
-Supervisor 根据任务状态决定下一步节点，Specialist 的结果写入共享状态，最终由 Supervisor 汇总。
-```
-
-候选：
-
-- Supervisor
-- 任务状态
-- 共享状态
-- 节点
-- 汇总
-
-不要机械问：
-
-```text
-什么是节点？
-什么是状态？
-```
-
-优先问：
-
-```text
-Supervisor 根据什么信息做路由决策？
-
-多个 Specialist 都会修改共享状态时，状态是如何合并的？
-
-为什么这里需要 Supervisor，而不是让多个 Agent 互相直接调用？
-```
-
-原因：这些问题能显著增加对 Multi-Agent 设计能力的判断。
-
----
-
-## 示例 3：前端性能
-
-### Resume Claim
-
-```text
-通过精简 Redux 状态订阅降低 React 页面交互阶段的长任务。
-```
-
-候选：
-
-- Redux
-- mapStateToProps
-- 状态订阅
-- JavaScript
-- 长任务
-
-不要因为 Redux / JavaScript 是前端关键词就自动追基础定义。
-
-优先：
-
-```text
-为什么订阅过大的状态范围会导致无关组件重复计算或渲染？
-
-你是如何证明交互长任务与状态订阅有关，而不是网络或图片加载导致？
-```
-
-这些问题同时具备 Claim Dependency 和高区分度。
-
----
-
-## 示例 4：产品经理
-
-### Resume Claim
-
-```text
-通过 AB 实验验证新的转化路径并推动方案上线。
-```
-
-Root Answer 可能提到：
-
-- 实验组 / 对照组
-- 转化率
-- 显著性
-- 埋点 SDK
-
-如果 Target Role 是产品经理：
-
-高价值：
-
-```text
-为什么选择转化率作为主指标？有没有 guardrail metric？
-
-如果主指标提升但退款率也提高，怎么判断实验是否成功？
-```
-
-低价值：
-
-```text
-埋点 SDK 内部如何批量上报 HTTP 请求？
-```
-
-除非 JD 本身要求数据平台 / 技术产品能力，否则后者通常不会改变产品岗位判断。
-
----
-
-## 示例 5：Answer-first 与待展开队列
+## 示例 2：Outbox——Answer-first，而不是预先列题
 
 Resume Claim：
 
 ```text
-使用 Transactional Outbox 保证长任务事件可靠记录与异步投递。
+使用 Transactional Outbox 保证业务状态与异步事件可靠记录。
 ```
 
-### 第 1 层
-
-问题：
+Root Question：
 
 ```text
 为什么业务状态和 Outbox Event 要在同一个事务里提交？
 ```
 
-回答中出现：
+完整 Answer 通过 Gate 后，可能暴露：
 
 ```text
-本地事务、至少一次投递、重复投递、幂等、JSON
+本地事务
+至少一次投递
+重复投递
+幂等
 ```
 
-价值判断：
+Node Evaluation：
 
-- `重复投递 / 幂等` → `UNEXPANDED`，因为它直接影响可靠性 Claim 的正确性
-- `JSON` → `DROPPED`，因为它只是表示格式，不增加岗位判断信息
+```text
+重复投递 / 幂等 → UNEXPANDED
+本地事务          → 如果本题已完整解释则 COVERED
+JSON              → 若只作为存储格式则 DROPPED
+```
 
-此时不能直接横向跳到“为什么不用 Kafka”。应先消费 `幂等` 这个高价值未展开节点。
-
-### 第 2 层
-
-问题：
+下一题应优先来自 `UNEXPANDED`：
 
 ```text
 Outbox Worker 重复投递时，消费侧如何保证幂等？
 ```
 
-回答中出现：
+这个 Answer 又可能产生：
 
 ```text
-eventId、唯一约束、条件更新、check-then-act 竞态
+eventId
+唯一约束
+条件更新
+check-then-act 竞态
 ```
 
-新节点：
+若“并发消费下的原子去重”仍为 `PARTIAL`：
 
 ```text
-并发消费下的原子去重 → UNEXPANDED
+为什么“先查 eventId 是否存在，再执行业务写入”在两个 Worker 并发时仍可能重复执行？
 ```
 
-于是继续：
-
-```text
-为什么“先查再写”在两个 Worker 并发时仍然可能重复执行？
-```
-
-这体现的是：
+链路是：
 
 ```text
 Answer₀
@@ -229,226 +117,180 @@ Answer₀
 
 ```text
 Claim
-→ 一次性列 10 个相关问题
+→ 一次性列 10 个 Outbox 相关问题
 ```
-
-### Answer Exhaustion Check
-
-只有当当前 Claim 中所有高价值节点都变成：
-
-- `EXPANDED`
-- `MERGED`
-- `DROPPED`
-
-且不再存在 `UNEXPANDED` 节点时，才允许转到其他 sibling 问题或下一个 Claim。
-
 
 ---
 
-## 示例 7：Expansion Queue 必须抢占 Root Queue
+## 示例 3：一个 Answer 可以产生多个 sibling，但一次只执行一个
 
-Resume Claim：
-
-```text
-使用 Transactional Outbox + Worker 实现 Webhook 可靠投递。
-```
-
-初始 Root Queue 可能识别出：
+假设某个 Outbox Answer 同时完整说明了：
 
 ```text
-ROOT_PENDING: 为什么用 Outbox？
-ROOT_PENDING: 为什么不用直接发 HTTP？
-ROOT_PENDING: 如何做 Webhook 签名？
-ROOT_PENDING: 如何处理死信？
+Worker 使用 SKIP LOCKED 领取记录
+投递失败 retry / backoff
+整体语义是 at-least-once
+消费侧需要幂等
 ```
 
-**不要一次性把这四道题全部生成出来。**
-
-先只物化最有价值的 Root Question：
+Node Extraction 可以得到：
 
 ```text
-为什么用 Transactional Outbox？
+sourceAnswerId = a-outbox
+
+├── 幂等 / 原子去重             UNEXPANDED
+├── 多 Worker / SKIP LOCKED     UNEXPANDED
+├── retry / backoff             UNEXPANDED
+└── dead letter                 UNEXPANDED（若 Answer 提到但未解释终局）
 ```
 
-Answer 中出现：
+下一步可以先选择价值最高的“幂等”：
 
 ```text
-FOR UPDATE SKIP LOCKED
-至少一次投递
-重复投递
-幂等
+消费侧如何在并发重试下做原子去重？
 ```
 
-高价值判定后：
+但其他 sibling 必须继续保留。
+
+当幂等深分支耗尽后，调度器重新查看 Expansion Queue，再决定是否进入：
 
 ```text
-Expansion Queue:
-- 幂等处理                UNEXPANDED
-- 多 Worker 并发领取       UNEXPANDED
-
-Root Queue:
-- 为什么不用直接发 HTTP？ ROOT_PENDING
-- 如何做 Webhook 签名？   ROOT_PENDING
-- 如何处理死信？          ROOT_PENDING
+多个 Worker 同时扫描 Outbox 时，SKIP LOCKED 具体避免了什么竞争？
 ```
 
-此时调度顺序必须是：
-
-```text
-幂等处理 / 多 Worker 并发领取
->
-Webhook 签名 / 死信等 Root Question
-```
-
-因此下一题应来自 Expansion Queue，例如：
-
-```text
-多个 Worker 同时扫描 Outbox 时，FOR UPDATE SKIP LOCKED 如何避免同一条记录被重复领取？
-```
-
-这个 Answer 又可能产生：
-
-```text
-事务锁
-Worker crash
-回滚
-饥饿 / starvation
-```
-
-继续完成 Node Extraction 和价值判断。只要仍有 HIGH-VALUE `UNEXPANDED` 节点，Sibling Transition Gate 必须保持 `BLOCKED`。
-
-只有 Expansion Queue 真正清空，才允许回到 Root Queue 继续“Webhook 签名”等横向主题。
-
-这个示例体现：
-
-```text
-Answer-driven vertical expansion
->
-preplanned topic coverage
-```
-
+不能因为“当前只执行一个节点”，就把其余 sibling 丢掉。
 
 ---
 
-## 示例 8：不要在当前分支尚未耗尽时横跳
+## 示例 4：Coverage 防止机械重复追问
+
+当前 Answer 已经说明：
+
+```text
+Worker 崩溃后，数据库行锁会随着事务回滚释放；
+如果应用还维护 processing lease，则需要过期时间来回收僵死 lease。
+```
+
+Candidate：
+
+```text
+Worker crash recovery
+```
+
+如果当前问题只需要解释锁释放与 lease 回收，这个节点已经：
+
+```text
+Coverage = SUFFICIENT
+Status   = COVERED
+```
+
+不要机械再问：
+
+```text
+Worker 崩溃怎么办？
+```
+
+但如果 Target Role 是高可靠后端，新的具体问题仍可能有信息增益：
+
+```text
+lease 需要续期时，如何避免慢 Worker 被误判过期，而新 Worker 又开始重复处理？
+```
+
+这是一个新的、更具体节点，不是重新打开同一个泛化问题。
+
+---
+
+## 示例 5：当前深分支优先于 Root Queue
 
 目标方向：Agent 应用开发 / Agent 平台工程。
 
 当前问题：
 
 ```text
-既然 Specialist 彼此独立，为什么不直接并行跑？
+为什么不让多个 Specialist 无限制并行执行？
 ```
 
-Generated Answer 已经解释：
+完整 Answer 解释了：
 
 ```text
-并行会增加瞬时并发、上游限流压力、取消传播与部分失败处理复杂度；
-可以按依赖图分层并行，并设置每层并发上限、超时和部分结果标识。
+瞬时并发
+上游限流
+部分失败
+取消传播
+依赖分层
 ```
 
-这时 Candidate Nodes 至少包括：
+其中：
 
 ```text
-部分失败如何收敛
-并发上限如何设计
-取消如何跨并行分支传播
-依赖分层如何决定
+部分失败如何收敛        UNEXPANDED
+取消如何传播            UNEXPANDED
+并发上限如何设计        UNEXPANDED
 ```
 
-如果其中某个节点仍具备高 Role Relevance、Claim Dependency 和 Information Gain，应继续当前分支，例如：
+即使 Root Queue 还保留：
 
 ```text
-并行执行时，如果一个 Specialist 失败，其他节点已经成功，Supervisor 应该整体失败还是带部分结果继续？
+评估 checkpoint 与业务 Task 的区别
 ```
 
-此时不应因为 Root Queue 里还有：
+此时也不能横跳 Root Queue。
+
+应先沿当前 Answer 继续，例如：
 
 ```text
-checkpoint 与业务 Task 有什么区别
+并行执行时，一个 Specialist 失败、其他节点已经成功，Supervisor 应整体失败还是带部分结果继续？
 ```
 
-就立刻横跳到 checkpoint。
+只有当前 Claim 下高价值 `UNEXPANDED` 节点都被 `EXPANDED / COVERED / MERGED / DROPPED` 后，才允许回到 Root Queue。
 
-只有当前 Answer 的高价值后代已经：
+---
 
-- `EXPANDED`
-- `COVERED`
-- `MERGED`
-- `DROPPED`
+## 示例 6：岗位边界决定停止位置
 
-且没有值得继续的 `UNEXPANDED` 后代时，才允许回到 Root Queue。
-
-### 已经解释充分的节点不要重复追
-
-如果 Answer 已经完整说明：
+同一个知识链：
 
 ```text
-Worker 崩溃后数据库行锁随事务回滚释放；若应用还维护 processing/lease 状态，则需要超时回收僵死租约。
+Outbox
+→ 幂等
+→ 并发去重
+→ 唯一约束
+→ 事务隔离
+→ PostgreSQL WAL
+→ page layout
 ```
 
-不要仅因为答案出现了 `Worker crash / lease` 就机械再问：
+如果目标岗位是 Agent / 后端平台工程师：
+
+- 幂等、并发去重、唯一约束、事务隔离通常仍有岗位判断价值；
+- WAL 是否继续取决于当前 Claim 与岗位要求；
+- page layout 通常已经进入数据库内核细节，继续追问信息增益很低。
+
+停止不是因为“已经第 N 层”，而是因为继续深入不再改变岗位能力判断。
+
+---
+
+## 反模式汇总
+
+以下行为都不符合 Expansion Policy：
 
 ```text
-Worker 崩溃怎么办？
+1. Claim 一上来就生成 10 个平行问题
+2. Answer 出现一个名词就机械创建 Follow-up
+3. 当前 Answer 已经讲透的节点仍重复追问
+4. 一个 Answer 产生多个高价值 sibling，但只保留最高分那个
+5. Expansion Queue 还有节点，却横跳新的 Root Theme
+6. 因为追到第 5 / 8 层就固定停止
 ```
 
-先判断 Coverage：
+正确目标始终是：
 
 ```text
-Worker crash recovery → SUFFICIENT → COVERED
-```
-
-只有进一步追问能增加新的岗位判断信息，例如租约续期与误回收竞态，才创建更具体的新节点。
-
-
-## 示例 9：一个 Answer 可以保留多个 sibling 问题
-
-假设 Outbox 的 Answer 同时说明：
-
-- Worker 使用 `FOR UPDATE SKIP LOCKED` 领取记录
-- 投递失败会 retry / backoff
-- 语义是 at-least-once
-- 消费侧必须幂等
-
-Node Extraction 不应该只留下“幂等”一个节点，而应该得到：
-
-```text
-sourceAnswerId = a-outbox
-
-├── 幂等 / 原子去重                  UNEXPANDED
-├── 多 Worker / SKIP LOCKED          UNEXPANDED
-└── retry / backoff / dead letter    UNEXPANDED
-```
-
-下一步调度器可以先选择“幂等”继续：
-
-```text
-消费侧怎么保证重复事件不会重复执行？
-```
-
-但此时另外两个 sibling **不能消失**。如果“幂等”分支继续产生 `unique constraint → check-then-act → transaction`，先完成该高价值深分支；当它耗尽后，回到：
-
-```text
-多 Worker / SKIP LOCKED
-retry / backoff / dead letter
-```
-
-继续生成对应问题。
-
-错误行为：
-
-```text
-从 Answer 提取 3 个高价值节点
-→ 只留下最高价值的 1 个
-→ 另外 2 个直接丢失
-```
-
-正确行为：
-
-```text
-从 Answer 提取 3 个高价值节点
-→ 3 个全部保留为 UNEXPANDED
-→ 一次执行 1 个
-→ 当前分支耗尽后返回其余 sibling
+完整 Answer
+→ 提取全部有意义节点
+→ Coverage + Value
+→ 保留所有高价值 sibling
+→ 一次执行一个
+→ 当前分支耗尽后返回 sibling
+→ 直到岗位信息增益耗尽
 ```
